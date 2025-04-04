@@ -1,0 +1,141 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Manage Departments - {{ college_profile.college_name }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Manage Departments - {{ college_profile.college_name }}</h3>
+            </div>
+            <div class="card-body">
+                <!-- Display messages -->
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li class="{{ message.tags }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <!-- Add Department Button -->
+                <div class="mb-4">
+                    {% if degrees %}
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="addDepartmentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Add Department
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="addDepartmentDropdown">
+                                {% for degree in degrees %}
+                                    <li><a class="dropdown-item" href="{% url 'colleges:link_departments' degree.id %}">{{ degree.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p class="text-danger">Please add a degree before adding a department.</p>
+                    {% endif %}
+                    <a href="{% url 'colleges:dashboard' %}" class="btn btn-secondary ms-2">Back to Dashboard</a>
+                </div>
+
+                <!-- Departments Grouped by Degree -->
+                {% if degrees %}
+                    {% for degree in degrees %}
+                        <h5 class="mt-4">{{ degree.name }} Departments</h5>
+                        {% if degree.departments.all %}
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Total Seats</th>
+                                        <th>Fees per Year</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for department in degree.departments.all %}
+                                        <tr>
+                                            <td>{{ department.name }}</td>
+                                            <td>{{ department.total_seats }}</td>
+                                            <td>${{ department.fees_per_year }}</td>
+                                            <td>
+                                                <a href="{% url 'colleges:edit_department' department.degree.id department.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No departments added for {{ degree.name }} yet.</p>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p>No degrees added yet. Please add a degree to start managing departments.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .card-header {
+            background-color: #1a2a6c;
+            color: white;
+            padding: 15px 20px;
+        }
+        .btn-primary, .btn-secondary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover, .btn-secondary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+        .ms-2 {
+            margin-left: 0.5rem;
+        }
+        .dropdown-menu {
+            min-width: 200px;
+        }
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        .messages {
+            margin: 20px 0;
+            padding: 0;
+            list-style: none;
+        }
+        .messages li {
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .messages .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        h5.mt-4 {
+            margin-top: 2rem;
+            border-bottom: 2px solid #1a2a6c;
+            padding-bottom: 5px;
+        }
+    </style>
+{% endblock %}

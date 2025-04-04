@@ -1,0 +1,77 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Student Profile{% endblock %}
+
+{% block content %}
+    <!-- <h1>Student Profile</h1> -->
+
+    {% if student_profile %}
+        <div class="card" style="margin-top: 50px;">
+            <div class="card-header">
+                <h3 class="mb-0">Profile Details</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>First Name:</strong> {{ student_profile.first_name }}</p>
+                <p><strong>Last Name:</strong> {{ student_profile.last_name }}</p>
+                <p><strong>Date of Birth:</strong> {{ student_profile.date_of_birth }}</p>
+                <p><strong>Gender:</strong> {{ student_profile.gender }}</p>
+                <p><strong>Address:</strong> {{ student_profile.address }}</p>
+                <p><strong>Contact Number:</strong> {{ student_profile.contact_number }}</p>
+                <p><strong>Email:</strong> {{ student_profile.email }}</p>
+                <p><strong>Parent Name:</strong> {{ student_profile.parent_name }}</p>
+                <p><strong>Parent Contact:</strong> {{ student_profile.parent_contact }}</p>
+                <p><strong>Created At:</strong> {{ student_profile.created_at }}</p>
+                <p><strong>Updated At:</strong> {{ student_profile.updated_at }}</p>
+                <a href="{% url 'students:student_profile' %}?edit=true" class="btn btn-primary btn-sm">Edit Profile</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Create Your Profile</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                        {{ form.date_of_birth }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+                        {{ form.gender }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+                        {{ form.address }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.contact_number.id_for_label }}" class="form-label">Contact Number</label>
+                        {{ form.contact_number }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.parent_name.id_for_label }}" class="form-label">Parent Name</label>
+                        {{ form.parent_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.parent_contact.id_for_label }}" class="form-label">Parent Contact</label>
+                        {{ form.parent_contact }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

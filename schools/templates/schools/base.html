@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a2a6c, #b21f1f);
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            width: 250px !important;
+            top: 0;
+            left: 0;
+            z-index: 2000;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .sidebar .offcanvas-header {
+            display: none;
+        }
+        .sidebar a {
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .sidebar a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .top-bar {
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        /* Hamburger menu icon */
+        .hamburger .navbar-toggler-icon {
+            background-image: none;
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+        .hamburger .navbar-toggler-icon::before,
+        .hamburger .navbar-toggler-icon::after,
+        .hamburger .navbar-toggler-icon span {
+            content: '';
+            position: absolute;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 2px;
+        }
+        .hamburger .navbar-toggler-icon::before {
+            top: 0;
+        }
+        .hamburger .navbar-toggler-icon span {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .hamburger .navbar-toggler-icon::after {
+            bottom: 0;
+        }
+        /* Notifications in top bar */
+        .notifications-wrapper {
+            position: relative;
+            margin-right: 20px;
+        }
+        .notifications-icon {
+            font-size: 1.5rem;
+            color: #1a2a6c;
+            cursor: pointer;
+            position: relative;
+        }
+        .notifications-icon:hover {
+            color: #b21f1f;
+        }
+        .notifications-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: #b21f1f;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 50%;
+            padding: 2px 6px;
+            line-height: 1;
+        }
+        .notifications-dropdown {
+            min-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+        .notifications-dropdown .dropdown-header {
+            background-color: #1a2a6c;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .notifications-dropdown .dropdown-item {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9rem;
+            color: #333;
+            white-space: normal;
+        }
+        .notifications-dropdown .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .notifications-dropdown .dropdown-item.unread {
+            background-color: #e6f0fa;
+            border-left: 3px solid #1a2a6c;
+        }
+        .notifications-dropdown .dropdown-item.read {
+            background-color: #f0f0f0;
+            border-left: 3px solid #ccc;
+        }
+        .notifications-dropdown .notification-message {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .notifications-dropdown .notification-timestamp {
+            color: #666;
+            font-size: 0.75rem;
+            margin-right: 10px;
+        }
+        .notifications-dropdown .mark-read-btn {
+            background-color: #1a2a6c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .notifications-dropdown .mark-read-btn:hover {
+            background-color: #b21f1f;
+        }
+        .notifications-dropdown .mark-read-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .notifications-dropdown .dropdown-item.empty {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .notifications-dropdown .view-all-link {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .notifications-dropdown .view-all-link a {
+            color: #1a2a6c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .notifications-dropdown .view-all-link a:hover {
+            color: #b21f1f;
+        }
+        /* Other existing styles */
+        .stat-card {
+            border-radius: 10px;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .stat-card h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+        .stat-card p {
+            margin: 5px 0 0;
+            font-size: 1rem;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .table {
+            background-color: white;
+        }
+        .table th {
+            background-color: #1a2a6c;
+            color: white;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .search-form .input-group {
+            max-width: 400px;
+        }
+        .search-form .form-control {
+            border-radius: 50px 0 0 50px;
+            border: 2px solid #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            box-shadow: none;
+            transition: border-color 0.3s ease;
+        }
+        .search-form .form-control:focus {
+            border-color: #b21f1f;
+            outline: none;
+        }
+        .search-form .btn-primary {
+            border-radius: 0 50px 50px 0;
+            background-color: #1a2a6c;
+            border: 2px solid #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .search-form .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .row.stat-cards {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .row.stat-cards > div {
+            display: flex;
+        }
+        .row.stat-cards .stat-card {
+            flex: 1 1 100%;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .action-modal-trigger {
+            display: none;
+            background: none;
+            border: none;
+            padding: 5px;
+            color: #1a2a6c;
+            font-size: 1.2rem;
+        }
+        .action-modal-trigger:hover {
+            color: #b21f1f;
+        }
+        .action-modal .modal-content {
+            border-radius: 10px;
+        }
+        .action-modal .modal-header {
+            background-color: #1a2a6c;
+            color: white;
+            border-bottom: none;
+        }
+        .action-modal .modal-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .action-modal .modal-body a {
+            width: 100%;
+            text-align: center;
+        }
+        .action-modal .modal-footer {
+            border-top: none;
+            justify-content: center;
+        }
+        @media (min-width: 1150px) {
+            .sidebar.offcanvas {
+                display: block !important;
+                transform: none !important;
+                visibility: visible !important;
+            }
+            .hamburger {
+                display: none !important;
+            }
+            .welcome-text {
+                display: inline !important;
+            }
+            .sidebar-header {
+                display: block !important;
+            }
+            .action-buttons {
+                display: flex !important;
+            }
+            .action-modal-trigger {
+                display: none !important;
+            }
+        }
+        @media (max-width: 1149px) {
+            .sidebar {
+                display: none;
+            }
+            .sidebar.offcanvas.show {
+                display: block !important;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .top-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+            .main-content {
+                padding-top: 70px;
+            }
+            .welcome-text {
+                display: none !important;
+            }
+            .hamburger {
+                display: inline-block !important;
+            }
+            .sidebar.offcanvas .offcanvas-header {
+                display: block;
+            }
+            .sidebar-header {
+                display: none !important;
+            }
+            .action-buttons {
+                display: none !important;
+            }
+            .action-modal-trigger {
+                display: block !important;
+            }
+        }
+        .hamburger.btn-primary i {
+            color: white !important;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar (Offcanvas for mobile, fixed for desktop) -->
+    <div class="sidebar offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h4 class="offcanvas-title text-center" id="sidebarMenuLabel">School</h4>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <h4 class="text-center sidebar-header">School</h4>
+            <a href="{% url 'schools:dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{% url 'schools:school_profile' %}"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'schools:class_section_management' %}"><i class="fas fa-chalkboard"></i> Class & Section</a>
+            <a href="{% url 'schools:admissions' %}"><i class="fas fa-user-plus"></i> Admissions</a>
+            <a href="{% url 'schools:applications' %}"><i class="fas fa-list"></i> Applications</a>
+            <a href="{% url 'schools:change_password' %}"><i class="fas fa-key"></i> Change Password</a>
+            <a href="{% url 'core:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-primary hamburger" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="welcome-text">Welcome, {{ user.school_profile.school_name|default:user.username }}</h5>
+            </div>
+            <div class="d-flex align-items-center">
+                <!-- Notifications Icon and Dropdown -->
+                <div class="notifications-wrapper">
+                    <a href="#" class="notifications-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notifications-badge">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu notifications-dropdown">
+                        <li class="dropdown-header">Notifications</li>
+                        {% if unread_notifications_count > 0 %}
+                            <li class="dropdown-item">
+                                <form method="post" action="{% url 'core:mark_all_notifications_read' %}" style="width: 100%;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="mark-read-btn" style="width: 100%;">Mark All as Read</button>
+                                </form>
+                            </li>
+                        {% endif %}
+                        {% if notifications %}
+                            {% for notification in notifications %}
+                                <li class="dropdown-item {% if notification.is_read %}read{% else %}unread{% endif %}">
+                                    <span class="notification-message">{{ notification.message }}</span>
+                                    <span class="notification-timestamp">{{ notification.created_at|date:"d M Y H:i" }}</span>
+                                    {% if not notification.is_read %}
+                                        <form method="post" action="{% url 'core:mark_notification_read' %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="notification_id" value="{{ notification.id }}">
+                                            <button type="submit" class="mark-read-btn">Mark as Read</button>
+                                        </form>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                            <li class="view-all-link">
+                                <a href="{% url 'core:notifications' %}">View All Notifications</a>
+                            </li>
+                        {% else %}
+                            <li class="dropdown-item empty">No notifications</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <!-- Logout Link -->
+                <a href="{% url 'core:logout' %}" class="" style="color: red; text-decoration:none;">Logout</a>
+            </div>
+        </div>
+
+        <!-- Child template content -->
+        {% block content %}
+        {% endblock %}
+
+        <!-- Messages -->
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Debug sidebar visibility
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.querySelector('.sidebar');
+            console.log('Sidebar element:', sidebar);
+            console.log('Sidebar display style:', window.getComputedStyle(sidebar).display);
+            console.log('Sidebar visibility style:', window.getComputedStyle(sidebar).visibility);
+            console.log('Sidebar opacity style:', window.getComputedStyle(sidebar).opacity);
+        });
+
+        // Debug hamburger menu click
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            console.log('Hamburger menu clicked, toggling sidebar');
+        });
+    </script>
+</body>
+</html>

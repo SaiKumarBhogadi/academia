@@ -1,0 +1,159 @@
+<!-- schools/templates/schools/_rating.html -->
+<div class="rating-section">
+    <style>
+        /* Rating Section Styling */
+        .rating-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 2px solid #1a2a6c;
+        }
+        .rating-section h4 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .rating-display {
+            font-size: 1.5rem;
+            color: #1a2a6c;
+            position: relative;
+            display: inline-block;
+        }
+        .rating-display .stars {
+            position: relative;
+            display: inline-block;
+        }
+        .rating-display .fa-star {
+            color: #d3d3d3; /* Gray color for empty stars */
+        }
+        .rating-display .filled {
+            color: #f1c40f; /* Gold color for filled stars */
+        }
+        .rating-display .partial {
+            position: relative;
+            color: #d3d3d3;
+        }
+        .rating-display .partial::before {
+            content: '\f005'; /* Font Awesome star */
+            position: absolute;
+            color: #f1c40f;
+            overflow: hidden;
+            width: var(--fill-width); /* Dynamic width for partial star */
+        }
+        .rating-display .rating-text {
+            margin-left: 10px;
+        }
+        .rating-form-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .rating-form-container .form-group {
+            margin-bottom: 20px;
+        }
+        .rating-form-container .form-label {
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 1rem;
+        }
+        .rating-form-container .form-control {
+            border: 2px solid #1a2a6c;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        .rating-form-container .form-control:focus {
+            border-color: #b21f1f;
+            box-shadow: none;
+        }
+        .rating-form-container .text-danger {
+            font-size: 0.875rem;
+            color: #b21f1f;
+        }
+        .rating-form-container .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .rating-form-container .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .rating-form-container .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .rating-form-container .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+        .no-rating {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+
+    <h4>School Rating</h4>
+
+    {% if show_rating_form %}
+        <!-- Show the form to edit the rating -->
+        <div class="rating-form-container">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="rating">
+                <div class="form-group">
+                    <label for="{{ rating_form.rating.id_for_label }}" class="form-label">{{ rating_form.rating.label }}</label>
+                    {{ rating_form.rating }}
+                    {% if rating_form.rating.errors %}
+                        <div class="text-danger">
+                            {% for error in rating_form.rating.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Save Rating</button>
+                    <a href="{% url 'schools:school_profile' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <!-- Show the current rating -->
+        {% if rating %}
+            <div class="rating-display">
+                <div class="stars">
+                    {% for i in "12345" %}
+                        {% if i|add:'0' <= rating_int %}
+                            <!-- Full star -->
+                            <i class="fa fa-star filled"></i>
+                        {% elif i|add:'0' == rating_int|add:1 and decimal_part > 0 %}
+                            <!-- Partial star -->
+                            <i class="fa fa-star partial" style="--fill-width: {{ fill_width }}%;"></i>
+                        {% else %}
+                            <!-- Empty star -->
+                            <i class="fa fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="rating-text">{{ rating.rating|floatformat:1 }} / 5</span>
+            </div>
+        {% else %}
+            <p class="no-rating">No rating set yet.</p>
+        {% endif %}
+        {% if request.user.is_authenticated and request.user.user_type == 'school' and request.user == school_profile.user %}
+        <a href="{% url 'schools:school_profile' %}?edit_rating=true" class="btn btn-primary mt-3">Edit Rating</a>
+    {% endif %}
+    {% endif %}
+</div>

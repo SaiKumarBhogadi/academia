@@ -1,0 +1,238 @@
+{% extends 'schools/base.html' %}
+
+{% block title %}Class and Section Management{% endblock %}
+
+{% block content %}
+    <style>
+        /* Form Styling */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .form-section h4 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 1rem;
+        }
+        .form-control {
+            border: 2px solid #1a2a6c;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            border-color: #b21f1f;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+        .class-list {
+            margin-top: 20px;
+        }
+        .class-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .section-item {
+            margin-left: 20px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .edit-form {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+
+    <div class="card" style="margin-top: 50px;">
+        <div class="card-header">
+            <h3 class="mb-0">
+                {% if school %}
+                    Manage Classes and Sections for {{ school.school_name }}
+                {% else %}
+                    Manage Classes and Sections
+                {% endif %}
+            </h3>
+        </div>
+        <div class="card-body">
+            <!-- Check if SchoolProfile exists -->
+            {% if not school %}
+                <div class="alert alert-warning" role="alert">
+                    Please set up your school profile to manage classes and sections. 
+                    <a href="{% url 'schools:school_profile' %}" class="alert-link">Set up your profile here</a>.
+                </div>
+            {% endif %}
+
+            <div class="form-container">
+                <!-- Form to Add a Class -->
+                <div class="form-section">
+                    <h4>Add a New Class</h4>
+                    {% if school %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="{{ class_form.grade.id_for_label }}" class="form-label">Grade</label>
+                                {{ class_form.grade }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ class_form.total_sections.id_for_label }}" class="form-label">Total Sections</label>
+                                {{ class_form.total_sections }}
+                            </div>
+                            <button type="submit" name="add_class" class="btn btn-primary">Add Class</button>
+                        </form>
+                    {% else %}
+                        <p>You cannot add classes until your school profile is set up.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Form to Add a Section -->
+                <div class="form-section">
+                    <h4>Add a New Section</h4>
+                    {% if school and classes %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label">Select Class</label>
+                                <select name="class_id" class="form-control" required>
+                                    <option value="">Select a Class</option>
+                                    {% for class in classes %}
+                                        <option value="{{ class.id }}">{{ class.grade }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ section_form.section_name.id_for_label }}" class="form-label">Section Name</label>
+                                {{ section_form.section_name }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ section_form.total_seats.id_for_label }}" class="form-label">Total Seats</label>
+                                {{ section_form.total_seats }}
+                            </div>
+                            <button type="submit" name="add_section" class="btn btn-primary">Add Section</button>
+                        </form>
+                    {% else %}
+                        <p>You cannot add sections until your school profile is set up and at least one class is created.</p>
+                    {% endif %}
+                </div>
+
+                <!-- List of Classes and Sections -->
+               <!-- List of Classes and Sections -->
+<div class="class-list">
+    <h4>Existing Classes and Sections</h4>
+    {% if school %}
+        {% if classes %}
+            {% for class in classes %}
+                <div class="class-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h5>{{ class.grade }} ({{ class.total_sections }} Sections)</h5>
+                        <button class="btn btn-secondary" onclick="toggleEditForm('edit-class-{{ class.id }}')">Edit Class</button>
+                    </div>
+                    <!-- Edit Class Form -->
+                    <div id="edit-class-{{ class.id }}" class="edit-form">
+                        <h5>Edit {{ class.grade }}</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="class_id" value="{{ class.id }}">
+                            <div class="form-group">
+                                <label class="form-label">Grade</label>
+                                <input type="text" name="grade" value="{{ class.grade }}" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Total Sections</label>
+                                <input type="number" name="total_sections" value="{{ class.total_sections }}" class="form-control" min="1" required>
+                            </div>
+                            <button type="submit" name="edit_class" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+
+                    <!-- Sections for this Class -->
+                    {% for section in class.sections.all %}
+                        <div class="section-item">
+                            <p>{{ section.section_name }} - Total Seats: {{ section.total_seats }}, Filled: {{ section.filled_seats_dynamic }}, Available: {{ section.available_seats_dynamic }}</p>
+                            <button class="btn btn-secondary" onclick="toggleEditForm('edit-section-{{ section.id }}')">Edit Section</button>
+                        </div>
+                        <!-- Edit Section Form -->
+                        <div id="edit-section-{{ section.id }}" class="edit-form">
+                            <h5>Edit {{ section.section_name }}</h5>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="section_id" value="{{ section.id }}">
+                                <div class="form-group">
+                                    <label class="form-label">Section Name</label>
+                                    <input type="text" name="section_name" value="{{ section.section_name }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Total Seats</label>
+                                    <input type="number" name="total_seats" value="{{ section.total_seats }}" class="form-control" min="1" required>
+                                </div>
+                                <button type="submit" name="edit_section" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No classes found. Add a class above.</p>
+        {% endif %}
+    {% else %}
+        <p>Classes and sections cannot be displayed until your school profile is set up.</p>
+    {% endif %}
+</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleEditForm(formId) {
+            const form = document.getElementById(formId);
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'students/base.html' %}
+
+{% block title %}{{ degree.name }} - {{ department.name }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">{{ degree.name }} - {{ department.name }} ({{ college.college_name }})</h3>
+            </div>
+            <div class="card-body">
+                <!-- Degree Details -->
+                <h4>Degree Details</h4>
+                <table class="profile-table">
+                    <tr>
+                        <th>Duration</th>
+                        <td>{{ degree.duration }}</td>
+                        <th>Total Seats</th>
+                        <td>{{ degree.total_seats }}</td>
+                    </tr>
+                    <tr>
+                        <th>Fees per Year (INR)</th>
+                        <td>{{ degree.fees_per_year }}</td>
+                        <th>Eligibility Criteria</th>
+                        <td>{{ degree.eligibility_criteria|default:"Not specified" }}</td>
+                    </tr>
+                </table>
+
+                <!-- Courses -->
+                <h4 class="mt-5">Courses</h4>
+                {% if courses %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Name</th>
+                                <th>Semester</th>
+                                <th>Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                                <tr>
+                                    <td>{{ course.course_code }}</td>
+                                    <td>{{ course.name }}</td>
+                                    <td>{{ course.semester }}</td>
+                                    <td>{{ course.credits }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No courses available for this degree.</p>
+                {% endif %}
+
+                <!-- Back Button -->
+                <div class="mt-3">
+                    <a href="{% url 'colleges:college_detail' college.id %}" class="btn btn-secondary">Back to College</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .card-header {
+            background-color: #1a2a6c;
+            color: white;
+            padding: 15px 20px;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .profile-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            margin: 0 auto;
+        }
+        .profile-table th,
+        .profile-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+        .profile-table th {
+            background-color: #1a2a6c;
+            color: white;
+            font-weight: 600;
+        }
+        .profile-table td {
+            color: #333;
+        }
+        @media (min-width: 768px) {
+            .profile-table th:nth-child(1),
+            .profile-table th:nth-child(3) {
+                width: 20%;
+            }
+            .profile-table td:nth-child(2),
+            .profile-table td:nth-child(4) {
+                width: 30%;
+            }
+            .profile-table th:nth-child(3),
+            .profile-table td:nth-child(4) {
+                border-left: 1px solid #ddd;
+            }
+        }
+        @media (max-width: 767px) {
+            .profile-table th,
+            .profile-table td {
+                display: block;
+                width: 100%;
+                text-align: left;
+            }
+            .profile-table th {
+                background-color: #1a2a6c;
+                color: white;
+            }
+            .profile-table td {
+                background-color: #f8f9fa;
+            }
+            .profile-table th:nth-child(3),
+            .profile-table td:nth-child(4) {
+                border-left: none;
+            }
+        }
+    </style>
+{% endblock %}

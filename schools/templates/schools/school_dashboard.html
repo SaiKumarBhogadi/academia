@@ -1,0 +1,363 @@
+{% extends 'schools/base.html' %}
+
+{% block title %}School Dashboard{% endblock %}
+
+{% block content %}
+    <style>
+        /* Base styles */
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-card .card-body {
+            padding: 20px;
+        }
+        .dashboard-card .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a2a6c;
+        }
+        .dashboard-card .card-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .dashboard-card .icon {
+            font-size: 2.5rem;
+            color: #b21f1f;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .recent-activity-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .recent-activity-item:last-child {
+            border-bottom: none;
+        }
+        .recent-activity-item p {
+            font-size: 1rem;
+        }
+        .recent-activity-item small {
+            font-size: 0.85rem;
+        }
+
+        /* Chart container for responsiveness */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #seatChart {
+            min-width: 600px; /* Minimum width to prevent label overlap on mobile */
+            width: 100%;
+            height: 300px !important; /* Fixed height for consistency */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+            .dashboard-card .card-title {
+                font-size: 0.9rem;
+            }
+            .dashboard-card .card-text {
+                font-size: 1.25rem;
+            }
+            .dashboard-card .icon {
+                font-size: 1.75rem;
+            }
+            .dashboard-card .card-body {
+                padding: 10px;
+            }
+            .btn-sm {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            .recent-activity-item p {
+                font-size: 0.9rem;
+            }
+            .recent-activity-item small {
+                font-size: 0.8rem;
+                display: block;
+                float: none !important;
+                margin-top: 5px;
+            }
+            .quick-links .btn {
+                font-size: 0.8rem;
+                padding: 6px;
+            }
+            .chart-container {
+                margin: 0 -10px; /* Extend to edges on mobile */
+            }
+            #seatChart {
+                height: 250px !important; /* Smaller height on mobile */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-card .card-title {
+                font-size: 1rem;
+            }
+            .dashboard-card .card-text {
+                font-size: 1.5rem;
+            }
+            .dashboard-card .icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Include Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- <h1 class="mb-4">School Dashboard</h1> -->
+
+    <!-- Welcome Section -->
+    <!-- <div class="card mb-4" style="margin-top: 50px;">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Welcome, {{ user.username }}!</h3>
+        </div>
+        <div class="card-body">
+            {% if school_profile %}
+                <p>Manage your school, {{ school_profile.school_name }}, with ease. Check your stats, review applications, and more below.</p>
+            {% else %}
+                <p>You haven't set up your school profile yet. Get started by creating your profile!</p>
+                <a href="{% url 'schools:school_profile' %}" class="btn btn-primary">Set Up Profile</a>
+            {% endif %}
+        </div>
+    </div> -->
+
+    {% if school_profile %}
+        <!-- Key Metrics -->
+        <div class="row mb-4" style="margin-top: 50px;">
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users icon mb-3"></i>
+                        <h5 class="card-title">Admitted Students</h5>
+                        <p class="card-text">{{ total_admitted }}</p>
+                        <a href="{% url 'schools:admissions' %}" class="btn btn-primary btn-sm">View Admissions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-alt icon mb-3"></i>
+                        <h5 class="card-title">Pending Applications</h5>
+                        <p class="card-text">{{ pending_applications }}</p>
+                        <a href="{% url 'schools:applications' %}" class="btn btn-primary btn-sm">Review Applications</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-school icon mb-3"></i>
+                        <h5 class="card-title">Total Classes</h5>
+                        <p class="card-text">{{ total_classes }}</p>
+                        <a href="{% url 'schools:class_section_management' %}" class="btn btn-primary btn-sm">Manage Classes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chair icon mb-3"></i>
+                        <h5 class="card-title">Available Seats</h5>
+                        <p class="card-text">{{ available_seats }} / {{ total_seats }}</p>
+                        <a href="{% url 'schools:admissions' %}" class="btn btn-primary btn-sm">View Seat Availability</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seat Availability Chart -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Seat Availability by Class</h3>
+            </div>
+            <div class="card-body chart-container">
+                <canvas id="seatChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Recent Activity</h3>
+            </div>
+            <div class="card-body">
+                {% if recent_applications %}
+                    <div class="recent-activity">
+                        {% for application in recent_applications %}
+                            <div class="recent-activity-item">
+                                <p class="mb-0">
+                                    <strong>{{ application.student.username }}</strong> applied for Class {{ application.school_class.grade }}, Section {{ application.section.section_name }} (Status: {{ application.status }})
+                                    <small class="text-muted float-right">{{ application.admission_date|date:"d M Y" }}</small>
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No recent activity.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Quick Links</h3>
+            </div>
+            <div class="card-body quick-links">
+                <div class="row">
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'schools:school_profile' %}" class="btn btn-primary btn-block">View/Edit Profile</a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'schools:class_section_management' %}" class="btn btn-primary btn-block">Manage Classes</a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'schools:admissions' %}" class="btn btn-primary btn-block">Manage Admissions</a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'schools:applications' %}" class="btn btn-primary btn-block">Review Applications</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Pass chart_data as JSON -->
+    {{ chart_data|json_script:"chart-data" }}
+
+    <!-- Chart.js Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the chart data from the JSON script tag
+            const chartData = JSON.parse(document.getElementById('chart-data').textContent);
+
+            // Log the chart data to the browser console for debugging
+            console.log('Chart Data:', chartData);
+
+            // Check if there is data to display
+            if (chartData.labels.length === 0) {
+                document.getElementById('seatChart').style.display = 'none';
+                const chartContainer = document.getElementById('seatChart').parentElement;
+                chartContainer.innerHTML += '<p class="text-muted">No data available to display the chart. Please add classes and sections.</p>';
+                return;
+            }
+
+            const ctx = document.getElementById('seatChart').getContext('2d');
+            // Enable device pixel ratio to prevent blurriness on high-DPI screens
+            const dpr = window.devicePixelRatio || 1;
+            ctx.canvas.width = ctx.canvas.width * dpr;
+            ctx.canvas.height = ctx.canvas.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Filled Seats',
+                            data: chartData.filled_seats,
+                            backgroundColor: 'rgba(178, 31, 31, 0.6)',
+                            borderColor: 'rgba(178, 31, 31, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Available Seats',
+                            data: chartData.available_seats,
+                            backgroundColor: 'rgba(26, 42, 108, 0.6)',
+                            borderColor: 'rgba(26, 42, 108, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Seats',
+                                font: {
+                                    size: window.innerWidth < 576 ? 14 : 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: window.innerWidth < 576 ? 12 : 14
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Classes',
+                                font: {
+                                    size: window.innerWidth < 576 ? 14 : 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                maxRotation: window.innerWidth < 576 ? 45 : 0,
+                                minRotation: window.innerWidth < 576 ? 45 : 0,
+                                font: {
+                                    size: window.innerWidth < 576 ? 12 : 14
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: window.innerWidth < 576 ? 12 : 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Seat Availability by Class',
+                            font: {
+                                size: window.innerWidth < 576 ? 16 : 18,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

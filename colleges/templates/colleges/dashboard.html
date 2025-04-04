@@ -1,0 +1,48 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}College Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">College Dashboard</h3>
+            </div>
+            <div class="card-body">
+                <h4>Welcome, {{ college_profile.college_name }}!</h4>
+                <p>This is your college dashboard. From here, you can manage your profile, degrees, departments, courses, and admissions.</p>
+                <div class="mt-3 mb-4">
+                    <a href="{% url 'colleges:college_profile' %}" class="btn btn-primary">View Profile</a>
+                    <a href="{% url 'colleges:degree_list' %}" class="btn btn-primary ms-2">Manage Degrees</a>
+                    <a href="{% url 'colleges:department_list' %}" class="btn btn-primary ms-2">Manage Departments</a>
+                    <a href="{% url 'colleges:course_list_all' %}" class="btn btn-primary ms-2">Manage Courses</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .card-header {
+            background-color: #1a2a6c;
+            color: white;
+            padding: 15px 20px;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .ms-2 {
+            margin-left: 0.5rem;
+        }
+    </style>
+{% endblock %}

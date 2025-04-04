@@ -1,0 +1,139 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header h3 {
+            font-size: 1.25rem;
+            color: #1a2a6c;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div class="dashboard-container">
+        <h1>Student Dashboard</h1>
+        <p>Welcome, {{ request.user.username }}!</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">Your Profile</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if request.user.student_profile %}
+                            <p><strong>Name:</strong> {{ request.user.student_profile.first_name }} {{ request.user.student_profile.last_name }}</p>
+                            <p><strong>Email:</strong> {{ request.user.student_profile.email }}</p>
+                            <p><strong>Contact:</strong> {{ request.user.student_profile.contact_number }}</p>
+                            <a href="{% url 'students:student_profile' %}" class="btn btn-primary btn-sm">View Profile</a>
+                        {% else %}
+                            <p>You have not created a profile yet.</p>
+                            <a href="{% url 'students:student_profile' %}" class="btn btn-primary btn-sm">Create Profile</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{% url 'schools:school_list' %}" class="btn btn-primary">Apply for Admission</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Your Applications</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Admission ID</th>
+                                <th>School</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Status</th>
+                                <th>Applied On</th>
+                                <th>Actions</th>  <!-- Added -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                                <tr>
+                                    <td>{{ application.admission_id }}</td>  <!-- Updated to use id since admission_id might not exist -->
+                                    <td>{{ application.school.school_name }}</td>
+                                    <td>{{ application.school_class.grade }}</td>
+                                    <td>{{ application.section.section_name }}</td>
+                                    <td>{{ application.status }}</td>
+                                    <td>{{ application.admission_date|date:"d M Y" }}</td>
+                                    <td>
+                                        {% if application.status == 'Pending' %}
+                                            <form method="post" action="{% url 'students:withdraw_application' application.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to withdraw this application?')">Withdraw</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7">You have not submitted any applications yet.</td>  <!-- Updated colspan -->
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

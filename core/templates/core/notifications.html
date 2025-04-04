@@ -1,0 +1,80 @@
+{% extends base_template %}
+
+{% block title %}All Notifications{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>All Notifications</h2>
+        {% if messages %}
+            <ul class="list-unstyled">
+                {% for message in messages %}
+                    <li class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if notifications %}
+            <div class="card">
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for notification in notifications %}
+                            <li class="list-group-item {% if notification.is_read %}read{% else %}unread{% endif %}" 
+                                style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="notification-message">{{ notification.message }}</span>
+                                <span class="notification-timestamp">{{ notification.created_at|date:"d M Y H:i" }}</span>
+                                {% if not notification.is_read %}
+                                    <form method="post" action="{% url 'core:mark_notification_read' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="notification_id" value="{{ notification.id }}">
+                                        <button type="submit" class="mark-read-btn">Mark as Read</button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <p>No notifications to display.</p>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .list-group-item.unread {
+            background-color: #e6f0fa;
+            border-left: 3px solid #1a2a6c;
+        }
+        .list-group-item.read {
+            background-color: #f0f0f0;
+            border-left: 3px solid #ccc;
+        }
+        .notification-message {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .notification-timestamp {
+            color: #666;
+            font-size: 0.75rem;
+            margin-right: 10px;
+        }
+        .mark-read-btn {
+            background-color: #1a2a6c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .mark-read-btn:hover {
+            background-color: #b21f1f;
+        }
+        .mark-read-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+{% endblock %}

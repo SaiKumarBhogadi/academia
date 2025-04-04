@@ -1,0 +1,42 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Application Submitted{% endblock %}
+
+{% block content %}
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .success-container h1 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+        }
+        .success-container p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+    </style>
+
+    <div class="success-container">
+        <h1>Application Submitted Successfully!</h1>
+        <p>Thank you for applying. Your application has been submitted and is now pending review by the school administration.</p>
+        <p>You will be notified once your application is approved or rejected.</p>
+        <a href="{% url 'schools:school_list' %}" class="btn btn-primary">Submit Another Application</a>
+    </div>
+{% endblock %}

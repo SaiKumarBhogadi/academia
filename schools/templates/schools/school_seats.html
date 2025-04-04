@@ -1,0 +1,308 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Apply to {{ school.school_name }}{% endblock %}
+
+{% block content %}
+    <style>
+        .apply-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .active-applications {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 2px solid #1a2a6c;
+            border-radius: 5px;
+        }
+        .active-applications h3 {
+            color: #1a2a6c;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .active-applications ul {
+            list-style: none;
+            padding: 0;
+        }
+        .active-applications li {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .active-applications a {
+            color: #1a2a6c;
+            text-decoration: underline;
+        }
+        .active-applications a:hover {
+            color: #b21f1f;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .form-section h4 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 1rem;
+        }
+        .form-control {
+            border: 2px solid #1a2a6c;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            border-color: #b21f1f;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+        .error-message {
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .error-message a {
+            color: #1a2a6c;
+            text-decoration: underline;
+        }
+        .error-message a:hover {
+            color: #b21f1f;
+        }
+        .seat-card {
+            cursor: pointer;
+            height: 60px;
+            width: 100%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        .seat-card.bg-success {
+            background-color: #28a745 !important;
+        }
+        .seat-card.bg-danger {
+            background-color: #dc3545 !important;
+            cursor: not-allowed;
+        }
+        .seat-card.selected {
+            border: 3px solid #1a2a6c;
+        }
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div class="card" style="margin-top: 50px;">
+        <div class="card-header">
+            <h3 class="mb-0">Apply to {{ school.school_name }} - Select a Seat</h3>
+        </div>
+        <div class="card-body">
+            <div class="apply-container">
+                <!-- Display messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Display active applications -->
+                {% if active_applications %}
+                    <div class="active-applications">
+                        <h3>Your Active Applications</h3>
+                        <ul>
+                            {% for application in active_applications %}
+                                <li>
+                                    Applied to <strong>{{ application.school.school_name }}</strong> for Class {{ application.school_class.grade }} 
+                                    (Section: {{ application.section.section_name }}) - Status: {{ application.status }}
+                                    <a href="{% url 'students:withdraw_application' application.id %}">Withdraw</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="accordion" id="schoolAccordion">
+                    {% for class in classes %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="classHeading-{{ class.id }}">
+                                <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#classCollapse-{{ class.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="classCollapse-{{ class.id }}">
+                                    Class: {{ class.grade }}
+                                </button>
+                            </h2>
+                            <div id="classCollapse-{{ class.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="classHeading-{{ class.id }}" data-bs-parent="#schoolAccordion">
+                                <div class="accordion-body">
+                                    <div class="accordion" id="sectionAccordion-{{ class.id }}">
+                                        {% for section in class.sections.all %}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="sectionHeading-{{ section.id }}">
+                                                <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sectionCollapse-{{ section.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="sectionCollapse-{{ section.id }}">
+                                                    Section: {{ section.section_name }} (Filled: {{ section.filled_seats_dynamic }} / Available: {{ section.available_seats|default:"0" }} / Total: {{ section.total_seats }})
+                                                </button>
+                                            </h2>
+                                            <div id="classCollapse-{{ section.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="sectionHeading-{{ section.id }}" data-bs-parent="#sectionAccordion-{{ class.id }}">
+                                                <div class="accordion-body">
+                                                    <div class="row">
+                                                        {% for seat in section.seats.all %}
+                                                            <div class="col-3 col-md-2 mb-2">
+                                                                <div class="card text-center seat-card {% if seat.is_filled %}bg-danger text-white{% else %}bg-success text-white{% endif %}" data-seat-id="{{ seat.id }}">
+                                                                    <div class="card-body p-1">
+                                                                        <p class="mb-0">Seat {{ seat.seat_number }}</p>
+                                                                        {% if seat.is_filled %}
+                                                                            <small class="d-block text-truncate" style="max-width: 80px;">Taken</small>
+                                                                        {% else %}
+                                                                            <small>Available</small>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% empty %}
+                                                            <p>No seats available for this section.</p>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% if section.available_seats > 0 %}
+                                                        <form method="post" class="seat-application-form mt-3" data-section-id="{{ section.id }}">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="seat_id" class="selected-seat-id">
+                                                            <div class="form-section">
+                                                                <h4>Your Details</h4>
+                                                                <p><strong>Student:</strong> {{ request.user.username }}</p>
+                                                                {% if application_form.non_field_errors %}
+                                                                    <div class="error-message">
+                                                                        {% for error in application_form.non_field_errors %}
+                                                                            <p>{{ error|safe }}</p>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% endif %}
+                                                                <div class="form-group">
+                                                                    <label for="{{ application_form.parent_name.id_for_label }}-{{ section.id }}" class="form-label">Parent Name</label>
+                                                                    <input type="text" name="parent_name" id="{{ application_form.parent_name.id_for_label }}-{{ section.id }}" class="form-control" value="{{ application_form.parent_name.value|default_if_none:'' }}" required>
+                                                                    {% if application_form.parent_name.errors %}
+                                                                        <div class="error-message">
+                                                                            {% for error in application_form.parent_name.errors %}
+                                                                                <p>{{ error }}</p>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="{{ application_form.contact_number.id_for_label }}-{{ section.id }}" class="form-label">Contact Number</label>
+                                                                    <input type="text" name="contact_number" id="{{ application_form.contact_number.id_for_label }}-{{ section.id }}" class="form-control" value="{{ application_form.contact_number.value|default_if_none:'' }}" required>
+                                                                    {% if application_form.contact_number.errors %}
+                                                                        <div class="error-message">
+                                                                            {% for error in application_form.contact_number.errors %}
+                                                                                <p>{{ error }}</p>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="{{ application_form.email.id_for_label }}-{{ section.id }}" class="form-label">Email</label>
+                                                                    <input type="email" name="email" id="{{ application_form.email.id_for_label }}-{{ section.id }}" class="form-control" value="{{ application_form.email.value|default_if_none:'' }}" required>
+                                                                    {% if application_form.email.errors %}
+                                                                        <div class="error-message">
+                                                                            {% for error in application_form.email.errors %}
+                                                                                <p>{{ error }}</p>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <button type="submit" name="apply_with_seat" class="btn btn-primary" disabled>Submit Application (Select a Seat)</button>
+                                                            </div>
+                                                        </form>
+                                                    {% else %}
+                                                        <p>No available seats in this section.</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                            <p>No sections available for this class.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No classes found for this school.</p>
+                    {% endfor %}
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'schools:school_list' %}" class="btn btn-secondary">Back to School List</a>
+                    <a href="{% url 'schools:apply' %}" class="btn btn-primary">Apply Using Dropdown Method</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.seat-application-form').forEach(form => {
+            const sectionId = form.getAttribute('data-section-id');
+            const seats = form.closest('.accordion-body').querySelectorAll('.seat-card');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const selectedSeatInput = form.querySelector('.selected-seat-id');
+
+            seats.forEach(seat => {
+                seat.addEventListener('click', function() {
+                    if (this.classList.contains('bg-danger')) {
+                        return; // Don't allow selecting a taken seat
+                    }
+
+                    // Deselect all seats in this section
+                    seats.forEach(s => s.classList.remove('selected'));
+                    // Select the clicked seat
+                    this.classList.add('selected');
+                    // Update the hidden input with the selected seat ID
+                    selectedSeatInput.value = this.getAttribute('data-seat-id');
+                    // Enable the submit button
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Application';
+                });
+            });
+
+            // Reset selection if the form is submitted with errors
+            if (selectedSeatInput.value) {
+                const selectedSeat = form.closest('.accordion-body').querySelector(`.seat-card[data-seat-id="${selectedSeatInput.value}"]`);
+                if (selectedSeat && !selectedSeat.classList.contains('bg-danger')) {
+                    selectedSeat.classList.add('selected');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Application';
+                }
+            }
+        });
+    </script>
+{% endblock %}
