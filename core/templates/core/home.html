@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +17,10 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             overflow-x: hidden;
+        }
+        .hero-logo {
+            max-width: 150px; /* Adjust the size */
+            margin-bottom: 20px; /* Spacing below the logo */
         }
         .hero-section {
             position: relative;
@@ -128,6 +133,8 @@
 <body>
     <div class="hero-section">
         <div class="hero-content">
+
+            <img src="{% static 'images/logo1.png' %}" alt="Admission Portal Logo" class="hero-logo">
             <h1>Welcome to the Admission Portal</h1>
             <p>Streamline your school admissions process with ease. Register to apply or login to manage your applications.</p>
             <div class="hero-buttons">

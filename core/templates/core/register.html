@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +20,7 @@
             font-family: 'Poppins', sans-serif;
         }
         .register-container {
-            max-width: 450px;
+            max-width: 500px;
             width: 100%;
             padding: 0 15px;
         }
@@ -45,9 +46,19 @@
         .register-card .card-body {
             padding: 2rem;
         }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .col {
+            flex: 1;
+            min-width: 0;
+            padding: 0 10px;
+        }
         .form-group {
             position: relative;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         .form-group label {
             font-size: 0.9rem;
@@ -126,6 +137,13 @@
             .register-card .card-header h2 {
                 font-size: 1.25rem;
             }
+            .row {
+                flex-direction: column;
+            }
+            .col {
+                flex: 100%;
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -133,35 +151,87 @@
     <div class="register-container">
         <div class="card register-card">
             <div class="card-header">
+                <img src="{% static 'images/logo1.png' %}" alt="Admission Portal Logo" class="hero-logo" height="60px" width="150px">
                 <h2><i class="fas fa-user-plus me-2"></i>Register</h2>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    {% for field in form %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            <div style="position: relative;">
-                                {% if field.name == "username" %}
-                                    <i class="fas fa-user"></i>
-                                {% elif field.name == "password" or field.name == "password1" or field.name == "password2" %}
-                                    <i class="fas fa-lock"></i>
-                                {% elif field.name == "email" %}
-                                    <i class="fas fa-envelope"></i>
-                                {% elif field.name == "user_type" %}
-                                    <i class="fas fa-users"></i>
-                                {% else %}
-                                    <i class="fas fa-info-circle"></i>
-                                {% endif %}
-                                {{ field }}
-                            </div>
-                            {% if field.errors %}
-                                <div class="alert alert-danger mt-2">
-                                    {{ field.errors|join:", " }}
-                                </div>
-                            {% endif %}
+                    <!-- Display form errors at the top -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.username }}
+                                </div>
+                                {% if form.errors.username %}
+                                    <span class="text-danger">{{ form.errors.username.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ form.email }}
+                                </div>
+                                {% if form.errors.email %}
+                                    <span class="text-danger">{{ form.errors.email.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.password }}
+                                </div>
+                                {% if form.errors.password %}
+                                    <span class="text-danger">{{ form.errors.password.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="{{ form.confirm_password.id_for_label }}">{{ form.confirm_password.label }}</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.confirm_password }}
+                                </div>
+                                {% if form.errors.confirm_password %}
+                                    <span class="text-danger">{{ form.errors.confirm_password.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.user_type.id_for_label }}">{{ form.user_type.label }}</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-users"></i>
+                            {{ form.user_type }}
+                        </div>
+                        {% if form.errors.user_type %}
+                            <span class="text-danger">{{ form.errors.user_type.0 }}</span>
+                        {% endif %}
+                    </div>
                     <button type="submit" class="btn btn-primary btn-register">Register</button>
                 </form>
                 {% for message in messages %}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Status Updated - Academia</title>
+</head>
+<body>
+    <h2>Hello {{ recipient_name }},</h2>
+    {% if college_name %}
+        <p>Your application to {{ college_name }} (Section: {{ section_name }}) has been {{ status|lower }}.</p>
+    {% elif school_name %}
+        <p>Your application to {{ school_name }} (Class: {{ class_grade }}, Section: {{ section_name }}) has been {{ status|lower }}.</p>
+    {% else %}
+        <p>Your application to {{ institution_name }} has been {{ status|lower }}.</p>
+    {% endif %}
+    {% if status == 'Approved' and seat_number %}
+        <p>Seat Number: {{ seat_number }} has been assigned to you.</p>
+    {% endif %}
+    <p>Thank you for using Academia!</p>
+    <p>Best,<br>The Academia Team<br><a href="http://academiaadmit.in">academiaadmit.in</a></p>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Delete Department - {{ college_profile.college_name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom styles for the Delete Department page */
+    .delete-department-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px 15px;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 10px 10px 0 0;
+        padding: 15px 20px;
+    }
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .alert {
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+    .btn-danger:hover {
+        background-color: #b02a37;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+    .text-danger {
+        font-size: 0.9rem;
+        font-style: italic;
+    }
+    @media (max-width: 576px) {
+        .delete-department-container {
+            padding: 15px 10px;
+        }
+        .card-header h3 {
+            font-size: 1.3rem;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .btn-group {
+            flex-direction: column;
+            gap: 8px;
+        }
+        .btn {
+            width: 100%;
+            padding: 8px;
+        }
+    }
+</style>
+
+<div class="delete-department-container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>Delete Department: {{ department.name }} - {{ degree.name }}</h3>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <p class="text-muted">Are you sure you want to delete the department "<strong>{{ department.name }}</strong>" for degree "{{ degree.name }}" in cycle {{ selected_cycle.year }}?</p>
+            <p class="text-danger">This action cannot be undone. All associated data (if any) will be deleted.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <a href="{% url 'colleges:department_list' %}?cycle_id={{ selected_cycle.id }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

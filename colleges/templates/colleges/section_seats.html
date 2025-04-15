@@ -1,0 +1,170 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Manage Seats - {{ department.name }}{% endblock %}
+
+{% block content %}
+    <style>
+        .seat-card {
+            cursor: pointer;
+            height: 60px;
+            width: 100%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin: 2px;
+            border-radius: 5px;
+        }
+        .seat-card.bg-success {
+            background-color: #28a745 !important;
+        }
+        .seat-card.bg-danger {
+            background-color: #dc3545 !important;
+        }
+        .seat-card.bg-danger a {
+            color: white;
+            text-decoration: none;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 2px;
+            word-break: break-word;
+            font-size: 0.7rem;
+        }
+        .seat-card.bg-danger a:hover {
+            text-decoration: underline;
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+        .alert {
+            margin-bottom: 20px;
+        }
+        .form-select {
+            width: auto;
+            display: inline-block;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+        .form-select:focus {
+            border-color: #b21f1f;
+            box-shadow: 0 0 5px rgba(178, 31, 31, 0.2);
+            outline: none;
+        }
+        @media (max-width: 768px) {
+            .seat-card { height: 50px; font-size: 0.65rem; }
+            .col { flex: 0 0 25%; max-width: 25%; }
+            .row { margin-left: -2px; margin-right: -2px; }
+            .col { padding-left: 2px; padding-right: 2px; }
+        }
+        @media (max-width: 576px) {
+            .col { flex: 0 0 33.33%; max-width: 33.33%; }
+        }
+        @media (max-width: 400px) {
+            .col { flex: 0 0 50%; max-width: 50%; }
+        }
+    </style>
+
+    <div class="card" style="margin-top: 50px;">
+        <div class="card-header">
+            <h3 class="mb-0">Manage Seats - {{ college_profile.college_name }} - {{ department.name }} ({{ degree.name }})</h3>
+            <form method="get" style="display:inline;">
+                <label for="cycle_id" class="form-label" style="display:none;">Select Cycle:</label>
+                <select name="cycle_id" id="cycle_id" class="form-select" onchange="this.form.submit()">
+                    {% for cycle in active_cycles %}
+                        <option value="{{ cycle.id }}" {% if cycle.id == selected_cycle.id %}selected{% endif %}>
+                            {{ cycle.year }} ({{ cycle.start_date|date:"d M Y" }} - {{ cycle.end_date|date:"d M Y" }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="accordion" id="sectionAccordion">
+                {% for section in sections %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="sectionHeading-{{ section.id }}">
+                            <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sectionCollapse-{{ section.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="sectionCollapse-{{ section.id }}">
+                                Section: {{ section.section_name }} (Filled: {{ section.filled_seats_dynamic }} / Available: {{ section.available_seats|default:"0" }} / Total: {{ section.total_seats }})
+                            </button>
+                        </h2>
+                        <div id="sectionCollapse-{{ section.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="sectionHeading-{{ section.id }}" data-bs-parent="#sectionAccordion">
+                            <div class="accordion-body">
+                                {% if section.seats.all %}
+                                    <div class="row row-cols-4 row-cols-md-6 g-1">
+                                        {% for seat in section.seats.all %}
+                                            <div class="col">
+                                                <div class="card text-center seat-card {% if seat.is_filled %}bg-danger text-white{% else %}bg-success text-white{% endif %}" data-seat-id="{{ seat.id }}">
+                                                    <div class="card-body p-1">
+                                                        <p class="mb-0">Seat {{ seat.seat_number }}</p>
+                                                        {% if seat.is_filled %}
+                                                            {% with found=False %}
+                                                                {% for application in applications %}
+                                                                    {% if application.seat.id == seat.id %}
+                                                                        {% with profile=application.student.student_profile %}
+                                                                            <small>
+                                                                                <a href="{% url 'colleges:college_student_details' college_id=college_profile.id student_id=application.student.id %}">
+                                                                                    {{ profile.first_name|default:application.student.username }} {{ profile.last_name|default:"" }}
+                                                                                </a>
+                                                                            </small>
+                                                                        {% endwith %}
+                                                                        {% with found=True %}{% endwith %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                {% if not found %}
+                                                                    <small>Taken (No Student Found - Seat ID: {{ seat.id }})</small>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        {% else %}
+                                                            <small>Available</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p>No seats available for this section. Seats will be created when you edit the section.</p>
+                                {% endif %}
+                                <a href="{% url 'colleges:edit_section' department.id section.id %}?cycle_id={{ cycle.id }}" class="btn btn-warning mt-3">Edit Section</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No sections available for this department in the selected cycle.</p>
+                {% endfor %}
+            </div>
+
+            <div class="mt-3">
+                <a href="{% url 'colleges:section_list' department_id=department.id %}" class="btn btn-secondary">Back to Sections</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

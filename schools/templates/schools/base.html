@@ -389,15 +389,46 @@
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <h4 class="text-center sidebar-header">School</h4>
-            <a href="{% url 'schools:dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="{% url 'schools:school_profile' %}"><i class="fas fa-user"></i> Profile</a>
-            <a href="{% url 'schools:class_section_management' %}"><i class="fas fa-chalkboard"></i> Class & Section</a>
-            <a href="{% url 'schools:admissions' %}"><i class="fas fa-user-plus"></i> Admissions</a>
-            <a href="{% url 'schools:applications' %}"><i class="fas fa-list"></i> Applications</a>
-            <a href="{% url 'schools:change_password' %}"><i class="fas fa-key"></i> Change Password</a>
-            <a href="{% url 'core:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <h4 class="text-center sidebar-header">Academia</h4>
+        
+            <a href="{% url 'schools:dashboard' %}">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+        
+            <a href="{% url 'schools:school_profile' %}">
+                <i class="fas fa-user-circle me-2"></i> Profile
+            </a>
+        
+            <a href="{% url 'schools:packages' %}">
+                <i class="fas fa-box-open me-2"></i> Packages
+            </a>
+        
+            <a href="{% url 'schools:cycle_list' %}">
+                <i class="fas fa-sync-alt me-2"></i> Manage Cycle
+            </a>
+        
+            <a href="{% url 'schools:class_section_management' %}">
+                <i class="fas fa-chalkboard-teacher me-2"></i> Class & Section
+            </a>
+        
+            <a href="{% url 'schools:admissions' %}">
+                <i class="fas fa-chair me-2"></i> Seat Overview
+            </a>
+            
+        
+            <a href="{% url 'schools:applications' %}">
+                <i class="fas fa-file-alt me-2"></i> Applications
+            </a>
+        
+            <a href="{% url 'schools:change_password' %}">
+                <i class="fas fa-key me-2"></i> Change Password
+            </a>
+        
+            <a href="{% url 'core:logout' %}">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
         </div>
+        
     </div>
 
     <!-- Main Content -->

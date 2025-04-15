@@ -1,6 +1,6 @@
 # colleges/admin.py
 from django.contrib import admin
-from .models import CollegeProfile, Department, Degree, Course
+from .models import CollegeProfile, Department, Degree, Course , Section
 
 @admin.register(CollegeProfile)
 class CollegeProfileAdmin(admin.ModelAdmin):
@@ -20,7 +20,7 @@ class DegreeAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'college', 'degree', 'hod_name', 'faculty_count', 'total_seats', 'fees_per_year')
+    list_display = ('name', 'college', 'degree', 'hod_name', 'faculty_count',  'fees_per_year')
     list_filter = ('college', 'degree')
     search_fields = ('name', 'hod_name')
 
@@ -29,3 +29,5 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('course_code', 'name', 'degree', 'department', 'semester', 'credits')
     list_filter = ('degree', 'department')
     search_fields = ('course_code', 'name')
+
+admin.site.register(Section)

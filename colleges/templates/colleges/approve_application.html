@@ -1,0 +1,9 @@
+{% extends 'colleges/base.html' %}
+{% block content %}
+    <h3>Approve Application</h3>
+    <p>Approve application for {{ application.student.username }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Approve</button>
+    </form>
+{% endblock %}

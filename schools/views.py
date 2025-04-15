@@ -1,8 +1,3 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import SchoolProfile
-
 import logging
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -99,7 +94,6 @@ def school_dashboard(request):
 
 
 
-
 # schools/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -152,19 +146,7 @@ def rating_view(request, school_profile):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import SchoolProfile
-from .forms import SchoolProfileForm
 
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from schools.models import SchoolProfile
-from .forms import SchoolProfileForm
-# from .views import rating_view, gallery_view, testimonial_view
-from core.signals import profile_created, profile_updated  # Import the signals
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -425,102 +407,176 @@ def school_change_password(request):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
-from .forms import SchoolClassForm, ClassSectionForm, AdmissionForm, StudentApplicationForm
 
-from django.http import HttpResponseForbidden
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat
+from django.http import HttpResponseForbidden
+from django.contrib import messages
+from .models import SchoolProfile, AdmissionCycle, SchoolClass, ClassSection, Seat
 from .forms import SchoolClassForm, ClassSectionForm
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def class_section_management(request):
     if request.user.user_type != 'school':
         return HttpResponseForbidden("You are not authorized to access this page.")
     
-    # Try to get the SchoolProfile, but don't raise 404 if it doesn't exist
     try:
         school = SchoolProfile.objects.get(user=request.user)
         classes = SchoolClass.objects.filter(school=school).prefetch_related('sections__seats')
+        cycles = AdmissionCycle.objects.filter(school=school).order_by('-year')
     except SchoolProfile.DoesNotExist:
         school = None
         classes = []
+        cycles = []
 
     # Calculate filled_seats and available_seats dynamically for each section
     for school_class in classes:
         for section in school_class.sections.all():
-            section.filled_seats_dynamic = section.seats.filter(is_filled=True).count()  # Dynamic filled seats
-            section.available_seats_dynamic = section.total_seats - section.filled_seats_dynamic  # Available = Total Seats - Filled Seats
+            section.filled_seats_dynamic = section.seats.filter(is_filled=True).count()
+            section.available_seats_dynamic = section.total_seats - section.filled_seats_dynamic
 
-    class_form = SchoolClassForm(request.POST or None)
+    # Initialize forms
+    class_form = SchoolClassForm(request.POST if 'add_class' in request.POST else None)
+    section_form = ClassSectionForm(request.POST if 'add_section' in request.POST else None)
     edit_class_form = None
-    if request.method == 'POST' and 'add_class' in request.POST:
-        if school is None:
-            return redirect('schools:class_section_management')
-        if class_form.is_valid():
-            school_class = class_form.save(commit=False)
-            school_class.school = school
-            school_class.save()
-            return redirect('schools:class_section_management')
-    elif request.method == 'POST' and 'edit_class' in request.POST:
-        if school is None:
-            return redirect('schools:class_section_management')
-        class_id = request.POST.get('class_id')
-        school_class = get_object_or_404(SchoolClass, id=class_id, school=school)
-        edit_class_form = SchoolClassForm(request.POST, instance=school_class)
-        if edit_class_form.is_valid():
-            edit_class_form.save()
-            return redirect('schools:class_section_management')
-
-    section_form = ClassSectionForm(request.POST or None)
     edit_section_form = None
-    if request.method == 'POST' and 'add_section' in request.POST:
-        if school is None:
-            return redirect('schools:class_section_management')
-        if section_form.is_valid():
+
+    # Handle Form Submissions
+    if request.method == 'POST':
+        if 'add_class' in request.POST:
+            if school is None:
+                messages.error(request, "Please set up your school profile first.")
+                return redirect('schools:class_section_management')
+            if class_form.is_valid():
+                grade = class_form.cleaned_data['grade']
+                cycle_id = request.POST.get('cycle')
+                try:
+                    cycle = AdmissionCycle.objects.get(id=cycle_id, school=school)
+                    if SchoolClass.objects.filter(school=school, grade=grade, cycle=cycle).exists():
+                        class_form.add_error('grade', "This grade already exists for the selected cycle.")
+                    else:
+                        school_class = class_form.save(commit=False)
+                        school_class.school = school
+                        school_class.cycle = cycle
+                        school_class.save()
+                        logger.info(f"Added class {grade} for cycle {cycle.year} and school {school.id}")
+                        messages.success(request, f"Class {grade} added successfully.")
+                        return redirect('schools:class_section_management')
+                except AdmissionCycle.DoesNotExist:
+                    class_form.add_error(None, "Invalid cycle selected.")
+            else:
+                logger.warning(f"Class form invalid: {class_form.errors}")
+
+        elif 'edit_class' in request.POST:
+            if school is None:
+                return redirect('schools:class_section_management')
             class_id = request.POST.get('class_id')
             school_class = get_object_or_404(SchoolClass, id=class_id, school=school)
-            section = section_form.save(commit=False)
-            section.school_class = school_class
-            section.save()
+            edit_class_form = SchoolClassForm(request.POST, instance=school_class)
+            if edit_class_form.is_valid():
+                cycle_id = request.POST.get('cycle')
+                if cycle_id and school_class.cycle_id != int(cycle_id):
+                    try:
+                        school_class.cycle = AdmissionCycle.objects.get(id=cycle_id, school=school)
+                    except AdmissionCycle.DoesNotExist:
+                        edit_class_form.add_error(None, "Invalid cycle selected.")
+                edit_class_form.save()
+                logger.info(f"Edited class {school_class.grade} for school {school.id}")
+                messages.success(request, f"Class {school_class.grade} updated successfully.")
+                return redirect('schools:class_section_management')
 
-            total_seats = section.total_seats
-            for i in range(1, total_seats + 1):
-                seat_number = f"{section.section_name[8:]}{i}"
-                Seat.objects.create(
-                    section=section,
-                    seat_number=seat_number,
-                    is_filled=False
-                )
-            return redirect('schools:class_section_management')
-    elif request.method == 'POST' and 'edit_section' in request.POST:
-        if school is None:
-            return redirect('schools:class_section_management')
-        section_id = request.POST.get('section_id')
-        section = get_object_or_404(ClassSection, id=section_id)
-        old_total_seats = section.total_seats
-        edit_section_form = ClassSectionForm(request.POST, instance=section)
-        if edit_section_form.is_valid():
-            section = edit_section_form.save()
+        elif 'add_section' in request.POST:
+            if school is None:
+                messages.error(request, "Please set up your school profile first.")
+                return redirect('schools:class_section_management')
+            if section_form.is_valid():
+                class_id = request.POST.get('class_id')
+                cycle_id = request.POST.get('cycle')
+                try:
+                    school_class = SchoolClass.objects.get(id=class_id, school=school)
+                    cycle = AdmissionCycle.objects.get(id=cycle_id, school=school)
+                    if school_class.cycle != cycle:
+                        section_form.add_error(None, "The selected class does not belong to the selected cycle.")
+                    else:
+                        section_name = section_form.cleaned_data['section_name']
+                        if ClassSection.objects.filter(school_class=school_class, section_name=section_name, cycle=cycle).exists():
+                            section_form.add_error('section_name', "This section name already exists for the selected class and cycle.")
+                        else:
+                            section = section_form.save(commit=False)
+                            section.school_class = school_class
+                            section.cycle = cycle
+                            section.save()
+                            total_seats = section.total_seats
+                            for i in range(1, total_seats + 1):
+                                seat_number = f"{section.section_name}{i}"
+                                Seat.objects.create(section=section, seat_number=seat_number, is_filled=False)
+                            logger.info(f"Added section {section_name} for class {school_class.grade} and cycle {cycle.year}")
+                            messages.success(request, f"Section {section_name} added successfully.")
+                            return redirect('schools:class_section_management')
+                except SchoolClass.DoesNotExist:
+                    section_form.add_error(None, "Invalid class selected.")
+                except AdmissionCycle.DoesNotExist:
+                    section_form.add_error(None, "Invalid cycle selected.")
+            else:
+                logger.warning(f"Section form invalid: {section_form.errors}")
 
-            new_total_seats = section.total_seats
-            current_seats = section.seats.count()
-            if new_total_seats > current_seats:
-                for i in range(current_seats + 1, new_total_seats + 1):
-                    seat_number = f"{section.section_name[8:]}{i}"
-                    Seat.objects.create(
-                        section=section,
-                        seat_number=seat_number,
-                        is_filled=False
-                    )
-            elif new_total_seats < current_seats:
-                seats_to_remove = section.seats.filter(is_filled=False).order_by('-seat_number')[:current_seats - new_total_seats]
-                for seat in seats_to_remove:
-                    seat.delete()
+        elif 'edit_section' in request.POST:
+            if school is None:
+                return redirect('schools:class_section_management')
+            section_id = request.POST.get('section_id')
+            section = get_object_or_404(ClassSection, id=section_id, school_class__school=school)
+            old_total_seats = section.total_seats
+            edit_section_form = ClassSectionForm(request.POST, instance=section)
+            if edit_section_form.is_valid():
+                cycle_id = request.POST.get('cycle')
+                if cycle_id and section.cycle_id != int(cycle_id):
+                    try:
+                        section.cycle = AdmissionCycle.objects.get(id=cycle_id, school=school)
+                    except AdmissionCycle.DoesNotExist:
+                        edit_section_form.add_error(None, "Invalid cycle selected.")
+                section = edit_section_form.save()
+                new_total_seats = section.total_seats
+                current_seats = section.seats.count()
+                if new_total_seats > current_seats:
+                    for i in range(current_seats + 1, new_total_seats + 1):
+                        seat_number = f"{section.section_name}{i}"
+                        Seat.objects.create(section=section, seat_number=seat_number, is_filled=False)
+                elif new_total_seats < current_seats:
+                    seats_to_remove = section.seats.filter(is_filled=False).order_by('-id')[:current_seats - new_total_seats]
+                    for seat in seats_to_remove:
+                        seat.delete()
+                logger.info(f"Edited section {section.section_name} for class {section.school_class.grade}")
+                messages.success(request, f"Section {section.section_name} updated successfully.")
+                return redirect('schools:class_section_management')
+
+        elif 'delete_section' in request.POST:
+            if school is None:
+                return redirect('schools:class_section_management')
+            section_id = request.POST.get('section_id')
+            section = get_object_or_404(ClassSection, id=section_id, school_class__school=school)
+            section_name = section.section_name
+            section.seats.all().delete()
+            section.delete()
+            logger.info(f"Deleted section {section_name} for school {school.id}")
+            messages.success(request, f"Section {section_name} deleted successfully.")
+            return redirect('schools:class_section_management')
+
+        elif 'delete_class' in request.POST:
+            if school is None:
+                return redirect('schools:class_section_management')
+            class_id = request.POST.get('class_id')
+            school_class = get_object_or_404(SchoolClass, id=class_id, school=school)
+            grade = school_class.grade
+            for section in school_class.sections.all():
+                section.seats.all().delete()
+            school_class.sections.all().delete()
+            school_class.delete()
+            logger.info(f"Deleted class {grade} for school {school.id}")
+            messages.success(request, f"Class {grade} deleted successfully.")
             return redirect('schools:class_section_management')
 
     context = {
@@ -530,27 +586,17 @@ def class_section_management(request):
         'section_form': section_form,
         'edit_class_form': edit_class_form,
         'edit_section_form': edit_section_form,
+        'cycles': cycles,
     }
     return render(request, 'schools/class_section_management.html', context)
 
 
-
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from django.contrib import messages
-from django.db import transaction, IntegrityError
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
-from .forms import AdmissionForm
-
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.db import transaction, IntegrityError
-from schools.models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
+from schools.models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission, AdmissionCycle
 from .forms import AdmissionForm
 
 @login_required
@@ -561,16 +607,22 @@ def admissions(request):
     # Try to get the SchoolProfile, but don't raise 404 if it doesn't exist
     try:
         school = SchoolProfile.objects.get(user=request.user)
-        classes = SchoolClass.objects.filter(school=school).prefetch_related('sections__seats')
+        # Fetch all cycles for the school
+        cycles = AdmissionCycle.objects.filter(school=school).order_by('-year')
+        # Organize classes by cycle without filters
+        cycle_classes = []
+        for cycle in cycles:
+            classes = SchoolClass.objects.filter(school=school, cycle=cycle).prefetch_related('sections__seats')
+            if classes.exists():
+                for school_class in classes:
+                    for section in school_class.sections.all():
+                        section.total_seats_dynamic = section.seats.count()
+                        section.filled_seats_dynamic = section.seats.filter(is_filled=True).count()
+                cycle_classes.append({'cycle': cycle, 'classes': classes})
     except SchoolProfile.DoesNotExist:
         school = None
-        classes = []
-
-    # Calculate total_seats and filled_seats dynamically for each section
-    for school_class in classes:
-        for section in school_class.sections.all():
-            section.total_seats_dynamic = section.seats.count()
-            section.filled_seats_dynamic = section.seats.filter(is_filled=True).count()
+        cycles = []
+        cycle_classes = []
 
     # Fetch pending applications for this school
     pending_applications = Admission.objects.filter(
@@ -646,30 +698,26 @@ def admissions(request):
 
     context = {
         'school': school,
-        'classes': classes,
+        'cycle_classes': cycle_classes,  # Pass cycle-wise data as a list
         'admission_form': admission_form,
-        'pending_applications': pending_applications,  # Add pending applications to context
+        'pending_applications': pending_applications,
     }
     return render(request, 'schools/admissions.html', context)
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
-from core.models import User
 
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.http import HttpResponseForbidden
-from django.db import IntegrityError
 from django.db.models import Q
-from schools.models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
-from core.signals import application_status_updated  # Import the signal
+from .models import SchoolProfile, Admission, SchoolClass, ClassSection, Seat, AdmissionCycle
+from django.db import IntegrityError
+from core.signals import application_status_updated
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def applications(request):
@@ -678,18 +726,20 @@ def applications(request):
     
     try:
         school = SchoolProfile.objects.get(user=request.user)
-        # Get all applications for this school
-        applications = Admission.objects.filter(school=school)
+        # Get all applications for this school with cycle info
+        applications = Admission.objects.filter(school=school).select_related('school_class__cycle')
 
         # Get search parameters
         admission_id = request.GET.get('admission_id', '').strip()
         student_name = request.GET.get('student_name', '').strip()
         class_id = request.GET.get('class_id', '').strip()
         section_id = request.GET.get('section_id', '').strip()
+        cycle_id = request.GET.get('cycle_id', '').strip()
 
         # Apply search filters
         if admission_id:
             applications = applications.filter(admission_id__icontains=admission_id)
+            logger.info(f"Filtered by admission_id: {admission_id}")
         
         if student_name:
             applications = applications.filter(
@@ -697,32 +747,50 @@ def applications(request):
                 Q(student__student_profile__first_name__icontains=student_name) |
                 Q(student__student_profile__last_name__icontains=student_name)
             )
-
+            logger.info(f"Filtered by student_name: {student_name}")
+        
         if class_id:
             applications = applications.filter(school_class__id=class_id)
-
+            logger.info(f"Filtered by class_id: {class_id}")
+        
         if section_id:
             applications = applications.filter(section__id=section_id)
+            logger.info(f"Filtered by section_id: {section_id}")
+        
+        if cycle_id:
+            applications = applications.filter(school_class__cycle__id=cycle_id)
+            logger.info(f"Filtered by cycle_id: {cycle_id}")
 
-        # Split applications into categories after filtering
-        pending_applications = applications.filter(status='Pending')
-        approved_applications = applications.filter(status='Approved')
-        rejected_applications = applications.filter(status='Rejected')
+        # Get all cycles (even empty ones)
+        cycles = AdmissionCycle.objects.filter(school=school).order_by('-year')
+        cycle_applications = {}
+        for cycle in cycles:
+            cycle_apps = applications.filter(school_class__cycle=cycle)
+            if cycle_apps.exists() or not cycle_id:
+                cycle_applications[cycle] = {
+                    'pending': cycle_apps.filter(status='Pending'),
+                    'approved': cycle_apps.filter(status='Approved'),
+                    'rejected': cycle_apps.filter(status='Rejected'),
+                }
 
-        # Get all classes for the Class dropdown
-        classes = SchoolClass.objects.filter(school=school)
+        # Get unique classes and sections based on selected cycle or all if no cycle filter
+        classes = SchoolClass.objects.filter(school=school).distinct()
+        if cycle_id:
+            classes = classes.filter(cycle__id=cycle_id)
+        sections = ClassSection.objects.filter(school_class__school=school).distinct()
+        if cycle_id:
+            sections = sections.filter(school_class__cycle__id=cycle_id)
+        elif class_id:
+            sections = sections.filter(school_class__id=class_id)
+        logger.info(f"Fetched cycles: {cycles.count()}, classes: {classes.count()}, sections: {sections.count()}")
 
-        # Get sections for the selected class (if any)
-        sections = []
-        if class_id:
-            sections = ClassSection.objects.filter(school_class__id=class_id, school_class__school=school)
     except SchoolProfile.DoesNotExist:
         school = None
-        pending_applications = []
-        approved_applications = []
-        rejected_applications = []
+        cycle_applications = {}
+        cycles = []
         classes = []
         sections = []
+        logger.error("SchoolProfile not found for user: %s", request.user.username)
 
     if request.method == 'POST' and 'approve_application' in request.POST:
         if school is None:
@@ -730,8 +798,9 @@ def applications(request):
             return redirect('schools:applications')
         application_id = request.POST.get('application_id')
         seat_id = request.POST.get('seat_id')
-        section_id = request.POST.get('section_id')
+        auto_assign = request.POST.get('auto_assign') == 'true'
         class_id = request.POST.get('class_id')
+        section_id = request.POST.get('section_id')
 
         application = get_object_or_404(Admission, id=application_id, school=school, status='Pending')
         section = get_object_or_404(ClassSection, id=section_id, school_class__id=class_id)
@@ -739,29 +808,42 @@ def applications(request):
 
         if not application.student:
             messages.error(request, "This application has no student assigned.")
+            logger.error(f"No student assigned for application_id: {application_id}")
             return redirect('schools:applications')
 
-        if not seat_id:
-            messages.error(request, "Please select a seat for the student.")
-            return redirect('schools:applications')
+        # Auto assign seat if selected, else use manual selection
+        if auto_assign:
+            available_seats = Seat.objects.filter(section=section, is_filled=False)
+            if available_seats.exists():
+                seat = available_seats.first()
+                logger.info(f"Auto-assigned seat {seat.seat_number} for application_id: {application_id}")
+            else:
+                messages.error(request, "No available seats for auto-assignment.")
+                logger.error(f"No available seats for application_id: {application_id}")
+                return redirect('schools:applications')
+        else:
+            if not seat_id:
+                messages.error(request, "Please select a seat for the student.")
+                logger.warning(f"No seat selected for application_id: {application_id}")
+                return redirect('schools:applications')
+            seat = get_object_or_404(Seat, id=seat_id, section__id=section_id)
 
-        seat = get_object_or_404(Seat, id=seat_id, section__id=section_id)
         if seat.section != section or seat.section.school_class != school_class:
             messages.error(request, "The selected seat does not belong to the selected class or section.")
+            logger.error(f"Seat mismatch for application_id: {application_id}, seat_id: {seat_id}")
             return redirect('schools:applications')
 
         if not seat.is_filled:
             try:
-                # If the seat is different from the original, clear the old seat
                 if application.seat and application.seat != seat:
                     old_seat = application.seat
                     old_seat.is_filled = False
                     old_seat.student = None
                     old_seat.save()
-                    # Update the filled_seats count for the old section
-                    old_section = old_seat.section
-                    old_section.filled_seats = max(0, old_section.filled_seats - 1)
-                    old_section.save()
+                    # old_section = old_seat.section
+                    # old_section.filled_seats = max(0, old_section.filled_seats - 1)
+                    # old_section.save()  # Commented out due to missing field
+                    logger.info(f"Cleared old seat {old_seat.seat_number} for application_id: {application_id}")
 
                 application.seat = seat
                 application.school_class = school_class
@@ -773,22 +855,24 @@ def applications(request):
                 seat.student = application.student
                 seat.save()
 
-                section.filled_seats += 1
-                section.save()
+                # section.filled_seats += 1  # Commented out due to missing field
+                # section.save()  # Commented out due to missing field
 
-                # Trigger the application status updated signal
                 application_status_updated.send(
                     sender=None,
                     student=application.student,
-                    school=request.user,
+                    institution=school,
                     application=application
                 )
 
                 messages.success(request, "Application approved successfully!")
+                logger.info(f"Approved application_id: {application_id}, assigned seat: {seat.seat_number}")
             except IntegrityError:
                 messages.error(request, "The selected seat is already taken by another admission. Please select a different seat.")
+                logger.error(f"IntegrityError for application_id: {application_id}, seat_id: {seat_id}")
         else:
             messages.error(request, "The selected seat is already taken.")
+            logger.error(f"Seat already filled for application_id: {application_id}, seat_id: {seat_id}")
         return redirect('schools:applications')
 
     if request.method == 'POST' and 'reject_application' in request.POST:
@@ -797,43 +881,44 @@ def applications(request):
             return redirect('schools:applications')
         application_id = request.POST.get('application_id')
         application = get_object_or_404(Admission, id=application_id, school=school, status='Pending')
-        seat = application.seat  # Get the associated seat
+        seat = application.seat
 
-        # Update the application status and clear the seat
         application.status = 'Rejected'
-        application.seat = None  # Clear the seat reference
+        application.seat = None
         application.save()
 
-        # Reset the seat
         if seat:
             seat.is_filled = False
             seat.student = None
             seat.save()
-            # Update the filled_seats count for the section
-            section = seat.section
-            section.filled_seats = max(0, section.filled_seats - 1)
-            section.save()
+            # section = seat.section
+            # section.filled_seats = max(0, section.filled_seats - 1)
+            # section.save()  # Commented out due to missing field
+            logger.info(f"Rejected application_id: {application_id}, cleared seat: {seat.seat_number}")
 
-        # Trigger the application status updated signal
         application_status_updated.send(
             sender=None,
             student=application.student,
-            school=request.user,
+            institution=school,
             application=application
         )
 
         messages.success(request, "Application rejected successfully!")
+        logger.info(f"Rejected application_id: {application_id}")
         return redirect('schools:applications')
 
     context = {
         'school': school,
-        'pending_applications': pending_applications,
-        'approved_applications': approved_applications,
-        'rejected_applications': rejected_applications,
+        'cycle_applications': cycle_applications,
+        'cycles': cycles,
         'classes': classes,
         'sections': sections,
+        'cycle_id': cycle_id,
     }
     return render(request, 'schools/applications.html', context)
+
+
+
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden, JsonResponse
@@ -876,141 +961,63 @@ def student_details(request, student_id):
 
 
 
+
+
+
+
+
+
+
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
 from .models import SchoolProfile, SchoolClass, ClassSection
 import logging
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.db import DatabaseError, IntegrityError, connection
-from .models import SchoolProfile, SchoolClass, ClassSection
-import logging
-import traceback
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.db import DatabaseError, IntegrityError, connection
-from .models import SchoolProfile, SchoolClass, ClassSection
-import logging
-import traceback
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.db import DatabaseError, IntegrityError, connection
-from .models import SchoolProfile, SchoolClass, ClassSection
-import logging
-import traceback
-
-# Set up logging
 logger = logging.getLogger(__name__)
 
 @login_required
-def get_sections(request, class_id):
-    logger.debug(f"get_sections called with class_id: {class_id}, user: {request.user.username if request.user.is_authenticated else 'Anonymous'}")
+def get_sections(request):
+    logger.debug(f"get_sections called with class_id: {request.GET.get('class_id')}, school_id: {request.GET.get('school_id')}, cycle_id: {request.GET.get('cycle_id')}")
+    
+    class_id = request.GET.get('class_id')
+    school_id = request.GET.get('school_id')
+    cycle_id = request.GET.get('cycle_id')
+    
+    if not class_id or not school_id or not cycle_id:
+        logger.warning(f"Missing parameters: class_id={class_id}, school_id={school_id}, cycle_id={cycle_id}")
+        return JsonResponse({'error': 'class_id, school_id, and cycle_id are required'}, status=400)
+
     try:
-        # Check if the user is authenticated
-        if not request.user.is_authenticated:
-            logger.error("User is not authenticated")
-            return JsonResponse({'error': 'User is not authenticated'}, status=401)
-
-        # Check if the request is AJAX
-        if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            logger.error("Request is not an AJAX request")
-            return JsonResponse({'error': 'This endpoint only supports AJAX requests'}, status=400)
-
-        # Validate class_id
-        try:
-            class_id = int(class_id)
-        except (ValueError, TypeError):
-            logger.error(f"Invalid class_id: {class_id}")
-            return JsonResponse({'error': 'Invalid class_id: must be an integer'}, status=400)
-
-        # Check database connection
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT 1")
-            logger.debug("Database connection is working")
-        except DatabaseError as e:
-            logger.error(f"Database connection error: {str(e)}", exc_info=True)
-            return JsonResponse({'error': f'Database connection error: {str(e)}'}, status=500)
-
-        # Check user permissions
-        if not request.user.is_active:
-            logger.error(f"User {request.user.username} is not active")
-            return JsonResponse({'error': 'User account is not active'}, status=403)
-
-        # Get the school profile for the current user
-        logger.debug(f"Fetching SchoolProfile for user: {request.user.username}")
-        school = get_object_or_404(SchoolProfile, user=request.user)
-        logger.debug(f"SchoolProfile found: {school}")
-
-        # Ensure the school class belongs to the current school
-        logger.debug(f"Fetching SchoolClass with id: {class_id} for school: {school}")
-        school_class = get_object_or_404(SchoolClass, id=class_id, school=school)
-        logger.debug(f"SchoolClass found: {school_class}")
-
-        # Query sections with prefetching to ensure fresh seat data
-        logger.debug(f"Fetching sections for SchoolClass: {school_class}")
-        try:
-            sections = ClassSection.objects.filter(school_class=school_class).prefetch_related('seats')
-            sections_list = list(sections)  # Force evaluation to catch any query errors
-            logger.debug(f"Sections found: {sections_list}")
-        except Exception as e:
-            logger.error(f"Error fetching sections for SchoolClass {school_class}: {str(e)}", exc_info=True)
-            sections_list = []
-            logger.debug("Falling back to empty sections list")
-
-        # Prepare sections data with dynamic filled_seats and available_seats
-        sections_data = []
-        for section in sections_list:
-            try:
-                # Check if required fields exist
-                if not hasattr(section, 'section_name'):
-                    logger.error(f"Section {section.id} does not have a section_name field")
-                    return JsonResponse({'error': 'Invalid section data: missing section_name field'}, status=500)
-                if not hasattr(section, 'total_seats'):
-                    logger.error(f"Section {section.id} is missing total_seats")
-                    return JsonResponse({'error': 'Invalid section data: missing total_seats'}, status=500)
-
-                # Calculate filled_seats dynamically
-                filled_seats = section.seats.filter(is_filled=True).count()
-                # Use the static total_seats from the model
-                total_seats = section.total_seats
-                # Calculate available_seats as total_seats - filled_seats
-                available_seats = total_seats - filled_seats
-
-                sections_data.append({
-                    'id': section.id,
-                    'section_name': str(section.section_name),
-                    'total_seats': total_seats,
-                    'filled_seats': filled_seats,
-                    'available_seats': available_seats
-                })
-            except Exception as e:
-                logger.error(f"Error processing section {section.id}: {str(e)}", exc_info=True)
-                return JsonResponse({'error': f'Error processing section data: {str(e)}'}, status=500)
-
-        logger.debug(f"Sections data prepared: {sections_data}")
+        class_id = int(class_id)
+        school_id = int(school_id)
+        cycle_id = int(cycle_id)
+        # Verify the school belongs to the user
+        school = SchoolProfile.objects.get(id=school_id, user=request.user)
+        school_class = get_object_or_404(SchoolClass, id=class_id, school_id=school_id, cycle_id=cycle_id)
+        sections = ClassSection.objects.filter(school_class=school_class, cycle_id=cycle_id).prefetch_related('seats')
+        sections_data = [
+            {
+                'id': section.id,
+                'section_name': section.section_name,
+                'available_seats': section.total_seats - section.seats.filter(is_filled=True).count()
+            } for section in sections
+        ]
+        logger.info(f"Found {len(sections_data)} sections for class_id={class_id}, cycle_id={cycle_id}")
         return JsonResponse({'sections': sections_data})
-
     except SchoolProfile.DoesNotExist:
-        logger.error(f"SchoolProfile not found for user: {request.user.username}")
-        return JsonResponse({'error': 'School profile not found'}, status=404)
+        logger.error(f"School not found or unauthorized: school_id={school_id}")
+        return JsonResponse({'error': 'School not found or unauthorized'}, status=403)
     except SchoolClass.DoesNotExist:
-        logger.error(f"SchoolClass with id {class_id} not found for school: {school}")
+        logger.error(f"Class not found: class_id={class_id}, cycle_id={cycle_id}")
         return JsonResponse({'error': 'Class not found'}, status=404)
-    except DatabaseError as e:
-        logger.error(f"Database error in get_sections for class_id {class_id}: {str(e)}", exc_info=True)
-        return JsonResponse({'error': f'Database error: {str(e)}'}, status=500)
-    except IntegrityError as e:
-        logger.error(f"Integrity error in get_sections for class_id {class_id}: {str(e)}", exc_info=True)
-        return JsonResponse({'error': f'Database integrity error: {str(e)}'}, status=500)
+    except ValueError:
+        logger.error(f"Invalid parameters: class_id={class_id}, school_id={school_id}, cycle_id={cycle_id}")
+        return JsonResponse({'error': 'Invalid class_id, school_id, or cycle_id'}, status=400)
     except Exception as e:
-        logger.error(f"Unexpected error in get_sections for class_id {class_id}: {str(e)}\n{traceback.format_exc()}", exc_info=True)
-        return JsonResponse({'error': f'Unexpected error: {str(e)}'}, status=500)
+        logger.error(f"Unexpected error in get_sections: {str(e)}")
+        return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
+    
 
 
 
@@ -1024,66 +1031,83 @@ def get_sections(request, class_id):
 #         return JsonResponse({'error': str(e)}, status=500)
 
 
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
-from .forms import SchoolClassForm, ClassSectionForm, AdmissionForm, StudentApplicationForm
+from django.http import HttpResponseForbidden
+from django.contrib import messages
+from .models import SchoolProfile, AdmissionCycle, SchoolClass, ClassSection, Admission
+from .forms import StudentApplicationForm
 
 @login_required
-def apply_for_admission(request):
+def apply_for_admission(request, school_id):
     if request.user.user_type != 'student':
         return HttpResponseForbidden("You are not authorized to access this page.")
-    schools = SchoolProfile.objects.all().prefetch_related('classes__sections')
+    
+    school = get_object_or_404(SchoolProfile, id=school_id)
+    cycles = AdmissionCycle.objects.filter(school=school, is_active=True).order_by('-year')
 
-    application_form = StudentApplicationForm(request.POST or None)
+    # Check if student has an active application for this school
     active_application = Admission.objects.filter(
         student=request.user,
+        school=school,
         status__in=['Pending', 'Approved']
     ).first()
 
-    if request.method == 'POST' and 'apply' in request.POST:
-        if application_form.is_valid():
-            if active_application:
-                error_message = (
-                    f"You already have an active application for Class {active_application.school_class.grade} "
-                    f"at {active_application.school.school_name} (Status: {active_application.status}). "
-                    "You can only apply to one class at a time. "
-                    f"<a href='/students/application/withdraw/{active_application.id}/'>Withdraw your current application</a> to apply to a different class."
-                )
-                application_form.add_error(None, error_message)
-            else:
-                school_id = request.POST.get('school_id')
-                class_id = request.POST.get('class_id')
-                section_id = request.POST.get('section_id')
-
-                school = get_object_or_404(SchoolProfile, id=school_id)
-                school_class = get_object_or_404(SchoolClass, id=class_id, school=school)
-                section = get_object_or_404(ClassSection, id=section_id, school_class=school_class)
-
-                if section.available_seats() > 0:
-                    application = application_form.save(commit=False)
-                    application.school = school
-                    application.school_class = school_class
-                    application.section = section
-                    application.student = request.user
-                    application.status = 'Pending'
-                    application.save()
-                    return redirect('schools:application_success')
+    initial_data = {}
+    if request.method == 'POST':
+        initial_data['cycle'] = request.POST.get('cycle')
+        initial_data['school_class'] = request.POST.get('school_class')
+        if all(key in request.POST for key in ['parent_name', 'contact_number', 'email']):
+            form = StudentApplicationForm(request.POST, school_id=school_id, initial=initial_data)
+            if form.is_valid():
+                cycle = form.cleaned_data['cycle']
+                if not cycle.is_active:
+                    messages.error(request, "Cannot apply for an inactive cycle.")
+                elif active_application:
+                    messages.error(request, f"You already have an active application at {school.school_name}. Withdraw it to apply again.")
                 else:
-                    application_form.add_error(None, "No seats available in this section.")
+                    school_class = form.cleaned_data['school_class']
+                    section = form.cleaned_data['section']
+
+                    if section.available_seats() > 0:
+                        admission = form.save(commit=False)
+                        admission.school = school
+                        admission.cycle = cycle
+                        admission.school_class = school_class
+                        admission.section = section
+                        admission.student = request.user
+                        admission.status = 'Pending'
+                        admission.save()
+                        application_submitted.send(sender=Admission, student=request.user, institution=school, application=admission)
+                        messages.success(request, "Application submitted successfully! Awaiting school approval.")
+                        return redirect('schools:application_success')
+                    else:
+                        messages.error(request, "No seats available in this section.")
+            else:
+                messages.error(request, "Please correct the errors in the form.")
+                for field, errors in form.errors.items():
+                    print(f"Field: {field}, Errors: {errors}")  # Debug field errors
+        else:
+            # Partial submit (cycle or class change), re-render form
+            form = StudentApplicationForm(school_id=school_id, initial=initial_data)
+    else:
+        form = StudentApplicationForm(school_id=school_id)
 
     context = {
-        'schools': schools,
-        'application_form': application_form,
-        'active_application': active_application,  # Added
+        'school': school,
+        'cycles': cycles,
+        'form': form,
+        'active_application': active_application,
     }
     return render(request, 'schools/apply.html', context)
 
 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
+from schools.models import SchoolProfile, Admission
 
-# New view to list all schools
 @login_required
 def school_list(request):
     if request.user.user_type != 'student':
@@ -1113,6 +1137,12 @@ def school_list(request):
     states = SchoolProfile.objects.values_list('state', flat=True).distinct()
     school_types = SchoolProfile.objects.values_list('school_type', flat=True).distinct()
 
+    # Check which schools the student has applied to
+    applied_schools = set()
+    if request.user.is_authenticated:
+        applied_admissions = Admission.objects.filter(student=request.user, status='Pending').values_list('school_id', flat=True)
+        applied_schools = set(applied_admissions)
+
     context = {
         'schools': schools,
         'districts': districts,
@@ -1122,39 +1152,13 @@ def school_list(request):
         'selected_state': state,
         'selected_school_type': school_type,
         'search_query': search_query,
+        'applied_schools': applied_schools,  # Pass applied schools list
     }
     return render(request, 'schools/school_list.html', context)
 
 
 
 
-
-
-
-from django.http import HttpResponseForbidden
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db import IntegrityError
-from .models import SchoolProfile, SchoolClass, Seat, Admission
-from .forms import StudentApplicationForm
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from django.contrib import messages
-from django.db import IntegrityError
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
-from .forms import StudentApplicationForm
-
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
-from django.db import IntegrityError
-from schools.models import SchoolProfile, SchoolClass, Seat, Admission
-from .forms import StudentApplicationForm
-from core.signals import application_submitted  # Import the signal
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -1267,10 +1271,46 @@ def school_seats(request, school_id):
 def application_success(request):
     return render(request, 'schools/application_success.html')
 
+
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import SchoolProfile, SchoolClass
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
 def get_classes(request):
     school_id = request.GET.get('school_id')
-    classes = SchoolClass.objects.filter(school_id=school_id).values('id', 'grade')
-    return JsonResponse({'classes': list(classes)})
+    cycle_id = request.GET.get('cycle_id')
+    
+    logger.debug(f"get_classes called with school_id={school_id}, cycle_id={cycle_id}")
+    
+    if not school_id or not cycle_id:
+        logger.warning(f"Missing parameters: school_id={school_id}, cycle_id={cycle_id}")
+        return JsonResponse({'error': 'school_id and cycle_id are required'}, status=400)
+    
+    try:
+        school_id = int(school_id)
+        cycle_id = int(cycle_id)
+        # Verify school ownership
+        school = SchoolProfile.objects.get(id=school_id, user=request.user)
+        classes = SchoolClass.objects.filter(school_id=school_id, cycle_id=cycle_id).values('id', 'grade')
+        logger.info(f"Found {classes.count()} classes for school_id={school_id}, cycle_id={cycle_id}: {[cls['grade'] for cls in classes]}")
+        if classes.count() == 0:
+            logger.warning(f"No classes found for school_id={school_id}, cycle_id={cycle_id}")
+        return JsonResponse({'classes': list(classes)})
+    except SchoolProfile.DoesNotExist:
+        logger.error(f"School not found or unauthorized: school_id={school_id}")
+        return JsonResponse({'error': 'School not found or unauthorized'}, status=403)
+    except ValueError:
+        logger.error(f"Invalid parameters: school_id={school_id}, cycle_id={cycle_id}")
+        return JsonResponse({'error': 'Invalid school_id or cycle_id'}, status=400)
+    except Exception as e:
+        logger.error(f"Unexpected error in get_classes: {str(e)}")
+        return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
+
 
 
 
@@ -1382,3 +1422,158 @@ def get_seats(request, section_id):
     except Exception as e:
         logger.error(f"Unexpected error in get_seats for section_id {section_id}: {str(e)}\n{traceback.format_exc()}", exc_info=True)
         return JsonResponse({'error': f'Unexpected error: {str(e)}'}, status=500)
+    
+
+
+
+# schools/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.contrib import messages
+from .models import SchoolProfile, AdmissionCycle
+from .forms import AdmissionCycleForm  # Ensure this form exists
+
+@login_required
+def create_cycle(request):
+    if request.user.user_type != 'school':  # Assuming user_type is in your User model
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    try:
+        school = SchoolProfile.objects.get(user=request.user)
+    except SchoolProfile.DoesNotExist:
+        messages.error(request, "Please set up your school profile first.")
+        return redirect('schools:school_profile')
+
+    if request.method == 'POST':
+        form = AdmissionCycleForm(request.POST, school=school)  # Pass school to form
+        if form.is_valid():
+            cycle = form.save(commit=False)
+            cycle.school = school  # Explicitly set school (redundant but safe)
+            cycle.save()
+            messages.success(request, f"Admission cycle {cycle.year} created successfully!")
+            return redirect('schools:cycle_list')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AdmissionCycleForm(school=school)  # Pass school to form
+
+    context = {
+        'school': school,
+        'form': form,
+    }
+    return render(request, 'schools/create_cycle.html', context)
+
+@login_required
+def edit_cycle(request, cycle_id):
+    if request.user.user_type != 'school':
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    cycle = get_object_or_404(AdmissionCycle, id=cycle_id, school__user=request.user)
+    if request.method == 'POST':
+        form = AdmissionCycleForm(request.POST, instance=cycle, school=cycle.school)  # Pass existing school
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Admission cycle {cycle.year} updated successfully!")
+            return redirect('schools:cycle_list')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AdmissionCycleForm(instance=cycle, school=cycle.school)
+
+    context = {
+        'school': cycle.school,
+        'form': form,
+        'cycle': cycle,
+    }
+    return render(request, 'schools/edit_cycle.html', context)
+
+@login_required
+def cycle_list(request):
+    if request.user.user_type != 'school':
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    try:
+        school = SchoolProfile.objects.get(user=request.user)
+        cycles = AdmissionCycle.objects.filter(school=school).order_by('-year')
+    except SchoolProfile.DoesNotExist:
+        messages.error(request, "Please set up your school profile first.")
+        return redirect('schools:school_profile')
+
+    context = {
+        'school': school,
+        'cycles': cycles,
+    }
+    return render(request, 'schools/cycle_list.html', context)
+
+
+
+from django.shortcuts import render
+from .models import SchoolProfile
+
+def packages(request):
+    # Get institution type if available (for now, assume school; extend for colleges later)
+    institution_type = 'school'  # Default
+    if request.user.is_authenticated and hasattr(request.user, 'school_profile'):
+        try:
+            school_profile = SchoolProfile.objects.get(user=request.user)
+            institution_type = school_profile.school_type.lower() if school_profile.school_type else 'school'
+        except SchoolProfile.DoesNotExist:
+            pass
+
+    context = {
+        'institution_type': institution_type,
+        'digital_marketing_packages': [
+            {
+                'name': 'Basic Package',
+                'price': '₹9,999/month',
+                'features': [
+                    '5 Social Media Posts (Facebook, Instagram)',
+                    '1 Promotional Video',
+                    'Basic SEO for School Website',
+                    'Google My Business Optimization',
+                    'Lead Generation Form Setup',
+                ],
+            },
+            {
+                'name': 'Standard Package',
+                'price': '₹19,999/month',
+                'features': [
+                    '10 Social Media Posts (FB, Insta, LinkedIn)',
+                    '2 Promotional Videos + Reels',
+                    'Advanced SEO & Website Optimization',
+                    'Facebook & Instagram Ads (₹3,000 Ad Budget Included)',
+                    'Google My Business & Reviews Management',
+                    'Lead Generation Campaigns',
+                ],
+            },
+            {
+                'name': 'Premium Package',
+                'price': '₹29,999/month',
+                'features': [
+                    '15 Social Media Posts (FB, Insta, LinkedIn, Twitter)',
+                    '3 Promotional Videos + Reels',
+                    'Full SEO + Blog Writing (2 Blogs/Month)',
+                    'Paid Ad Campaigns on FB, Insta (₹5,000 Ad Budget Included)',
+                    'School Admission Landing Page',
+                    'Google My Business & Reviews Management',
+                ],
+            },
+        ],
+        'academia_package': {
+            'name': 'Academia Admission Package',
+            'price': '₹TBD/month',  # Placeholder, update later
+            'features': [
+                'Online Application Form',
+                'Student Data Management',
+                'Institution Listing & Filtering',
+                '2000 Applications/Month',
+                'Email Notifications',
+                'Institution Data Analytics',
+                'Admin Seat Visualization',
+                'Institution Landing Page',
+                'Payment Gateway Integration',
+            ],
+        },
+    }
+    return render(request, 'schools/packages.html', context)

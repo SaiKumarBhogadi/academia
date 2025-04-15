@@ -1,0 +1,100 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Student Details - {{ student.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Student Details</h2>
+
+    <!-- Check if CollegeProfile exists -->
+    {% if not college %}
+        <div class="alert alert-warning" role="alert">
+            <strong>College Profile Not Set!</strong> Please set up your college profile to view student details.  
+            <a href="{% url 'colleges:college_profile' %}" class="alert-link">Set up your profile here</a>.
+        </div>
+    {% else %}
+        <!-- Profile Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Profile Details</h5>
+            </div>
+            <div class="card-body">
+                {% if student_profile %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Student Name:</strong> {{ student_profile.first_name|default:"Not provided" }} {{ student_profile.last_name|default:"" }}</p>
+                            <p><strong>Email:</strong> {{ student_profile.email|default:"Not provided" }}</p>
+                            <p><strong>Date of Birth:</strong> {{ student_profile.date_of_birth|default:"Not provided" }}</p>
+                            <p><strong>Gender:</strong> {{ student_profile.gender|default:"Not provided" }}</p>
+                            <p><strong>Address:</strong> {{ student_profile.address|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Contact Number:</strong> {{ student_profile.contact_number|default:"Not provided" }}</p>
+                            <p><strong>Parent Name:</strong> {{ student_profile.parent_name|default:"Not provided" }}</p>
+                            <p><strong>Parent Contact:</strong> {{ student_profile.parent_contact|default:"Not provided" }}</p>
+                            <p><strong>Profile Created:</strong> {{ student_profile.created_at|date:"d M Y H:i" }}</p>
+                            <p><strong>Profile Updated:</strong> {{ student_profile.updated_at|date:"d M Y H:i" }}</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Profile not created yet.</p>
+                {% endif %}
+                <p><strong>User Type:</strong> {{ student.user_type }}</p>
+                <p><strong>Approved:</strong> 
+                    <span class="badge {% if student.is_approved %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ student.is_approved|yesno:"Yes,No" }}
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Applications Table -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Applications</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Application ID</th>
+                                <th>Department</th>
+                                <th>Section</th>
+                                <th>Selected Seat</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                                <tr>
+                                    <td>{{ application.id }}</td>
+                                    <td>{{ application.department.name|default:"N/A" }}</td>
+                                    <td>{{ application.section.section_name|default:"Not Assigned" }}</td>
+                                    <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
+                                    <td>
+                                        <span class="badge {% if application.status == 'Approved' %}bg-success{% elif application.status == 'Rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ application.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No applications found for this student.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a href="{% url 'colleges:manage_applications' college_id=college.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Applications
+        </a>
+    </div>
+</div>
+{% endblock %}

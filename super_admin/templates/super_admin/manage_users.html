@@ -228,74 +228,76 @@
         </div>
 
         <!-- Super Admins -->
-        <div class="card">
-            <div class="card-body">
-                <h5>Super Admins</h5>
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Approved</th>
-                                <th>Active</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in super_admins %}
-                                <tr>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.user_type }}</td>
-                                    <td>{{ user.is_approved|yesno:"Yes,No" }}</td>
-                                    <td>{{ user.is_active|yesno:"Yes,No" }}</td>
-                                    <td>
-                                        <!-- Inline buttons for large screens -->
-                                        <div class="action-buttons">
-                                            <a href="{% url 'super_admin:toggle_user_active' user.id %}" class="btn btn-warning btn-sm">
-                                                {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
-                                            </a>
-                                            <a href="{% url 'super_admin:edit_user' user.id %}" class="btn btn-primary btn-sm">Edit</a>
-                                            <a href="{% url 'super_admin:delete_user' user.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">Delete</a>
-                                        </div>
-                                        <!-- Modal trigger for smaller screens -->
-                                        <button class="action-modal-trigger" data-bs-toggle="modal" data-bs-target="#actionModal{{ user.id }}">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <!-- Modal for this user -->
-                                        <div class="modal fade action-modal" id="actionModal{{ user.id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ user.id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="actionModalLabel{{ user.id }}">Actions for {{ user.username }}</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <a href="{% url 'super_admin:toggle_user_active' user.id %}" class="btn btn-warning btn-sm">
-                                                            {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
-                                                        </a>
-                                                        <a href="{% url 'super_admin:edit_user' user.id %}" class="btn btn-primary btn-sm">Edit</a>
-                                                        <a href="{% url 'super_admin:delete_user' user.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">Delete</a>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
+      <!-- Super Admins -->
+<div class="card">
+    <div class="card-body">
+        <h5>Super Admins</h5>
+        <div class="table-container">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Approved</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in super_admins %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.user_type }}</td>
+                            <td>{{ user.is_approved|yesno:"Yes,No" }}</td>
+                            <td>{{ user.is_active|yesno:"Yes,No" }}</td>
+                            <td>
+                                <!-- Inline buttons for large screens -->
+                                <div class="action-buttons">
+                                    <a href="{% url 'super_admin:toggle_user_active' user.id %}" class="btn btn-warning btn-sm">
+                                        {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </a>
+                                    <a href="{% url 'super_admin:edit_user' user.id %}" class="btn btn-primary btn-sm">Edit</a>
+                                    <a href="{% url 'super_admin:delete_user' user.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">Delete</a>
+                                </div>
+                                <!-- Modal trigger for smaller screens -->
+                                <button class="action-modal-trigger" data-bs-toggle="modal" data-bs-target="#actionModal{{ user.id }}">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <!-- Modal for this user -->
+                                <div class="modal fade action-modal" id="actionModal{{ user.id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ user.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="actionModalLabel{{ user.id }}">Actions for {{ user.username }}</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <a href="{% url 'super_admin:toggle_user_active' user.id %}" class="btn btn-warning btn-sm">
+                                                    {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                                </a>
+                                                <a href="{% url 'super_admin:edit_user' user.id %}" class="btn btn-primary btn-sm">Edit</a>
+                                                <a href="{% url 'super_admin:delete_user' user.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">Delete</a>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="6">No super admins found.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">No super admins found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+    </div>
+</div>
+
     </div>
 {% endblock %}

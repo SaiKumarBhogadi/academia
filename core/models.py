@@ -1,5 +1,22 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+
+class CustomUserManager(UserManager):
+    def create_superuser(self, username, email, password, **extra_fields):
+        extra_fields.setdefault('user_type', 'super_admin')
+        extra_fields.setdefault('is_approved', True)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if not username:
+            raise ValueError('The username must be set')
+        if not email:
+            raise ValueError('The email must be set')
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 class User(AbstractUser):
     USER_TYPE_CHOICES = (
@@ -16,9 +33,14 @@ class User(AbstractUser):
         'unique': "A user with that email already exists.",
     })
 
+    objects = CustomUserManager()
+
     def __str__(self):
         return self.username
-    
+
+    # Custom method to check if user is super admin
+    def is_super_admin(self):
+        return self.user_type == 'super_admin'
 
 class Notification(models.Model):
     NOTIFICATION_TYPES = (

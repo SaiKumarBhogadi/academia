@@ -1,0 +1,10 @@
+Hello {{ recipient_name }},
+
+Congratulations! Your account on Academia has been approved by the super admin.
+You can now log in using the link below:
+{{ login_url }}
+
+Thank you for joining us!
+Best,
+The Academia Team
+http://academiaadmit.in

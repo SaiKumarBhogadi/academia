@@ -1,0 +1,39 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Withdraw Application{% endblock %}
+
+{% block content %}
+    <div class="card" style="margin-top: 50px;">
+        <div class="card-header">
+            <h3 class="mb-0">Withdraw Application</h3>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <p>Are you sure you want to withdraw your application (ID: {{ application.id }}) to 
+                {% if application.department %}
+                    <strong>{{ application.department.college.college_name }} (Degree: {{ application.department.degree.degree_name }}, Department: {{ application.department.name }}, Section: {{ application.section.section_name }})</strong>
+                {% else %}
+                    <strong>{{ application.school.school_name }} (Class: {{ application.school_class.grade }}, Section: {{ application.section.section_name }})</strong>
+                {% endif %}
+            </p>
+            <p>Status: {{ application.status }}</p>
+            {% if application.seat %}
+                <p>Assigned Seat: {{ application.seat.seat_number }}</p>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="app_type" value="{% if application.department %}College{% else %}School{% endif %}">
+                <button type="submit" class="btn btn-danger">Yes, Withdraw</button>
+                <a href="{% url 'students:student_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -3,280 +3,246 @@
 {% block title %}Admissions{% endblock %}
 
 {% block content %}
-    <h1>Admissions</h1>
+    <!-- Bootstrap CSS (if not already in base.html) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Check if SchoolProfile exists -->
-    {% if not school %}
-        <div class="alert alert-warning" role="alert">
-            Please set up your school profile to manage admissions, classes, and seats. 
-            <a href="{% url 'schools:school_profile' %}" class="alert-link">Set up your profile here</a>.
-        </div>
-    {% endif %}
+    <!-- Custom CSS -->
+    <style>
+        .management-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    <!-- Seat Visualization -->
-  <!-- Seat Visualization -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h3 class="mb-0">Seat Availability</h3>
-    </div>
-    <div class="card-body">
-        {% if school %}
-            <div class="accordion" id="seatAvailabilityAccordion">
-                {% for class in classes %}
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="classHeading-{{ class.id }}">
-                            <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#classCollapse-{{ class.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="classCollapse-{{ class.id }}">
-                                Class: {{ class.grade }}
-                            </button>
-                        </h2>
-                        <div id="classCollapse-{{ class.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="classHeading-{{ class.id }}" data-bs-parent="#seatAvailabilityAccordion">
-                            <div class="accordion-body">
-                                <div class="accordion" id="sectionAccordion-{{ class.id }}">
-                                    {% for section in class.sections.all %}
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="sectionHeading-{{ section.id }}">
-                                                <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sectionCollapse-{{ section.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="sectionCollapse-{{ section.id }}">
-                                                    Section: {{ section.section_name }} (Filled: {{ section.filled_seats_dynamic }} / Total: {{ section.total_seats_dynamic }})
-                                                </button>
-                                            </h2>
-                                            <div id="sectionCollapse-{{ section.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="sectionHeading-{{ section.id }}" data-bs-parent="#sectionAccordion-{{ class.id }}">
-                                                <div class="accordion-body">
-                                                    <div class="row">
-                                                        {% for seat in section.seats.all %}
-                                                            <div class="col-3 col-md-2 mb-2">
-                                                                <div class="card text-center {% if seat.is_filled %}bg-danger text-white{% else %}bg-success text-white{% endif %}" style="height: 60px; width: 100%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
-                                                                    <div class="card-body p-1">
-                                                                        <p class="mb-0">{{ seat.seat_number }}</p>
-                                                                        {% if seat.is_filled %}
-                                                                            <small class="d-block text-truncate" style="max-width: 80px;">{{ seat.student.username }}</small>
-                                                                        {% else %}
-                                                                            <small>Avl</small>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        {% empty %}
-                                                            <p>No seats available for this section.</p>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% empty %}
-                                        <p>No sections available for this class.</p>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% empty %}
-                    <p>No classes found. Please create classes and sections to manage seats.</p>
-                {% endfor %}
+        .card-header {
+            background-color: #1a2a6c;
+            color: white;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .alert-warning {
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+        }
+
+        .accordion-button {
+            font-weight: 500;
+            color: #1a2a6c;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #e9ecef;
+            color: #1a2a6c;
+        }
+
+        .seat-card {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, opacity 0.2s;
+            font-size: 0.85rem;
+            overflow: hidden;
+        }
+
+        .seat-card.available {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .seat-card.filled {
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+        }
+
+        .seat-card:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .seat-card .student-name {
+            font-size: 0.7rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 90%;
+            margin-top: 5px;
+        }
+
+        .seat-status {
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+        }
+
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+
+        @media (max-width: 768px) {
+            .seat-card {
+                height: 60px;
+                font-size: 0.75rem;
+            }
+
+            .seat-card .student-name {
+                font-size: 0.65rem;
+            }
+
+            .seat-status {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .seat-card {
+                height: 50px;
+                font-size: 0.7rem;
+            }
+
+            .seat-card .student-name {
+                display: none; /* Hide student name on very small screens */
+            }
+        }
+    </style>
+
+    <div class="management-container">
+        <!-- Check if SchoolProfile exists -->
+        {% if not school %}
+            <div class="alert alert-warning" role="alert">
+                Please set up your school profile to manage admissions, classes, and seats. 
+                <a href="{% url 'schools:school_profile' %}" class="alert-link">Set up your profile here</a>.
             </div>
-        {% else %}
-            <p>Seat availability cannot be displayed until your school profile is set up.</p>
         {% endif %}
-    </div>
-</div>
 
-    <!-- Admit Student Form -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="mb-0">Admit Student</h3>
-        </div>
-        <div class="card-body">
-            {% if school and classes %}
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="id_student" class="form-label">Student</label>
-                            {{ admission_form.student }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="class_id" class="form-label">Class</label>
-                            <select name="class_id" id="class_id" class="form-control" required>
-                                <option value="">Select Class</option>
-                                {% for class in classes %}
-                                    <option value="{{ class.id }}">{{ class.grade }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="section_id" class="form-label">Section</label>
-                            <select name="section_id" id="section_id" class="form-control" required>
-                                <option value="">Select Section</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="seat_id" class="form-label">Seat</label>
-                            <select name="seat_id" id="seat_id" class="form-control" required>
-                                <option value="">Select Seat</option>
-                            </select>
-                        </div>
-                    </div>
-                    <input type="hidden" name="admit_student" value="true">
-                    <button type="submit" class="btn btn-primary">Admit Student</button>
-                </form>
-            {% else %}
-                <p>You cannot admit students until your school profile is set up and classes are created.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Link to Applications Page -->
-    {% if school %}
+        <!-- Seat Visualization -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="mb-0">Applications</h3>
+                <h3 class="mb-0">Seat Availability</h3>
             </div>
             <div class="card-body">
-                <a href="{% url 'schools:applications' %}" class="btn btn-primary">View All Applications</a>
+                {% if school %}
+                    {% if cycle_classes %}
+                        <div class="accordion" id="seatAvailabilityAccordion">
+                            {% for item in cycle_classes %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="cycleHeading-{{ item.cycle.id }}">
+                                        <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#cycleCollapse-{{ item.cycle.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="cycleCollapse-{{ item.cycle.id }}">
+                                            Cycle: {{ item.cycle.year }}
+                                        </button>
+                                    </h2>
+                                    <div id="cycleCollapse-{{ item.cycle.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="cycleHeading-{{ item.cycle.id }}" data-bs-parent="#seatAvailabilityAccordion">
+                                        <div class="accordion-body">
+                                            <div class="accordion" id="classAccordion-{{ item.cycle.id }}">
+                                                {% for class in item.classes %}
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header" id="classHeading-{{ class.id }}">
+                                                            <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#classCollapse-{{ class.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="classCollapse-{{ class.id }}">
+                                                                Class: {{ class.grade }}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="classCollapse-{{ class.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="classHeading-{{ class.id }}" data-bs-parent="#classAccordion-{{ item.cycle.id }}">
+                                                            <div class="accordion-body">
+                                                                <div class="accordion" id="sectionAccordion-{{ class.id }}">
+                                                                    {% for section in class.sections.all %}
+                                                                        <div class="accordion-item">
+                                                                            <h2 class="accordion-header" id="sectionHeading-{{ section.id }}">
+                                                                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sectionCollapse-{{ section.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="sectionCollapse-{{ section.id }}">
+                                                                                    Section: {{ section.section_name }} (Filled: {{ section.filled_seats_dynamic }} / Total: {{ section.total_seats_dynamic }})
+                                                                                </button>
+                                                                            </h2>
+                                                                            <div id="sectionCollapse-{{ section.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="sectionHeading-{{ section.id }}" data-bs-parent="#sectionAccordion-{{ class.id }}">
+                                                                                <div class="accordion-body">
+                                                                                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+                                                                                        {% for seat in section.seats.all %}
+                                                                                            <div class="col">
+                                                                                                <div class="seat-card {% if seat.is_filled %}filled{% else %}available{% endif %}" {% if seat.is_filled %}data-student-id="{{ seat.student.id }}"{% endif %}>
+                                                                                                    <div>
+                                                                                                        <div class="seat-status">{{ seat.seat_number }}</div>
+                                                                                                        {% if seat.is_filled %}
+                                                                                                            <div class="student-name" title="{{ seat.student.username }}">{{ seat.student.username }}</div>
+                                                                                                        {% else %}
+                                                                                                            <div class="student-name">Available</div>
+                                                                                                        {% endif %}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        {% empty %}
+                                                                                            <p class="text-muted">No seats available for this section.</p>
+                                                                                        {% endfor %}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% empty %}
+                                                                        <p class="text-muted">No sections available for this class.</p>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% empty %}
+                                                    <p class="text-muted">No classes available for this cycle.</p>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">No cycles or classes found. Please create cycles and classes to manage seats.</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No cycles or classes found. Please create cycles and classes to manage seats.</p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Seat availability cannot be displayed until your school profile is set up.</p>
+                {% endif %}
             </div>
         </div>
-    {% endif %}
 
-    <!-- JavaScript for Dynamic Dropdowns -->
-  <!-- JavaScript for Dynamic Dropdowns -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // For Admit Student Form
-        const classSelect = document.getElementById('class_id');
-        const sectionSelect = document.getElementById('section_id');
-        const seatSelect = document.getElementById('seat_id');
+        <!-- Link to Applications Page -->
+        {% if school %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">Applications</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'schools:applications' %}" class="btn btn-primary">View All Applications</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 
-        // Only run the event listeners if the elements exist (i.e., the form is rendered)
-        if (classSelect && sectionSelect && seatSelect) {
-            classSelect.addEventListener('change', function() {
-                const classId = this.value;
-                sectionSelect.innerHTML = '<option value="">Select Section</option>';
-                seatSelect.innerHTML = '<option value="">Select Seat</option>';
+    <!-- Bootstrap JS (if not already in base.html) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-                if (classId) {
-                    console.log(`[Admit Student] Fetching sections for classId: ${classId}`);
-                    // Add a cache-busting parameter to prevent caching
-                    const url = `/schools/get-sections/${classId}/?t=${new Date().getTime()}`;
-                    fetch(url, {
-                        method: 'GET',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        redirect: 'manual'
-                    })
-                        .then(response => {
-                            console.log(`[Admit Student] Response status: ${response.status}, ok: ${response.ok}, redirected: ${response.redirected}`);
-                            console.log(`[Admit Student] Response headers:`, response.headers);
-                            if (response.status === 0 || response.type === 'opaqueredirect') {
-                                throw new Error('Request was redirected (possibly to login page) - authentication issue');
-                            }
-                            if (!response.ok) {
-                                return response.json().then(errData => {
-                                    console.error('[Admit Student] Error response data:', errData);
-                                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error || 'Unknown error'}`);
-                                }).catch(() => {
-                                    return response.text().then(text => {
-                                        console.error('[Admit Student] Raw response body:', text);
-                                        throw new Error(`HTTP error! Status: ${response.status}, Message: Unable to parse error response as JSON. Raw response logged above.`);
-                                    });
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('[Admit Student] Sections data received:', data);
-                            if (data.error) {
-                                console.error('[Admit Student] Server returned an error:', data.error);
-                                sectionSelect.innerHTML = '<option value="">Failed to load sections</option>';
-                            } else if (data.sections && data.sections.length > 0) {
-                                data.sections.forEach(section => {
-                                    console.log(`[Admit Student] Processing section:`, section);
-                                    const option = document.createElement('option');
-                                    option.value = section.id;
-                                    option.textContent = `${section.section_name} (Available: ${section.available_seats})`;
-                                    sectionSelect.appendChild(option);
-                                });
-                            } else {
-                                console.log('[Admit Student] No sections found for class ID:', classId);
-                                sectionSelect.innerHTML = '<option value="">No sections available</option>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('[Admit Student] Error fetching sections:', error.message);
-                            sectionSelect.innerHTML = '<option value="">Error loading sections</option>';
-                        });
-                } else {
-                    console.log('[Admit Student] Class ID is empty, resetting section dropdown');
-                }
+    <!-- JavaScript for Seat Click -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle click on filled seats to open student profile
+            document.querySelectorAll('.seat-card.filled').forEach(seat => {
+                seat.addEventListener('click', function() {
+                    const studentId = this.dataset.studentId;
+                    if (studentId) {
+                        console.log(`[Seat Click] Navigating to student profile for ID: ${studentId}`);
+                        window.location.href = `/schools/student-details/${studentId}/`;
+                    }
+                });
             });
-
-            sectionSelect.addEventListener('change', function() {
-                const sectionId = this.value;
-                seatSelect.innerHTML = '<option value="">Select Seat</option>';
-
-                if (sectionId) {
-                    console.log(`[Admit Student] Fetching seats for sectionId: ${sectionId}`);
-                    // Add a cache-busting parameter to prevent caching
-                    const url = `/schools/get-seats/${sectionId}/?t=${new Date().getTime()}`;
-                    fetch(url, {
-                        method: 'GET',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        redirect: 'manual'
-                    })
-                        .then(response => {
-                            console.log(`[Admit Student] Response status: ${response.status}, ok: ${response.ok}, redirected: ${response.redirected}`);
-                            console.log(`[Admit Student] Response headers:`, response.headers);
-                            if (response.status === 0 || response.type === 'opaqueredirect') {
-                                throw new Error('Request was redirected (possibly to login page) - authentication issue');
-                            }
-                            if (!response.ok) {
-                                return response.json().then(errData => {
-                                    console.error('[Admit Student] Error response data:', errData);
-                                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error || 'Unknown error'}`);
-                                }).catch(() => {
-                                    return response.text().then(text => {
-                                        console.error('[Admit Student] Raw response body:', text);
-                                        throw new Error(`HTTP error! Status: ${response.status}, Message: Unable to parse error response as JSON. Raw response logged above.`);
-                                    });
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('[Admit Student] Seats data received:', data);
-                            if (data.error) {
-                                console.error('[Admit Student] Server returned an error:', data.error);
-                                seatSelect.innerHTML = '<option value="">Failed to load seats</option>';
-                            } else if (data.seats && data.seats.length > 0) {
-                                data.seats.forEach(seat => {
-                                    if (!seat.is_filled) {
-                                        const option = document.createElement('option');
-                                        option.value = seat.id;
-                                        option.textContent = seat.seat_number;
-                                        seatSelect.appendChild(option);
-                                    }
-                                });
-                            } else {
-                                console.log('[Admit Student] No seats found for section ID:', sectionId);
-                                seatSelect.innerHTML = '<option value="">No seats available</option>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('[Admit Student] Error fetching seats:', error.message);
-                            seatSelect.innerHTML = '<option value="">Error loading seats</option>';
-                        });
-                } else {
-                    console.log('[Admit Student] Section ID is empty, resetting seat dropdown');
-                }
-            });
-        } else {
-            console.warn('[Admit Student] One or more form elements (classSelect, sectionSelect, seatSelect) not found');
-        }
-    });
-</script>
+        });
+    </script>
 {% endblock %}

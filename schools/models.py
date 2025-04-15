@@ -1,7 +1,7 @@
 from django.db import models
-from core.models import User  # Ensure we're importing your custom User model
+from core.models import User  # Using your custom User model
 
-# School Profile Model
+# School Profile Model (Unchanged)
 class SchoolProfile(models.Model):
     SCHOOL_TYPE_CHOICES = (
         ('public', 'Public'),
@@ -42,39 +42,69 @@ class SchoolProfile(models.Model):
     def __str__(self):
         return f"Profile for {self.school_name}"
 
-# SchoolClass Model
+# Admission Cycle Model (Added)
+# schools/models.py
+from django.db import models
+
+class AdmissionCycle(models.Model):
+    school = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='cycles')
+    year = models.PositiveIntegerField()  # Removed unique=True, relying on unique_together
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_active = models.BooleanField(default=True)
+    is_archived = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('school', 'year')  # Prevent duplicate cycles for the same school
+
+    def __str__(self):
+        return f"{self.year} Cycle - {self.school.school_name}"
+    
+
+    
+# SchoolClass Model (Added cycle)
 class SchoolClass(models.Model):
     school = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='classes')
+    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, related_name='classes', null=True, blank=True)  # Nullable for now
     grade = models.CharField(max_length=50)
     total_sections = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f"{self.grade} - {self.school.school_name}"
+        cycle_info = f"(Cycle: {self.cycle.year})" if self.cycle else "(No Cycle)"
+        return f"{self.grade} - {self.school.school_name} {cycle_info}".strip()
 
-# ClassSection Model
+# ClassSection Model (Added cycle, removed filled_seats for dynamic calculation)
 class ClassSection(models.Model):
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name='sections')
+    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, related_name='sections', null=True, blank=True)  # Nullable for now
     section_name = models.CharField(max_length=10)
     total_seats = models.PositiveIntegerField(default=40)
-    filled_seats = models.PositiveIntegerField(default=0)
 
     def available_seats(self):
-        return self.total_seats - self.filled_seats
+        return self.total_seats - self.seats.filter(is_filled=True).count()
 
     def __str__(self):
-        return f"{self.school_class.grade} - {self.section_name}"
+        cycle_info = f"(Cycle: {self.cycle.year})" if self.cycle else "(No Cycle)"
+        return f"{self.school_class.grade if self.school_class else 'Unknown Class'} - {self.section_name} {cycle_info}".strip()
 
-# Seat Model
+# Seat Model (Unchanged)
 class Seat(models.Model):
     section = models.ForeignKey(ClassSection, on_delete=models.CASCADE, related_name='seats')
     seat_number = models.CharField(max_length=10)
     is_filled = models.BooleanField(default=False)
     student = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='seats')
+    seat_order = models.PositiveIntegerField(blank=True, null=True, help_text="Numeric part of seat_number for ordering")
+
+    def save(self, *args, **kwargs):
+        if not self.seat_order and self.seat_number:
+            # Extract numeric part (e.g., "A1" -> 1)
+            self.seat_order = int(''.join(filter(str.isdigit, self.seat_number)))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.section} - Seat {self.seat_number}"
 
-
+# Admission Model (Added cycle)
 class Admission(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -84,6 +114,7 @@ class Admission(models.Model):
     ]
 
     school = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='admissions')
+    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, related_name='admissions', null=True, blank=True)  # Nullable for now
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name='admissions')
     section = models.ForeignKey(ClassSection, on_delete=models.CASCADE, related_name='admissions')
     seat = models.OneToOneField(Seat, on_delete=models.CASCADE, related_name='admission', null=True)
@@ -96,11 +127,9 @@ class Admission(models.Model):
     admission_id = models.CharField(max_length=20, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Call the parent save method first to set admission_date
-        if not self.pk:  # Only for new objects
-            super().save(*args, **kwargs)  # This sets admission_date due to auto_now_add=True
+        if not self.pk:
+            super().save(*args, **kwargs)
 
-        # Now generate admission_id if it doesn't exist
         if not self.admission_id:
             year = self.admission_date.year
             last_admission = Admission.objects.filter(admission_id__startswith=f"ADM-{year}-").order_by('-admission_id').first()
@@ -111,14 +140,12 @@ class Admission(models.Model):
                 new_number = 1
             self.admission_id = f"ADM-{year}-{new_number:03d}"
 
-        # Save again to update admission_id
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.student.username if self.student else 'No Student'} - {self.section}"
-    
+        return f"{self.student.username if self.student else 'No Student'} - {self.section.section_name if self.section else 'No Section'}"
 
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator  # Moved here for consistency
 class SchoolRating(models.Model):
     school_profile = models.OneToOneField(SchoolProfile, on_delete=models.CASCADE, related_name='rating')
     rating = models.FloatField(
@@ -132,7 +159,6 @@ class SchoolRating(models.Model):
     def __str__(self):
         return f"{self.rating} stars for {self.school_profile.school_name}"
 
-
 class SchoolGallery(models.Model):
     school_profile = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='gallery')
     image = models.ImageField(upload_to='gallery_images/', blank=False, null=False)
@@ -141,9 +167,7 @@ class SchoolGallery(models.Model):
 
     def __str__(self):
         return f"Image for {self.school_profile.school_name} - {self.caption or 'No caption'}"
-    
 
-# Add this to your existing models.py
 class SchoolTestimonial(models.Model):
     school_profile = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='testimonials')
     author_name = models.CharField(max_length=100, blank=False, help_text="Name of the person giving the testimonial")

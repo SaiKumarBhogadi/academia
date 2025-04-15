@@ -45,21 +45,25 @@ class SchoolProfileForm(forms.ModelForm):
 
 
 from django import forms
-from .models import SchoolClass, ClassSection
+from .models import SchoolClass, ClassSection, AdmissionCycle  # Added AdmissionCycle
 
 class SchoolClassForm(forms.ModelForm):
+    cycle = forms.ModelChoiceField(queryset=AdmissionCycle.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+
     class Meta:
         model = SchoolClass
-        fields = ['grade', 'total_sections']
+        fields = ['grade', 'total_sections', 'cycle']  # Added cycle
         widgets = {
             'grade': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Grade 1'}),
             'total_sections': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
 class ClassSectionForm(forms.ModelForm):
+    cycle = forms.ModelChoiceField(queryset=AdmissionCycle.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+
     class Meta:
         model = ClassSection
-        fields = ['section_name', 'total_seats']
+        fields = ['section_name', 'total_seats', 'cycle']  # Added cycle
         widgets = {
             'section_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Section A'}),
             'total_seats': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
@@ -68,23 +72,79 @@ class ClassSectionForm(forms.ModelForm):
 
 from django import forms
 from core.models import User  # Import User from core.models
-from .models import SchoolClass, ClassSection, Admission
+from .models import SchoolClass, ClassSection, Admission, AdmissionCycle  # Added AdmissionCycle
+
 class AdmissionForm(forms.ModelForm):
     student = forms.ModelChoiceField(queryset=User.objects.filter(user_type='student'), widget=forms.Select(attrs={'class': 'form-control'}))
+    cycle = forms.ModelChoiceField(queryset=AdmissionCycle.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))  # Added cycle
 
     class Meta:
         model = Admission
-        fields = ['student']
+        fields = ['student', 'cycle']  # Added cycle
+        # Note: Other fields (school_class, section, etc.) might need dynamic queryset if required
+
+from django import forms
+from .models import SchoolClass, ClassSection, Admission, AdmissionCycle
 
 class StudentApplicationForm(forms.ModelForm):
+    cycle = forms.ModelChoiceField(
+        queryset=AdmissionCycle.objects.none(),
+        empty_label="Select a Cycle",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control', 'onchange': 'updateForm(this);'})
+    )
+    school_class = forms.ModelChoiceField(
+        queryset=SchoolClass.objects.none(),
+        empty_label="Select a Class",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control', 'onchange': 'updateForm(this);'})
+    )
+    section = forms.ModelChoiceField(
+        queryset=ClassSection.objects.none(),
+        empty_label="Select a Section",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    parent_name = forms.CharField(
+        max_length=255,
+        required=True,
+        label="Parent's Name",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    contact_number = forms.CharField(
+        max_length=15,
+        required=True,
+        label="Contact Number",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        required=True,
+        label="Email",
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Admission
         fields = ['parent_name', 'contact_number', 'email']
-        widgets = {
-            'parent_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter parent name'}),
-            'contact_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter contact number'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter email address'}),
-        }
+
+    def __init__(self, *args, school_id=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if school_id:
+            self.fields['cycle'].queryset = AdmissionCycle.objects.filter(school_id=school_id, is_active=True).order_by('-year')
+            cycle_id = self.data.get('cycle') if 'cycle' in self.data else (self.instance.cycle_id if self.instance.cycle_id else None)
+            if cycle_id:
+                self.fields['school_class'].queryset = SchoolClass.objects.filter(school_id=school_id, cycle_id=cycle_id)
+                class_id = self.data.get('school_class') if 'school_class' in self.data else (self.instance.school_class_id if self.instance.school_class_id else None)
+                if class_id:
+                    self.fields['section'].queryset = ClassSection.objects.filter(school_class_id=class_id, cycle_id=cycle_id)
+                elif self.instance.section_id and self.instance.school_class_id:
+                    self.fields['section'].queryset = ClassSection.objects.filter(school_class_id=self.instance.school_class_id, cycle_id=cycle_id)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        return instance
 
 
 from .models import SchoolProfile, SchoolRating
@@ -126,3 +186,48 @@ class SchoolTestimonialForm(forms.ModelForm):
             'author_role': forms.Select(attrs={'class': 'form-control'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter the testimonial message'}),
         }
+
+
+
+# schools/forms.py
+from django import forms
+from .models import SchoolProfile, SchoolClass, ClassSection, AdmissionCycle
+
+class AdmissionCycleForm(forms.ModelForm):
+    class Meta:
+        model = AdmissionCycle
+        fields = ['year', 'start_date', 'end_date', 'is_active', 'is_archived']
+        widgets = {
+            'year': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 2025'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_archived': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.school = kwargs.pop('school', None)  # Pass school from view
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['year'].widget.attrs['readonly'] = True  # Prevent editing year after creation
+        if self.school:
+            self.fields['school'] = forms.ModelChoiceField(
+                queryset=SchoolProfile.objects.filter(id=self.school.id),
+                widget=forms.HiddenInput(),
+                initial=self.school,
+                required=False
+            )
+
+    def clean_year(self):
+        year = self.cleaned_data['year']
+        if self.school and AdmissionCycle.objects.filter(school=self.school, year=year).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError("A cycle with this year already exists for your school.")
+        return year
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.school and not instance.school_id:  # Only set if not already set
+            instance.school = self.school
+        if commit:
+            instance.save()
+        return instance

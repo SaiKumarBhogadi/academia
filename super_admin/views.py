@@ -58,6 +58,11 @@ def dashboard(request):
     }
     return render(request, 'super_admin/dashboard.html', context)
 
+
+from django.contrib.auth.decorators import login_required
+from core.signals import user_approved
+
+@login_required
 def approve_user(request, user_id):
     if request.user.user_type != 'super_admin':
         return redirect('core:login')
@@ -65,6 +70,8 @@ def approve_user(request, user_id):
     user.is_approved = True
     user.save()
     messages.success(request, f'{user.username} has been approved.')
+    # Trigger the user_approved signal
+    user_approved.send(sender=None, user=user)
     return redirect('super_admin:dashboard')
 
 def add_user(request):
@@ -83,33 +90,32 @@ def add_user(request):
         form = AdminAddUserForm()
     return render(request, 'super_admin/add_user.html', {'form': form})
 
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
+from django.contrib import messages
+from core.models import User  # Adjust based on your custom user model location
+from core.forms import AdminAddUserForm  # Import from core app
+
 def manage_users(request):
     if request.user.user_type != 'super_admin':
         return redirect('core:login')
 
-    # Get search query from GET parameters
     search_query = request.GET.get('search', '')
 
-    # Get users by role, excluding the current Super Admin
-    schools = User.objects.filter(user_type='school').exclude(id=request.user.id)
-    colleges = User.objects.filter(user_type='college').exclude(id=request.user.id)
-    students = User.objects.filter(user_type='student').exclude(id=request.user.id)
-    super_admins = User.objects.filter(user_type='super_admin').exclude(id=request.user.id)
+    # Fetch users by role (include logged-in super admin this time)
+    schools = User.objects.filter(user_type='school')
+    colleges = User.objects.filter(user_type='college')
+    students = User.objects.filter(user_type='student')
+    super_admins = User.objects.filter(user_type='super_admin')
 
-    # Apply search filter (username or email)
+    # Apply search filter to all user roles
     if search_query:
-        schools = schools.filter(
-            Q(username__icontains=search_query) | Q(email__icontains=search_query)
-        )
-        colleges = colleges.filter(
-            Q(username__icontains=search_query) | Q(email__icontains=search_query)
-        )
-        students = students.filter(
-            Q(username__icontains=search_query) | Q(email__icontains=search_query)
-        )
-        super_admins = super_admins.filter(
-            Q(username__icontains=search_query) | Q(email__icontains=search_query)
-        )
+        filter_condition = Q(username__icontains=search_query) | Q(email__icontains=search_query)
+        schools = schools.filter(filter_condition)
+        colleges = colleges.filter(filter_condition)
+        students = students.filter(filter_condition)
+        super_admins = super_admins.filter(filter_condition)
 
     context = {
         'schools': schools,
@@ -118,6 +124,7 @@ def manage_users(request):
         'super_admins': super_admins,
         'search_query': search_query,
     }
+
     return render(request, 'super_admin/manage_users.html', context)
 
 def toggle_user_active(request, user_id):
@@ -156,6 +163,8 @@ def edit_user(request, user_id):
             return redirect('super_admin:manage_users')
         else:
             messages.error(request, 'Please correct the errors below.')
+            for field, errors in form.errors.items():
+                print(f"Field: {field}, Errors: {errors}")  # Debug errors
     else:
         form = AdminAddUserForm(instance=user)
     return render(request, 'super_admin/edit_user.html', {'form': form, 'user': user})

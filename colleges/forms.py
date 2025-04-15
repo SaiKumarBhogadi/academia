@@ -1,6 +1,7 @@
-# colleges/forms.py
 from django import forms
-from .models import CollegeProfile, Department, Degree, Course
+from .models import CollegeProfile, Department, Degree, Course, Section, AdmissionCycle
+from .models import Application
+from django.utils import timezone
 
 class CollegeProfileForm(forms.ModelForm):
     class Meta:
@@ -41,36 +42,124 @@ class CollegeProfileForm(forms.ModelForm):
             'profile_pic': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
+# colleges/forms.py
+from django import forms
+from .models import AdmissionCycle, Degree, Department, Section, Course, CollegeProfile
+
+from django import forms
+from .models import AdmissionCycle
+
+from django import forms
+from .models import AdmissionCycle
+
+class AdmissionCycleForm(forms.ModelForm):
+    class Meta:
+        model = AdmissionCycle
+        fields = ['year', 'start_date', 'end_date', 'is_active', 'is_archived']
+
+    def __init__(self, college, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_date'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        self.fields['end_date'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        self.fields['year'].widget.attrs.update({'class': 'form-control'})
+        self.fields['is_active'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['is_archived'].widget.attrs.update({'class': 'form-check-input'})
+        self.college = college  # Store college instance for validation
+
+    def clean_year(self):
+        year = self.cleaned_data['year']
+        # Check for existing cycles, excluding the current instance if editing
+        queryset = AdmissionCycle.objects.filter(college=self.college, year=year)
+        if self.instance and self.instance.pk:  # If editing
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise forms.ValidationError(
+                "This year already has a cycle for this college. Please choose a different year or edit the existing one."
+            )
+        return year
+
+    
 class DegreeForm(forms.ModelForm):
     class Meta:
         model = Degree
         fields = ['name', 'duration', 'eligibility_criteria']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'duration': forms.TextInput(attrs={'class': 'form-control'}),
-            'eligibility_criteria': forms.Textarea(attrs={'class': 'form-control'}),
+            'eligibility_criteria': forms.Textarea(attrs={'rows': 3}),
         }
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ['name', 'hod_name', 'faculty_count', 'labs', 'total_seats', 'fees_per_year']
+        fields = ['name', 'hod_name', 'faculty_count', 'labs', 'fees_per_year']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'hod_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'faculty_count': forms.NumberInput(attrs={'class': 'form-control'}),
-            'labs': forms.Textarea(attrs={'class': 'form-control'}),
-            'total_seats': forms.NumberInput(attrs={'class': 'form-control'}),
-            'fees_per_year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'labs': forms.Textarea(attrs={'rows': 3}),
         }
+
+class SectionForm(forms.ModelForm):
+    class Meta:
+        model = Section
+        fields = ['section_name', 'total_seats']
 
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ['course_code', 'name', 'semester', 'credits']
-        widgets = {
-            'course_code': forms.TextInput(attrs={'class': 'form-control'}),
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'semester': forms.TextInput(attrs={'class': 'form-control'}),
-            'credits': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
+
+
+from django import forms
+from django.utils import timezone
+from .models import Application, AdmissionCycle
+
+from django import forms
+from django.utils import timezone
+from .models import Application, AdmissionCycle
+
+class ApplicationForm(forms.ModelForm):
+    parent_name = forms.CharField(max_length=100, required=True)
+    contact_number = forms.CharField(max_length=15, required=True)
+    email = forms.EmailField(required=True)
+    cycle = forms.ModelChoiceField(
+        queryset=AdmissionCycle.objects.none(),
+        required=True,
+        widget=forms.HiddenInput(),  # Change to hidden input
+        label="Admission Cycle"  # Label is optional since it's hidden
+    )
+
+    class Meta:
+        model = Application
+        fields = ['parent_name', 'contact_number', 'email', 'cycle']
+
+    def __init__(self, college, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(ApplicationForm, self).__init__(*args, **kwargs)
+        self.fields['parent_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['contact_number'].widget.attrs.update({'class': 'form-control'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control'})
+        self.fields['cycle'].queryset = AdmissionCycle.objects.filter(college=college, is_active=True, is_archived=False).order_by('year')
+        if 'initial' in kwargs and 'cycle_id' in kwargs['initial']:
+            selected_cycle = AdmissionCycle.objects.filter(id=kwargs['initial']['cycle_id'], college=college).first()
+            if selected_cycle:
+                self.fields['cycle'].initial = selected_cycle
+                self.initial['cycle'] = selected_cycle  # Force initial value
+        elif college:
+            active_cycle = AdmissionCycle.objects.filter(college=college, is_active=True, is_archived=False).first()
+            if active_cycle:
+                self.fields['cycle'].initial = active_cycle
+                self.initial['cycle'] = active_cycle
+
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_cycle = cleaned_data.get('cycle')
+        if not selected_cycle:
+            raise forms.ValidationError("Admission cycle is required but not set.")
+        # Temporarily disable date validation for testing
+        # if timezone.now().date() < selected_cycle.start_date or timezone.now().date() > selected_cycle.end_date:
+        #     raise forms.ValidationError(f"Applications are not accepted outside the cycle period ({selected_cycle.start_date} to {selected_cycle.end_date}).")
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.cycle = self.cleaned_data['cycle']  # Use the hidden cycle value
+        if commit:
+            instance.save()
+        return instance

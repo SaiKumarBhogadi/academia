@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +32,7 @@
             border: none;
         }
         .login-card .card-header {
-            background: #6e8efb;
+            background: #6e8ffbbb;
             color: #fff;
             text-align: center;
             padding: 1.5rem;
@@ -119,6 +120,7 @@
     <div class="login-container">
         <div class="card login-card">
             <div class="card-header">
+                <img src="{% static 'images/logo1.png' %}" alt="Admission Portal Logo" class="hero-logo" height="60px" width="150px">
                 <h2><i class="fas fa-lock me-2"></i>Login</h2>
             </div>
             <div class="card-body">

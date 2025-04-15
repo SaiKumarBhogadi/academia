@@ -1,0 +1,17 @@
+Hello {{ recipient_name }},
+
+{% if college_name %}
+The application status for {{ student_name }} at {{ college_name }} (Section: {{ section_name }}) has been updated to {{ status|lower }}.
+{% elif school_name %}
+The application status for {{ student_name }} at {{ school_name }} (Class: {{ class_grade }}, Section: {{ section_name }}) has been updated to {{ status|lower }}.
+{% else %}
+The application status for {{ student_name }} at {{ institution_name }} has been updated to {{ status|lower }}.
+{% endif %}
+{% if status == 'Approved' and seat_number %}
+Seat Number: {{ seat_number }} has been assigned.
+{% endif %}
+
+Please update your records accordingly. Thank you!
+Best,
+The Academia Team
+http://academiaadmit.in

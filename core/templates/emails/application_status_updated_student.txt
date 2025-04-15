@@ -1,0 +1,17 @@
+Hello {{ recipient_name }},
+
+{% if college_name %}
+Your application to {{ college_name }} (Section: {{ section_name }}) has been {{ status|lower }}.
+{% elif school_name %}
+Your application to {{ school_name }} (Class: {{ class_grade }}, Section: {{ section_name }}) has been {{ status|lower }}.
+{% else %}
+Your application to {{ institution_name }} has been {{ status|lower }}.
+{% endif %}
+{% if status == 'Approved' and seat_number %}
+Seat Number: {{ seat_number }} has been assigned to you.
+{% endif %}
+
+Thank you for using Academia!
+Best,
+The Academia Team
+http://academiaadmit.in

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Withdrawn - Academia</title>
+</head>
+<body>
+    <h2>Hello {{ recipient_name }},</h2>
+    {% if college_name %}
+        <p>An application by {{ student_name }} for (Degree: {{ degree_name }}, Department: {{ department_name }}, Section: {{ section_name }}) at {{ college_name }} has been withdrawn.</p>
+    {% elif school_name %}
+        <p>An application by {{ student_name }} for (Class: {{ class_grade }}, Section: {{ section_name }}) at {{ school_name }} has been withdrawn.</p>
+    {% else %}
+        <p>An application by {{ student_name }} has been withdrawn.</p>
+    {% endif %}
+    <p>Please update your records accordingly. Thank you!</p>
+    <p>Best,<br>The Academia Team<br><a href="http://academiaadmit.in">academiaadmit.in</a></p>
+</body>
+</html>

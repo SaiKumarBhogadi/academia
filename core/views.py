@@ -1,20 +1,20 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import RegistrationForm
+# from django.shortcuts import render, redirect
+# from django.contrib import messages
+# from .forms import RegistrationForm
 
-def home(request):
-    return render(request, 'core/home.html')
+# def home(request):
+#     return render(request, 'core/home.html')
 
-def register(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            messages.success(request, 'Registration successful! Awaiting admin approval.')
-            return redirect('core:login')
-    else:
-        form = RegistrationForm()
-    return render(request, 'core/register.html', {'form': form})
+# def register(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             messages.success(request, 'Registration successful! Awaiting admin approval.')
+#             return redirect('core:login')
+#     else:
+#         form = RegistrationForm()
+#     return render(request, 'core/register.html', {'form': form})
 
 
 from django.contrib.auth import authenticate, login, logout
@@ -27,6 +27,12 @@ from django.db import IntegrityError
 def home(request):
     return render(request, 'core/home.html')
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.db import IntegrityError
+from .forms import RegistrationForm
+from core.signals import user_registered
+
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -34,6 +40,7 @@ def register(request):
             try:
                 user = form.save()
                 messages.success(request, 'Registration successful! Awaiting admin approval.')
+                user_registered.send(sender=None, user=user)
                 return redirect('core:login')
             except IntegrityError:
                 messages.error(request, 'Username or email already exists. Please choose a different one.')
@@ -42,6 +49,7 @@ def register(request):
     else:
         form = RegistrationForm()
     return render(request, 'core/register.html', {'form': form})
+
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login

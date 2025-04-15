@@ -1,0 +1,14 @@
+Hello {{ recipient_name }},
+
+{% if college_name %}
+Your application to {{ college_name }} (Degree: {{ degree_name }}, Department: {{ department_name }}, Section: {{ section_name }}) has been withdrawn successfully.
+{% elif school_name %}
+Your application to {{ school_name }} (Class: {{ class_grade }}, Section: {{ section_name }}) has been withdrawn successfully.
+{% else %}
+Your application has been withdrawn successfully.
+{% endif %}
+
+You can now apply to a different section or institution if desired. Thank you for using Academia!
+Best,
+The Academia Team
+http://academiaadmit.in

@@ -3,228 +3,542 @@
 {% block title %}Class and Section Management{% endblock %}
 
 {% block content %}
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Custom CSS -->
     <style>
-        /* Form Styling */
-        .form-container {
-            max-width: 800px;
-            margin: 0 auto;
+        .management-container {
             padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+
+        .card-header {
+            background-color: #1a2a6c;
+            color: white;
+            border-radius: 5px 5px 0 0;
         }
-        .form-section h4 {
-            color: #1a2a6c;
-            margin-bottom: 20px;
-            font-size: 1.25rem;
-            font-weight: 600;
+
+        .card-body {
+            padding: 1.5rem;
         }
+
+        .alert-warning, .alert-success, .alert-danger {
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
+
         .form-label {
-            font-weight: 600;
+            font-weight: 500;
             color: #1a2a6c;
-            margin-bottom: 8px;
-            display: block;
+            margin-bottom: 0.5rem;
             font-size: 1rem;
         }
+
         .form-control {
             border: 2px solid #1a2a6c;
             border-radius: 5px;
-            padding: 10px;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
+            transition: border-color 0.3s ease;
         }
+
         .form-control:focus {
             border-color: #b21f1f;
             box-shadow: none;
+            outline: none;
         }
+
         .btn-primary {
             background-color: #1a2a6c;
             border-color: #1a2a6c;
-            padding: 10px 20px;
+            padding: 0.75rem 1.5rem;
             font-size: 1rem;
             border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-right: 0.5rem;
         }
+
         .btn-primary:hover {
             background-color: #b21f1f;
             border-color: #b21f1f;
         }
+
+        .btn-secondary, .btn-danger {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            margin: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .btn-secondary {
             background-color: #6c757d;
             border-color: #6c757d;
-            padding: 5px 10px;
-            font-size: 0.9rem;
-            border-radius: 5px;
         }
+
         .btn-secondary:hover {
             background-color: #5a6268;
-            border-color: #5a6268;
         }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary i, .btn-danger i {
+            font-size: 1.2rem;
+        }
+
         .class-list {
-            margin-top: 20px;
+            margin-top: 2rem;
         }
+
         .class-item {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 10px;
+            border: 1px solid #eee;
             border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .section-item {
-            margin-left: 20px;
-            padding: 10px;
-            border-top: 1px solid #eee;
+
+        .class-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .class-header, .section-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-details {
+            font-size: 0.95rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Accordion Styles */
+        .accordion {
+            margin-bottom: 2rem;
+        }
+
+        .accordion-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            background-color: #fff;
+        }
+
+        .accordion-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .edit-form {
+
+        .accordion-header h4 {
+            margin: 0;
+            color: #1a2a6c;
+        }
+
+        .accordion-header .toggle-icon {
+            font-size: 1.2rem;
+            color: #1a2a6c;
+        }
+
+        .accordion-body {
+            padding: 1.5rem;
             display: none;
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        }
+
+        .accordion-body.active {
+            display: block;
+        }
+
+        .text-muted {
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .management-container {
+                padding: 15px;
+            }
+
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .class-header, .section-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .btn-primary, .btn-secondary, .btn-danger {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+
+            .accordion-header h4 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-control {
+                font-size: 0.9rem;
+                padding: 0.5rem;
+            }
+
+            .btn-primary, .btn-secondary, .btn-danger {
+                font-size: 0.95rem;
+                padding: 0.5rem;
+            }
+
+            .class-item {
+                padding: 1rem;
+            }
+
+            .accordion-header {
+                padding: 0.75rem;
+            }
+
+            .accordion-body {
+                padding: 1rem;
+            }
         }
     </style>
 
-    <div class="card" style="margin-top: 50px;">
-        <div class="card-header">
-            <h3 class="mb-0">
-                {% if school %}
-                    Manage Classes and Sections for {{ school.school_name }}
-                {% else %}
-                    Manage Classes and Sections
+    <div class="management-container">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    {% if school %}
+                        Manage Classes and Sections for {{ school.school_name }}
+                    {% else %}
+                        Manage Classes and Sections
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
-            </h3>
-        </div>
-        <div class="card-body">
-            <!-- Check if SchoolProfile exists -->
-            {% if not school %}
-                <div class="alert alert-warning" role="alert">
-                    Please set up your school profile to manage classes and sections. 
-                    <a href="{% url 'schools:school_profile' %}" class="alert-link">Set up your profile here</a>.
-                </div>
-            {% endif %}
 
-            <div class="form-container">
+                <!-- Check if SchoolProfile exists -->
+                {% if not school %}
+                    <div class="alert alert-warning" role="alert">
+                        Please set up your school profile to manage classes and sections. 
+                        <a href="{% url 'schools:school_profile' %}" class="alert-link">Set up your profile here</a>.
+                    </div>
+                {% endif %}
+
                 <!-- Form to Add a Class -->
                 <div class="form-section">
-                    <h4>Add a New Class</h4>
+                    <h4 class="text-primary">Add a New Class</h4>
                     {% if school %}
                         <form method="post">
                             {% csrf_token %}
-                            <div class="form-group">
-                                <label for="{{ class_form.grade.id_for_label }}" class="form-label">Grade</label>
-                                {{ class_form.grade }}
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label for="{{ class_form.grade.id_for_label }}" class="form-label">Grade</label>
+                                    {{ class_form.grade }}
+                                    {% if class_form.grade.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in class_form.grade.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label for="{{ class_form.total_sections.id_for_label }}" class="form-label">Total Sections</label>
+                                    {{ class_form.total_sections }}
+                                    {% if class_form.total_sections.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in class_form.total_sections.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label for="{{ class_form.cycle.id_for_label }}" class="form-label">Select Cycle</label>
+                                    <select name="cycle" id="id_cycle_class" class="form-control" required>
+                                        <option value="">Select a Cycle</option>
+                                        {% for cycle in cycles %}
+                                            <option value="{{ cycle.id }}" {% if cycle.id|stringformat:"s" == request.POST.cycle %}selected{% endif %}>{{ cycle.year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if class_form.cycle.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in class_form.cycle.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="{{ class_form.total_sections.id_for_label }}" class="form-label">Total Sections</label>
-                                {{ class_form.total_sections }}
-                            </div>
+                            {% if class_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in class_form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                             <button type="submit" name="add_class" class="btn btn-primary">Add Class</button>
                         </form>
                     {% else %}
-                        <p>You cannot add classes until your school profile is set up.</p>
+                        <p class="text-muted">You cannot add classes until your school profile is set up.</p>
                     {% endif %}
                 </div>
 
                 <!-- Form to Add a Section -->
                 <div class="form-section">
-                    <h4>Add a New Section</h4>
+                    <h4 class="text-primary" style="margin-top: 30px;">Add a New Section</h4>
                     {% if school and classes %}
-                        <form method="post">
+                        <form method="post" id="sectionForm">
                             {% csrf_token %}
-                            <div class="form-group">
-                                <label class="form-label">Select Class</label>
-                                <select name="class_id" class="form-control" required>
-                                    <option value="">Select a Class</option>
-                                    {% for class in classes %}
-                                        <option value="{{ class.id }}">{{ class.grade }}</option>
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label class="form-label">Select Cycle</label>
+                                    <select name="cycle" id="id_cycle" class="form-control" required>
+                                        <option value="">Select a Cycle</option>
+                                        {% for cycle in cycles %}
+                                            <option value="{{ cycle.id }}" {% if cycle.id|stringformat:"s" == request.POST.cycle %}selected{% endif %}>{{ cycle.year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if section_form.cycle.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in section_form.cycle.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label class="form-label">Select Class</label>
+                                    <select name="class_id" id="id_class_id" class="form-control" required>
+                                        <option value="">Select a Cycle First</option>
+                                        {% if request.POST.class_id %}
+                                            {% for class in classes %}
+                                                {% if class.id|stringformat:"s" == request.POST.class_id %}
+                                                    <option value="{{ class.id }}" selected>{{ class.grade }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    {% if section_form.school_class.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in section_form.school_class.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label for="{{ section_form.section_name.id_for_label }}" class="form-label">Section Name</label>
+                                    {{ section_form.section_name }}
+                                    {% if section_form.section_name.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in section_form.section_name.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label for="{{ section_form.total_seats.id_for_label }}" class="form-label">Total Seats</label>
+                                    {{ section_form.total_seats }}
+                                    {% if section_form.total_seats.errors %}
+                                        <ul class="errorlist">
+                                            {% for error in section_form.total_seats.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if section_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in section_form.non_field_errors %}
+                                        <p>{{ error }}</p>
                                     {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="{{ section_form.section_name.id_for_label }}" class="form-label">Section Name</label>
-                                {{ section_form.section_name }}
-                            </div>
-                            <div class="form-group">
-                                <label for="{{ section_form.total_seats.id_for_label }}" class="form-label">Total Seats</label>
-                                {{ section_form.total_seats }}
-                            </div>
+                                </div>
+                            {% endif %}
                             <button type="submit" name="add_section" class="btn btn-primary">Add Section</button>
                         </form>
                     {% else %}
-                        <p>You cannot add sections until your school profile is set up and at least one class is created.</p>
+                        <p class="text-muted">You cannot add sections until your school profile is set up and at least one class is created.</p>
                     {% endif %}
                 </div>
 
                 <!-- List of Classes and Sections -->
-               <!-- List of Classes and Sections -->
-<div class="class-list">
-    <h4>Existing Classes and Sections</h4>
-    {% if school %}
-        {% if classes %}
-            {% for class in classes %}
-                <div class="class-item">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h5>{{ class.grade }} ({{ class.total_sections }} Sections)</h5>
-                        <button class="btn btn-secondary" onclick="toggleEditForm('edit-class-{{ class.id }}')">Edit Class</button>
-                    </div>
-                    <!-- Edit Class Form -->
-                    <div id="edit-class-{{ class.id }}" class="edit-form">
-                        <h5>Edit {{ class.grade }}</h5>
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="class_id" value="{{ class.id }}">
-                            <div class="form-group">
-                                <label class="form-label">Grade</label>
-                                <input type="text" name="grade" value="{{ class.grade }}" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Total Sections</label>
-                                <input type="number" name="total_sections" value="{{ class.total_sections }}" class="form-control" min="1" required>
-                            </div>
-                            <button type="submit" name="edit_class" class="btn btn-primary">Save Changes</button>
-                        </form>
-                    </div>
+                <div class="class-list">
+                    <h4 class="text-primary">Existing Classes and Sections</h4>
+                    {% if school %}
+                        {% if cycles %}
+                            <div class="accordion">
+                                {% for cycle in cycles %}
+                                    <div class="accordion-item">
+                                        <div class="accordion-header" onclick="toggleAccordion('accordion-{{ cycle.id }}')">
+                                            <h4>Cycle: {{ cycle.year }}</h4>
+                                            <i class="fas fa-chevron-down toggle-icon"></i>
+                                        </div>
+                                        <div class="accordion-body" id="accordion-{{ cycle.id }}">
+                                            {% for class in classes %}
+                                                {% if class.cycle.id == cycle.id %}
+                                                    <div class="class-item">
+                                                        <div class="class-header">
+                                                            <h5 class="mb-0">{{ class.grade }} ({{ class.total_sections }} Sections)</h5>
+                                                            <div>
+                                                                <button class="btn btn-secondary" onclick="toggleEditForm('edit-class-{{ class.id }}')">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <form method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete {{ class.grade }}? This will remove all sections and seats.');">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="class_id" value="{{ class.id }}">
+                                                                    <input type="hidden" name="delete_class" value="true">
+                                                                    <button type="submit" class="btn btn-danger">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Edit Class Form -->
+                                                        <div id="edit-class-{{ class.id }}" class="edit-form">
+                                                            <h5 class="mb-3">Edit {{ class.grade }}</h5>
+                                                            <form method="post">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="class_id" value="{{ class.id }}">
+                                                                <div class="row">
+                                                                    <div class="col-12 col-md-6 mb-3">
+                                                                        <label class="form-label">Grade</label>
+                                                                        <input type="text" name="grade" value="{{ class.grade }}" class="form-control" required>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 mb-3">
+                                                                        <label class="form-label">Total Sections</label>
+                                                                        <input type="number" name="total_sections" value="{{ class.total_sections }}" class="form-control" min="1" required>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 mb-3">
+                                                                        <label class="form-label">Select Cycle</label>
+                                                                        <select name="cycle" class="form-control" required>
+                                                                            <option value="">Select a Cycle</option>
+                                                                            {% for c in cycles %}
+                                                                                <option value="{{ c.id }}" {% if c.id == class.cycle.id %}selected{% endif %}>{{ c.year }}</option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <button type="submit" name="edit_class" class="btn btn-primary">Save Changes</button>
+                                                            </form>
+                                                        </div>
 
-                    <!-- Sections for this Class -->
-                    {% for section in class.sections.all %}
-                        <div class="section-item">
-                            <p>{{ section.section_name }} - Total Seats: {{ section.total_seats }}, Filled: {{ section.filled_seats_dynamic }}, Available: {{ section.available_seats_dynamic }}</p>
-                            <button class="btn btn-secondary" onclick="toggleEditForm('edit-section-{{ section.id }}')">Edit Section</button>
-                        </div>
-                        <!-- Edit Section Form -->
-                        <div id="edit-section-{{ section.id }}" class="edit-form">
-                            <h5>Edit {{ section.section_name }}</h5>
-                            <form method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="section_id" value="{{ section.id }}">
-                                <div class="form-group">
-                                    <label class="form-label">Section Name</label>
-                                    <input type="text" name="section_name" value="{{ section.section_name }}" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Total Seats</label>
-                                    <input type="number" name="total_seats" value="{{ section.total_seats }}" class="form-control" min="1" required>
-                                </div>
-                                <button type="submit" name="edit_section" class="btn btn-primary">Save Changes</button>
-                            </form>
-                        </div>
-                    {% endfor %}
+                                                        <!-- Sections for this Class -->
+                                                        {% for section in class.sections.all %}
+                                                            <div class="section-item">
+                                                                <p class="section-details">{{ section.section_name }} - Total Seats: {{ section.total_seats }}, Filled: {{ section.filled_seats_dynamic }}, Available: {{ section.available_seats_dynamic }}</p>
+                                                                <div>
+                                                                    <button class="btn btn-secondary" onclick="toggleEditForm('edit-section-{{ section.id }}')">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                    <form method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete {{ section.section_name }}? This will remove all associated seats.');">
+                                                                        {% csrf_token %}
+                                                                        <input type="hidden" name="section_id" value="{{ section.id }}">
+                                                                        <input type="hidden" name="delete_section" value="true">
+                                                                        <button type="submit" class="btn btn-danger">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Edit Section Form -->
+                                                            <div id="edit-section-{{ section.id }}" class="edit-form">
+                                                                <h5 class="mb-3">Edit {{ section.section_name }}</h5>
+                                                                <form method="post">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="section_id" value="{{ section.id }}">
+                                                                    <div class="row">
+                                                                        <div class="col-12 col-md-6 mb-3">
+                                                                            <label class="form-label">Section Name</label>
+                                                                            <input type="text" name="section_name" value="{{ section.section_name }}" class="form-control" required>
+                                                                        </div>
+                                                                        <div class="col-12 col-md-6 mb-3">
+                                                                            <label class="form-label">Total Seats</label>
+                                                                            <input type="number" name="total_seats" value="{{ section.total_seats }}" class="form-control" min="1" required>
+                                                                        </div>
+                                                                        <div class="col-12 col-md-6 mb-3">
+                                                                            <label class="form-label">Select Cycle</label>
+                                                                            <select name="cycle" class="form-control" required>
+                                                                                <option value="">Select a Cycle</option>
+                                                                                {% for c in cycles %}
+                                                                                    <option value="{{ c.id }}" {% if c.id == section.cycle.id %}selected{% endif %}>{{ c.year }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="submit" name="edit_section" class="btn btn-primary">Save Changes</button>
+                                                                </form>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            {% empty %}
+                                                <p class="text-muted">No classes found for this cycle.</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No cycles found. Please create a cycle first.</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">Classes and sections cannot be displayed until your school profile is set up.</p>
+                    {% endif %}
                 </div>
-            {% endfor %}
-        {% else %}
-            <p>No classes found. Add a class above.</p>
-        {% endif %}
-    {% else %}
-        <p>Classes and sections cannot be displayed until your school profile is set up.</p>
-    {% endif %}
-</div>
             </div>
         </div>
     </div>
@@ -234,5 +548,68 @@
             const form = document.getElementById(formId);
             form.style.display = form.style.display === 'block' ? 'none' : 'block';
         }
+
+        function toggleAccordion(id) {
+            const body = document.getElementById(id);
+            const icon = body.previousElementSibling.querySelector('.toggle-icon');
+            body.classList.toggle('active');
+            if (body.classList.contains('active')) {
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+
+        $(document).ready(function() {
+            $('#id_cycle').change(function() {
+                var cycleId = $(this).val();
+                var schoolId = '{{ school.id|default_if_none:"" }}';
+                var $classSelect = $('#id_class_id');
+
+                console.log('Cycle changed to:', cycleId, 'School ID:', schoolId);
+
+                // Clear and reset dropdown
+                $classSelect.empty().append('<option value="">Select a Class</option>');
+
+                if (cycleId && schoolId) {
+                    $.ajax({
+                        url: '{% url "schools:get_classes" %}',
+                        type: 'GET',
+                        data: {
+                            'school_id': schoolId,
+                            'cycle_id': cycleId
+                        },
+                        cache: false, // Prevent caching
+                        success: function(data) {
+                            console.log('AJAX Success - Response:', data);
+                            if (data.classes && data.classes.length > 0) {
+                                $.each(data.classes, function(index, classItem) {
+                                    console.log('Adding class:', classItem.grade, 'ID:', classItem.id);
+                                    $classSelect.append(
+                                        $('<option></option>').val(classItem.id).text(classItem.grade)
+                                    );
+                                });
+                            } else {
+                                console.log('No classes found for cycle:', cycleId);
+                                $classSelect.append('<option value="">No classes available</option>');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error:', status, error, xhr.responseText);
+                            $classSelect.empty().append('<option value="">Error loading classes</option>');
+                        }
+                    });
+                } else {
+                    console.log('Cycle or School ID missing');
+                }
+            });
+
+            // Trigger change on page load if cycle is pre-selected
+            var preSelectedCycle = $('#id_cycle').val();
+            if (preSelectedCycle) {
+                console.log('Triggering change for pre-selected cycle:', preSelectedCycle);
+                $('#id_cycle').trigger('change');
+            }
+        });
     </script>
 {% endblock %}

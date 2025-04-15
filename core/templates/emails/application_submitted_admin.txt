@@ -1,0 +1,9 @@
+Hello {{ recipient_name }},
+
+A new application has been submitted by {{ student_name }} for {{ section_name }} at {{ institution_name }}.
+Status: {{ application_status }}
+
+Please review the application at your earliest convenience. Thank you!
+Best,
+The Academia Team
+http://academiaadmit.in

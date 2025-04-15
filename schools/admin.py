@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission
+from .models import SchoolProfile, SchoolClass, ClassSection, Seat, Admission, AdmissionCycle  # Added AdmissionCycle
 
 @admin.register(SchoolProfile)
 class SchoolProfileAdmin(admin.ModelAdmin):
@@ -18,16 +18,16 @@ class SchoolProfileAdmin(admin.ModelAdmin):
 
 @admin.register(SchoolClass)
 class SchoolClassAdmin(admin.ModelAdmin):
-    list_display = ('grade', 'school', 'total_sections')
-    list_filter = ('school',)
-    search_fields = ('grade', 'school__school_name')
+    list_display = ('grade', 'school', 'cycle', 'total_sections')  # Added cycle
+    list_filter = ('school', 'cycle')  # Added cycle
+    search_fields = ('grade', 'school__school_name', 'cycle__year')  # Added cycle__year
     ordering = ('grade',)
 
 @admin.register(ClassSection)
 class ClassSectionAdmin(admin.ModelAdmin):
-    list_display = ('school_class', 'section_name', 'total_seats', 'filled_seats', 'available_seats')
-    list_filter = ('school_class__school', 'school_class__grade')
-    search_fields = ('section_name', 'school_class__grade', 'school_class__school__school_name')
+    list_display = ('school_class', 'section_name', 'total_seats', 'available_seats')  # Removed filled_seats
+    list_filter = ('school_class__school', 'school_class__grade', 'cycle')  # Added cycle
+    search_fields = ('section_name', 'school_class__grade', 'school_class__school__school_name', 'cycle__year')  # Added cycle__year
     ordering = ('school_class__grade', 'section_name')
 
 @admin.register(Seat)
@@ -39,13 +39,25 @@ class SeatAdmin(admin.ModelAdmin):
 
 @admin.register(Admission)
 class AdmissionAdmin(admin.ModelAdmin):
-    list_display = ('admission_id', 'student', 'school', 'school_class', 'section', 'status', 'admission_date')  # Added admission_id
-    list_filter = ('status', 'school', 'school_class__grade', 'section__section_name')
-    search_fields = ('admission_id', 'student__username', 'school__school_name')  # Added admission_id
+    list_display = ('admission_id', 'student', 'school', 'school_class', 'section', 'cycle', 'status', 'admission_date')  # Added cycle
+    list_filter = ('status', 'school', 'school_class__grade', 'section__section_name', 'cycle')  # Added cycle
+    search_fields = ('admission_id', 'student__username', 'school__school_name', 'cycle__year')  # Added cycle__year
     ordering = ('-admission_date',)
     fieldsets = (
-        (None, {'fields': ('school', 'student', 'admission_id')}),  # Added admission_id
-        ('Class Info', {'fields': ('school_class', 'section', 'seat')}),
+        (None, {'fields': ('school', 'student', 'admission_id')}),
+        ('Class Info', {'fields': ('school_class', 'section', 'seat', 'cycle')}),  # Added cycle
         ('Parent Info', {'fields': ('parent_name', 'contact_number', 'email')}),
         ('Status', {'fields': ('status', 'admission_date')}),
+    )
+
+@admin.register(AdmissionCycle)  # Added registration for AdmissionCycle
+class AdmissionCycleAdmin(admin.ModelAdmin):
+    list_display = ('year', 'school', 'start_date', 'end_date', 'is_active', 'is_archived')
+    list_filter = ('is_active', 'is_archived', 'school')
+    search_fields = ('year', 'school__school_name')
+    ordering = ('year',)
+    fieldsets = (
+        (None, {'fields': ('school', 'year')}),
+        ('Dates', {'fields': ('start_date', 'end_date')}),
+        ('Status', {'fields': ('is_active', 'is_archived')}),
     )

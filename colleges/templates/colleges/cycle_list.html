@@ -1,0 +1,33 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Manage Cycles - {{ college_profile.college_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>Manage Admission Cycles - {{ college_profile.college_name }}</h3>
+        </div>
+        <div class="card-body">
+            <a href="{% url 'colleges:add_cycle' %}" class="btn btn-primary mb-3">Add New Cycle</a>
+            {% if cycles %}
+                <ul class="list-group">
+                    {% for cycle in cycles %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ cycle.year }} ({{ cycle.start_date|date:"d M Y" }} - {{ cycle.end_date|date:"d M Y" }})
+                            {% if cycle.is_active %}<span class="badge bg-success">Active</span>{% endif %}
+                            {% if cycle.is_archived %}<span class="badge bg-secondary">Archived</span>{% endif %}
+                            <div>
+                                <a href="{% url 'colleges:edit_cycle' cycle.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
+                                <a href="{% url 'colleges:delete_cycle' cycle.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No cycles created yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

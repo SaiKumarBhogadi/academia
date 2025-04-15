@@ -3,139 +3,87 @@
 {% block title %}Manage Departments - {{ college_profile.college_name }}{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="mb-0">Manage Departments - {{ college_profile.college_name }}</h3>
-            </div>
-            <div class="card-body">
-                <!-- Display messages -->
-                {% if messages %}
-                    <ul class="messages">
-                        {% for message in messages %}
-                            <li class="{{ message.tags }}">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+<div class="container my-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header  text-white" style="background-color: rgb(51, 51, 126);">
+            <h4 class="mb-0">Manage Departments - {{ college_profile.college_name }}</h4>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
-                <!-- Add Department Button -->
-                <div class="mb-4">
-                    {% if degrees %}
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="addDepartmentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Add Department
+            <div class="accordion" id="cycleAccordion">
+                {% for cycle, degree_departments in cycle_degrees_departments.items %}
+                    <div class="accordion-item mb-3">
+                        <h2 class="accordion-header" id="heading{{ cycle.id }}">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ cycle.id }}" aria-expanded="{{ forloop.first|yesno:'true,false' }}" aria-controls="collapse{{ cycle.id }}">
+                                {{ cycle.year }} ({{ cycle.start_date|date:"d M Y" }} - {{ cycle.end_date|date:"d M Y" }})
                             </button>
-                            <ul class="dropdown-menu" aria-labelledby="addDepartmentDropdown">
-                                {% for degree in degrees %}
-                                    <li><a class="dropdown-item" href="{% url 'colleges:link_departments' degree.id %}">{{ degree.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% else %}
-                        <p class="text-danger">Please add a degree before adding a department.</p>
-                    {% endif %}
-                    <a href="{% url 'colleges:dashboard' %}" class="btn btn-secondary ms-2">Back to Dashboard</a>
-                </div>
+                        </h2>
+                        <div id="collapse{{ cycle.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ cycle.id }}" data-bs-parent="#cycleAccordion">
+                            <div class="accordion-body">
+                                {% if degree_departments %}
+                                    {% for degree, departments in degree_departments.items %}
+                                        <div class="mb-4">
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                                <h5 class="mb-2">{{ degree.name }} Departments</h5>
+                                                <a href="{% url 'colleges:add_department' degree.id %}?cycle_id={{ cycle.id }}" class="btn btn-sm btn-success">+ Add Department</a>
+                                            </div>
 
-                <!-- Departments Grouped by Degree -->
-                {% if degrees %}
-                    {% for degree in degrees %}
-                        <h5 class="mt-4">{{ degree.name }} Departments</h5>
-                        {% if degree.departments.all %}
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Total Seats</th>
-                                        <th>Fees per Year</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for department in degree.departments.all %}
-                                        <tr>
-                                            <td>{{ department.name }}</td>
-                                            <td>{{ department.total_seats }}</td>
-                                            <td>${{ department.fees_per_year }}</td>
-                                            <td>
-                                                <a href="{% url 'colleges:edit_department' department.degree.id department.id %}" class="btn btn-sm btn-primary">Edit</a>
-                                            </td>
-                                        </tr>
+                                            {% if departments %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover table-bordered align-middle">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>HOD</th>
+                                                                <th>Faculty Count</th>
+                                                                <th>Fees per Year</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for department in departments %}
+                                                                <tr>
+                                                                    <td>{{ department.name }}</td>
+                                                                    <td>{{ department.hod_name|default:"N/A" }}</td>
+                                                                    <td>{{ department.faculty_count }}</td>
+                                                                    <td>${{ department.fees_per_year }}</td>
+                                                                    <td>
+                                                                        <div class="btn-group btn-group-sm" role="group">
+                                                                            <a href="{% url 'colleges:section_list' department.id %}?cycle_id={{ cycle.id }}" class="btn btn-info">Sections</a>
+                                                                            <a href="{% url 'colleges:edit_department' department.id %}?cycle_id={{ cycle.id }}" class="btn btn-warning">Edit</a>
+                                                                            <a href="{% url 'colleges:delete_department' department.id %}?cycle_id={{ cycle.id }}" class="btn btn-danger">Delete</a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% else %}
+                                                <p class="text-muted">No departments added for this degree.</p>
+                                            {% endif %}
+                                        </div>
                                     {% endfor %}
-                                </tbody>
-                            </table>
-                        {% else %}
-                            <p>No departments added for {{ degree.name }} yet.</p>
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <p>No degrees added yet. Please add a degree to start managing departments.</p>
-                {% endif %}
+                                {% else %}
+                                    <p class="text-muted">No degrees added for this cycle.</p>
+                                    <a href="#" class="btn btn-secondary btn-sm disabled">Add Department (No Degrees)</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+
+            {% if not cycle_degrees_departments %}
+                <p class="text-muted">No departments or cycles added yet.</p>
+                <a href="{% url 'colleges:add_cycle' %}" class="btn btn-primary">Add Cycle</a>
+            {% endif %}
         </div>
     </div>
-{% endblock %}
-
-{% block extra_css %}
-    <style>
-        .card-header {
-            background-color: #1a2a6c;
-            color: white;
-            padding: 15px 20px;
-        }
-        .btn-primary, .btn-secondary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .btn-primary:hover, .btn-secondary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 0.875rem;
-        }
-        .ms-2 {
-            margin-left: 0.5rem;
-        }
-        .dropdown-menu {
-            min-width: 200px;
-        }
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
-        .messages {
-            margin: 20px 0;
-            padding: 0;
-            list-style: none;
-        }
-        .messages li {
-            padding: 10px 20px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .messages .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .messages .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        h5.mt-4 {
-            margin-top: 2rem;
-            border-bottom: 2px solid #1a2a6c;
-            padding-bottom: 5px;
-        }
-    </style>
+</div>
 {% endblock %}

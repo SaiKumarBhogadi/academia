@@ -1,0 +1,14 @@
+Hello {{ recipient_name }},
+
+{% if college_name %}
+An application by {{ student_name }} for (Degree: {{ degree_name }}, Department: {{ department_name }}, Section: {{ section_name }}) at {{ college_name }} has been withdrawn.
+{% elif school_name %}
+An application by {{ student_name }} for (Class: {{ class_grade }}, Section: {{ section_name }}) at {{ school_name }} has been withdrawn.
+{% else %}
+An application by {{ student_name }} has been withdrawn.
+{% endif %}
+
+Please update your records accordingly. Thank you!
+Best,
+The Academia Team
+http://academiaadmit.in

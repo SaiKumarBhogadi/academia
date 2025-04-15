@@ -1,234 +1,245 @@
 {% extends 'students/base.html' %}
+{% load static %}
 
 {% block title %}Select a School{% endblock %}
 
 {% block content %}
-    <style>
-        .school-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .filter-section {
-            margin-bottom: 30px;
-            padding: 15px;
-            background-color: #f1f3f5;
-            border-radius: 5px;
-        }
-        .filter-section .form-group {
-            margin-bottom: 15px;
-        }
-        .filter-section label {
-            font-weight: 600;
-            color: #1a2a6c;
-            margin-right: 10px;
-        }
-        .filter-section select, .filter-section input[type="text"] {
-            border: 2px solid #1a2a6c;
-            border-radius: 5px;
-            padding: 8px;
-            font-size: 1rem;
-        }
-        .filter-section button {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-            color: white;
-            padding: 8px 15px;
-            font-size: 1rem;
-            border-radius: 5px;
-        }
-        .filter-section button:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .school-card {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-        .school-card:hover {
-            transform: translateY(-5px);
-        }
-        .school-card .school-link {
-            text-decoration: none;
-            color: inherit;
-        }
-        .school-card .school-header {
-            display: flex;
-            align-items: center;
-        }
-        .school-card .school-image {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-right: 15px;
-        }
-        .school-card .school-image-placeholder {
-            width: 80px;
-            height: 80px;
-            background-color: #ddd;
-            border-radius: 5px;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        .school-card .school-name {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1a2a6c;
-            margin: 0;
-        }
-        .school-card .school-details {
-            margin-top: 10px;
-        }
-        .school-card .school-details p {
-            margin: 5px 0;
-            color: #333;
-        }
-        .school-card .school-details .label {
-            font-weight: 600;
-            color: #1a2a6c;
-        }
-        .school-card .action-buttons {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        .school-card .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-            padding: 8px 15px;
-            font-size: 1rem;
-            border-radius: 5px;
-            color: white;
-            text-decoration: none;
-        }
-        .school-card .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .school-card .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            padding: 8px 15px;
-            font-size: 1rem;
-            border-radius: 5px;
-            color: white;
-            text-decoration: none;
-        }
-        .school-card .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #5a6268;
-        }
-    </style>
-
-    <div class="card" style="margin-top: 50px;">
-        <div class="card-header">
-            <h3 class="mb-0">Select a School to Apply</h3>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header" style="background-color: #ffffff; color: #1a2a6c; border-bottom: 2px solid #1a2a6c;">
+            <h3 class="mb-0">Explore Schools</h3>
         </div>
-        <div class="card-body">
-            <div class="school-container">
-                <!-- Filter and Search Section -->
-                <div class="filter-section">
-                    <form method="get" class="row g-3">
-                        <div class="col-md-3 form-group">
-                            <label for="district">District:</label>
-                            <select name="district" id="district" class="form-control">
-                                <option value="">All Districts</option>
-                                {% for district in districts %}
-                                    {% if district %}
-                                        <option value="{{ district }}" {% if selected_district == district %}selected{% endif %}>{{ district }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="state">State:</label>
-                            <select name="state" id="state" class="form-control">
-                                <option value="">All States</option>
-                                {% for state in states %}
-                                    {% if state %}
-                                        <option value="{{ state }}" {% if selected_state == state %}selected{% endif %}>{{ state }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="school_type">School Type:</label>
-                            <select name="school_type" id="school_type" class="form-control">
-                                <option value="">All Types</option>
-                                {% for type in school_types %}
-                                    {% if type %}
-                                        <option value="{{ type }}" {% if selected_school_type == type %}selected{% endif %}>{{ type|capfirst }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="search">Search by School Name:</label>
-                            <input type="text" name="search" id="search" class="form-control" value="{{ search_query }}" placeholder="Enter school name">
-                        </div>
-                        <div class="col-md-3 form-group d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary">Filter</button>
-                        </div>
-                    </form>
-                </div>
+        <div class="card-body p-4" style="background-color: #ffffff;">
+            <!-- Filter Section -->
+            <div class="filter-section mb-4 p-3" style="border: 1px solid #dee2e6; border-radius: 8px;">
+                <h5 class="text-primary mb-3">Filter Options</h5>
+                <form method="get" class="row g-3">
+                    <!-- Filter by District -->
+                    <div class="col-md-4">
+                        <label for="district" class="form-label text-dark">District</label>
+                        <select name="district" id="district" class="form-select" style="border-color: #1a2a6c;">
+                            <option value="">All Districts</option>
+                            {% for district in districts %}
+                                {% if district %}
+                                    <option value="{{ district }}" {% if selected_district == district %}selected{% endif %}>{{ district }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filter by State -->
+                    <div class="col-md-4">
+                        <label for="state" class="form-label text-dark">State</label>
+                        <select name="state" id="state" class="form-select" style="border-color: #1a2a6c;">
+                            <option value="">All States</option>
+                            {% for state in states %}
+                                {% if state %}
+                                    <option value="{{ state }}" {% if selected_state == state %}selected{% endif %}>{{ state }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filter by School Type -->
+                    <div class="col-md-4">
+                        <label for="school_type" class="form-label text-dark">School Type</label>
+                        <select name="school_type" id="school_type" class="form-select" style="border-color: #1a2a6c;">
+                            <option value="">All Types</option>
+                            {% for type in school_types %}
+                                {% if type %}
+                                    <option value="{{ type }}" {% if selected_school_type == type %}selected{% endif %}>{{ type|capfirst }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Search by School Name -->
+                    <div class="col-md-4">
+                        <label for="search" class="form-label text-dark">Search by School Name</label>
+                        <input type="text" name="search" id="search" class="form-control" value="{{ search_query|default_if_none:'' }}" placeholder="Enter school name" style="border-color: #1a2a6c;">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary mt-3 w-100" style="background-color: #1a2a6c; border-color: #1a2a6c;">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
 
-                <!-- School Cards -->
-                <div class="row">
+            <!-- School List -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% if schools %}
                     {% for school in schools %}
-                        <div class="col-md-6">
-                            <div class="school-card">
-                                <div class="school-header">
-                                    {% if school.profile_pic %}
-                                        <img src="{{ school.profile_pic.url }}" alt="{{ school.school_name }} Profile Pic" class="school-image">
-                                    {% else %}
-                                        <div class="school-image-placeholder">No Image</div>
-                                    {% endif %}
-                                    <h4 class="school-name">{{ school.school_name }}</h4>
+                        <div class="col">
+                            <div class="card h-100 school-card shadow-sm" style="will-change: transform, box-shadow;">
+                                <div class="card-img-top position-relative overflow-hidden">
+                                    <img src="{% if school.profile_pic and school.profile_pic.url %}{{ school.profile_pic.url }}{% else %}{% static 'images/no-images.avif' %}{% endif %}" alt="{{ school.school_name }} Profile" class="img-fluid w-100" style="object-fit: cover; height: 200px;" loading="lazy">
                                 </div>
-                                <div class="school-details">
-                                    <p><span class="label">Address:</span> 
-                                        {% if school.street_address %}{{ school.street_address }}, {% endif %}
-                                        {% if school.city %}{{ school.city }}, {% endif %}
-                                        {% if school.district %}{{ school.district }}, {% endif %}
-                                        {% if school.state %}{{ school.state }}{% endif %}
-                                        {% if school.pincode %} - {{ school.pincode }}{% endif %}
-                                        {% if not school.street_address and not school.city and not school.district and not school.state and not school.pincode %}
-                                            Not provided
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-primary fw-bold">{{ school.school_name }}</h5>
+                                    <div class="card-text flex-grow-1">
+                                        <p><strong>Address:</strong> 
+                                            {% if school.street_address %}{{ school.street_address }}, {% endif %}
+                                            {% if school.city %}{{ school.city }}, {% endif %}
+                                            {% if school.district %}{{ school.district }}, {% endif %}
+                                            {% if school.state %}{{ school.state }}{% endif %}
+                                            {% if school.pincode %} - {{ school.pincode }}{% endif %}
+                                            {% if not school.street_address and not school.city and not school.district and not school.state and not school.pincode %}
+                                                Not provided
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>School Type:</strong> {{ school.school_type|capfirst|default:"Not specified" }}</p>
+                                        <!-- <p><strong>Total Students:</strong> {{ school.total_students|default:"Not specified" }}</p> -->
+                                        <p><strong>Total Teachers:</strong> {{ school.total_teachers|default:"Not specified" }}</p>
+                                        <p><strong>Established:</strong> {{ school.established_year|default:"Not specified" }}</p>
+                                        <!-- <p><strong>Contact:</strong> {{ school.contact_phone|default:"Not specified" }}</p> -->
+                                    </div>
+                                    <div class="mt-auto">
+                                        <a href="{% url 'schools:public_school_profile' school.id %}" class="btn btn-primary w-100 mb-2" style="background-color: #1a2a6c; border-color: #1a2a6c;">View Details</a>
+                                        <a href="{% url 'schools:apply_for_admission' school.id %}" class="btn btn-primary w-100" style="background-color: #1a2a6c; border-color: #1a2a6c;">Apply</a>
+                                        {% if school.id in applied_schools %}
+                                            <div class="applied-status text-success mt-2">Already Applied</div>
                                         {% endif %}
-                                    </p>
-                                    <p><span class="label">School Type:</span> {{ school.school_type|capfirst|default:"Not specified" }}</p>
-                                    <p><span class="label">Total Students:</span> {{ school.total_students|default:"Not specified" }}</p>
-                                    <p><span class="label">Total Teachers:</span> {{ school.total_teachers|default:"Not specified" }}</p>
-                                    <p><span class="label">Established:</span> {{ school.established_year|default:"Not specified" }}</p>
-                                    <p><span class="label">Contact:</span> {{ school.contact_phone|default:"Not specified" }}</p>
-                                </div>
-                                <div class="action-buttons">
-                                    <a href="{% url 'schools:public_school_profile' school.id %}" class="btn btn-primary">View Profile</a>
-                                    <a href="{% url 'schools:school_seats' school.id %}" class="btn btn-secondary">Apply for Admission</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% empty %}
-                        <div class="col-12">
-                            <p>No schools found matching your criteria.</p>
-                        </div>
                     {% endfor %}
-                </div>
-
-                <!-- <div class="mt-3">
-                    <a href="{% url 'schools:apply' %}" class="btn btn-primary">Apply Using Dropdown Method</a>
-                </div> -->
+                {% else %}
+                    <p class="text-muted">No schools found with the selected filters.</p>
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
+
+
+<style>
+    .card-header {
+        background-color: #ffffff;
+        color: #1a2a6c;
+        border-bottom: 2px solid #1a2a6c;
+        padding: 15px 20px;
+    }
+    .card-body {
+        background-color: #ffffff;
+    }
+    .filter-section {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+    .school-card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .school-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    .card-img-top img {
+        transition: transform 0.3s ease;
+    }
+    .card-title.text-primary {
+        color: #1a2a6c;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    .card-text p {
+        color: #333;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 4px 0;
+    }
+    .card-text p strong {
+        color: #1a2a6c;
+        font-weight: 500;
+    }
+    .btn-primary {
+        background-color: #1a2a6c;
+        border-color: #1a2a6c;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #b21f1f;
+        border-color: #b21f1f;
+    }
+    .text-muted {
+        color: #6c757d;
+        font-style: italic;
+    }
+    .form-select, .form-control {
+        transition: border-color 0.3s ease;
+    }
+    .form-select:focus, .form-control:focus {
+        border-color: #b21f1f;
+        box-shadow: 0 0 5px rgba(178, 31, 31, 0.5);
+    }
+    .applied-status {
+        color: #28a745;
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .card-header h3 {
+            font-size: 1.5rem;
+        }
+        .card-title.text-primary {
+            font-size: 1.1rem;
+        }
+        .card-text p {
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        .card-img-top img {
+            height: 180px;
+        }
+        .col-md-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-header h3 {
+            font-size: 1.25rem;
+        }
+        .card-title.text-primary {
+            font-size: 1rem;
+        }
+        .card-text p {
+            font-size: 0.85rem;
+        }
+        .btn-primary {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        .card-img-top img {
+            height: 150px;
+        }
+        .row {
+            flex-direction: column !important;
+        }
+        .col {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        .row.g-3 {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .col-md-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
+
+

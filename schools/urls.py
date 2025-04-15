@@ -8,7 +8,7 @@ urlpatterns = [
     path('profile/', views.school_profile, name='school_profile'),
     path('class-section-management/', views.class_section_management, name='class_section_management'),
     path('admissions/', views.admissions, name='admissions'),
-    path('apply/', views.apply_for_admission, name='apply'),
+    path('apply/<int:school_id>/', views.apply_for_admission, name='apply_for_admission'),
     path('application-success/', views.application_success, name='application_success'),
     path('get-classes/', views.get_classes, name='get_classes'),
     path('get-sections/', views.get_sections, name='get_sections'),
@@ -28,5 +28,12 @@ urlpatterns = [
     path('get-seats/<int:section_id>/', views.get_seats, name='get_seats'),
     path('applications/', views.applications, name='applications'),
     path('student-details/<int:student_id>/', views.student_details, name='student_details'),
+
+
+    path('create-cycle/', views.create_cycle, name='create_cycle'),
+    path('edit-cycle/<int:cycle_id>/', views.edit_cycle, name='edit_cycle'),
+    path('cycle-list/', views.cycle_list, name='cycle_list'),
+
+    path('packages/', views.packages, name='packages'),
     
 ]

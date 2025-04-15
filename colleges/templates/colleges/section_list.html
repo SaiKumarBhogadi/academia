@@ -1,0 +1,64 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Manage Sections - {{ college_profile.college_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>Manage Sections - {{ college_profile.college_name }} (Department: {{ department.name }})</h3>
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="cycleAccordion">
+                {% for cycle, sections in cycle_sections.items %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ cycle.id }}">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ cycle.id }}" aria-expanded="true" aria-controls="collapse{{ cycle.id }}">
+                                {{ cycle.year }} ({{ cycle.start_date|date:"d M Y" }} - {{ cycle.end_date|date:"d M Y" }})
+                            </button>
+                        </h2>
+                        <div id="collapse{{ cycle.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ cycle.id }}" data-bs-parent="#cycleAccordion">
+                            <div class="accordion-body">
+                                <a href="{% url 'colleges:add_section' department.id %}?cycle_id={{ cycle.id }}" class="btn btn-primary mb-3">Add Section</a>
+                                {% if sections %}
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Section Name</th>
+                                                <th>Total Seats</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for section in sections %}
+                                                <tr>
+                                                    <td>{{ section.section_name }}</td>
+                                                    <td>{{ section.total_seats }}</td>
+                                                    <td>
+                                                        <a href="{% url 'colleges:section_seats' college_profile.id department.degree.id department.id %}?cycle_id={{ cycle.id }}" class="btn btn-info btn-sm">View Seats</a>
+                                                        <a href="{% url 'colleges:edit_section' department.id section.id %}?cycle_id={{ cycle.id }}" class="btn btn-warning btn-sm">Edit Section</a>
+                                                        <form method="post" action="{% url 'colleges:delete_section' department.id section.id %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete section {{ section.section_name }}? This will delete all associated seats.');">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger btn-sm">Delete Section</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p class="text-muted">No sections added for this cycle.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if not cycle_sections %}
+                <p class="text-muted">No sections added for any cycle in this department.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

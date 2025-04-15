@@ -134,3 +134,23 @@ AUTH_USER_MODEL = 'core.User'
 # Media settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Use SMTP for real sending
+# For testing, uncomment the line below instead: EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'saibhogadi999@gmail.com'  # Replace with your Gmail address (e.g., academia.portal@gmail.com)
+EMAIL_HOST_PASSWORD = 'ayumyybravyjgutx'  # Replace with the 16-character app password (generate via Google Account with 2FA)
+DEFAULT_FROM_EMAIL = 'no-reply@academia.com'  # Default "from" address for all emails

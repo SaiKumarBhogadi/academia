@@ -1,0 +1,10 @@
+Hello {{ recipient_name }},
+
+Welcome to Academia! Your account has been created successfully.
+Your account is currently awaiting admin approval. Once approved, you can log in using the link below:
+{{ login_url }}
+
+Thank you for joining us!
+Best,
+The Academia Team
+http://academiaadmit.in

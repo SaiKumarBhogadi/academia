@@ -1,0 +1,33 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Delete Degree - {{ college_profile.college_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header text-white rounded-top-4" style="background-color: rgb(32, 32, 74);">
+            <h3 class="mb-0"><i class="fas fa-graduation-cap me-2"></i> Delete Degree - {{ college_profile.college_name }}</h3>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} rounded-3">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <p class="text-muted fw-semibold"><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Are you sure you want to delete the degree "<strong>{{ degree.name }}</strong>" for cycle {{ selected_cycle.year }}?</p>
+            <p class="text-danger fst-italic">This action cannot be undone. All associated data (if any) will be deleted.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-danger rounded-3">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
+                    <a href="{% url 'colleges:degree_list' %}?cycle_id={{ selected_cycle.id }}" class="btn btn-secondary rounded-3">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

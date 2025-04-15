@@ -1,0 +1,197 @@
+{% extends 'students/base.html' %}
+{% load static %} <!-- For static files like no-image.png -->
+
+{% block title %}{{ degree.name }} Departments - {{ college.college_name }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <!-- Degree Header with Image -->
+            <div class="card-header text-white p-4" style="background: linear-gradient(to bottom, #1a2a6c, #b21f1f); display: flex; align-items: center;">
+                <div class="degree-image me-3">
+                    <img src="{% if college.profile_pic and college.profile_pic.url %}{{ college.profile_pic.url }}{% else %}{% static 'images/no-images.avif' %}{% endif %}" alt="{{ degree.name }} Logo" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #ffffff;">
+                </div>
+                <div>
+                    <h2 class="mb-0">{{ degree.name }} Departments - {{ college.college_name }}</h2>
+                    {% if cycle %}
+                        <p class="text-white small">Cycle: {{ cycle.year }} ({{ cycle.start_date|date:"d M Y" }} - {{ cycle.end_date|date:"d M Y" }})</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body p-4" style="background-color: rgba(255, 255, 255, 0.9);">
+                <!-- Degree Information -->
+                <h3 class="mt-4" style="color: #1a2a6c;">Degree Information</h3>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
+                            <h6 class="mb-2" style="color: #1a2a6c;">Details</h6>
+                            <p><strong>Degree Name:</strong> {{ degree.name }}</p>
+                            <p><strong>Duration:</strong> {{ degree.duration }}</p>
+                            <p><strong>Eligibility Criteria:</strong> {{ degree.eligibility_criteria|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Departments -->
+                <h3 class="mt-5" style="color: #1a2a6c;">Departments</h3>
+                {% if departments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr style="background: linear-gradient(to right, #1a2a6c, #b21f1f); color: white;">
+                                    <th>Name</th>
+                                    <th>HOD</th>
+                                    <th>Faculty Count</th>
+                                    <th>Labs</th>
+                                    <th>Total Seats</th>
+                                    <th>Fees per Year</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for department in departments %}
+                                    <tr class="department-row">
+                                        <td>{{ department.name }}</td>
+                                        <td>{{ department.hod_name|default:"Not specified" }}</td>
+                                        <td>{{ department.faculty_count }}</td>
+                                        <td>{{ department.labs|default:"Not specified" }}</td>
+                                        <td>{{ department.total_seats }}</td>
+                                        <td>${{ department.fees_per_year }}</td>
+                                        <td>
+                                            <a href="{% url 'colleges:degree_detail' college.id degree.id department.id cycle.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No departments available for {{ degree.name }} in the selected cycle.</p>
+                {% endif %}
+
+                <!-- Back Button -->
+                <div class="mt-3">
+                    <a href="{% url 'colleges:college_detail' college.id %}?cycle_id={{ cycle.id }}" class="btn btn-secondary">Back to College</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .card-header {
+            background: linear-gradient(to bottom, #1a2a6c, #b21f1f);
+            color: white;
+            padding: 20px;
+        }
+        .degree-image img {
+            transition: transform 0.3s ease;
+        }
+        .degree-image img:hover {
+            transform: scale(1.1);
+        }
+        .detail-card {
+            border-left: 4px solid #1a2a6c;
+            transition: box-shadow 0.3s ease;
+        }
+        .detail-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .card-body {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .btn-primary {
+            background-color: #1a2a6c;
+            border-color: #1a2a6c;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #b21f1f;
+            border-color: #b21f1f;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        .department-row:hover {
+            background-color: #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .degree-image {
+                margin-bottom: 10px;
+            }
+            .degree-image img {
+                width: 80px;
+                height: 80px;
+            }
+            .detail-card {
+                margin-bottom: 15px;
+            }
+            .table thead {
+                display: none;
+            }
+            .table tbody tr {
+                display: block;
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            .table td {
+                display: block;
+                text-align: right;
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+                position: relative;
+            }
+            .table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                position: absolute;
+                left: 10px;
+                color: #1a2a6c;
+            }
+            .table td:last-child {
+                border-bottom: none;
+            }
+            .table td[data-label="Actions"] {
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .detail-card p {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

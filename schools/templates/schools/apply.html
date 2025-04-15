@@ -1,178 +1,268 @@
 {% extends 'students/base.html' %}
 
-{% block title %}Apply for Admission{% endblock %}
+{% block title %}Apply for Admission - {{ school.school_name }}{% endblock %}
 
 {% block content %}
-    <style>
+<style>
+    .apply-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .form-section h4 {
+        color: #1a2a6c;
+        margin-bottom: 20px;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1a2a6c;
+        margin-bottom: 6px;
+        display: block;
+        font-size: 1rem;
+    }
+
+    select.form-control {
+        width: 100%;
+        min-height: 40px;
+        max-height: 40px;
+        border: 2px solid #1a2a6c;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        display: block;
+        background-color: #fff;
+    }
+
+    select.form-control option {
+        padding: 5px 10px;
+    }
+
+    select.form-control option::after {
+        content: " - " attr(data-seats) " seats available";
+        color: #666;
+    }
+
+    .form-control:focus {
+        border-color: #b21f1f;
+        box-shadow: none;
+        outline: none;
+    }
+
+    .btn-primary {
+        background-color: #1a2a6c;
+        border-color: #1a2a6c;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        background-color: #b21f1f;
+        border-color: #b21f1f;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #5a6268;
+        color: white;
+    }
+
+    .error-message {
+        color: #ff4d4d;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    .card {
+        margin: 50px 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        padding: 15px 20px;
+        background-color: #f8f9fa;
+    }
+
+    @media (max-width: 768px) {
         .apply-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        .form-section h4 {
-            color: #1a2a6c;
-            margin-bottom: 20px;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #1a2a6c;
-            margin-bottom: 8px;
-            display: block;
-            font-size: 1rem;
+        .card {
+            margin: 20px 10px;
         }
         .form-control {
-            border: 2px solid #1a2a6c;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .form-control:focus {
-            border-color: #b21f1f;
-            box-shadow: none;
-        }
-        .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 5px;
-        }
-        .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .error-message {
-            color: #ff4d4d;
             font-size: 0.9rem;
-            margin-top: 5px;
+            padding: 8px 10px;
         }
-        .error-message a {
-            color: #1a2a6c;
-            text-decoration: underline;
+        .btn-primary, .btn-secondary {
+            font-size: 0.9rem;
+            padding: 8px 15px;
         }
-        .error-message a:hover {
-            color: #b21f1f;
-        }
-    </style>
+    }
 
-    <div class="card" style="margin-top: 50px;">
-        <div class="card-header">
-            <h3 class="mb-0">Apply for Admission - Dropdown Method</h3>
-        </div>
-        <div class="card-body">
-            <div class="apply-container">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="form-section">
-                        <h4>Select School, Class, and Section</h4>
-                        <div class="form-group">
-                            <label class="form-label">Select School</label>
-                            <select name="school_id" class="form-control" id="school-select" required>
-                                <option value="">Select a School</option>
-                                {% for school in schools %}
-                                    <option value="{{ school.id }}">{{ school.school_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Select Class</label>
-                            <select name="class_id" class="form-control" id="class-select" required>
-                                <option value="">Select a Class</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Select Section</label>
-                            <select name="section_id" class="form-control" id="section-select" required>
-                                <option value="">Select a Section</option>
-                            </select>
-                        </div>
+    @media (max-width: 480px) {
+        .form-control {
+            font-size: 0.85rem;
+            padding: 6px 8px;
+        }
+        .btn-primary, .btn-secondary {
+            font-size: 0.85rem;
+            padding: 8px 12px;
+        }
+        .card {
+            margin: 10px 5px;
+        }
+        .card-header h3 {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">Apply for Admission - {{ school.school_name }}</h3>
+    </div>
+    <div class="card-body">
+        <div class="apply-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
                     </div>
-
-                    <div class="form-section">
-                        <h4>Your Details</h4>
-                        <p><strong>Student:</strong> {{ request.user.username }}</p>
-                        {% if application_form.non_field_errors %}
-                            <div class="error-message">
-                                {% for error in application_form.non_field_errors %}
-                                    <p>{{ error|safe }}</p>
-                                {% endfor %}
-                            </div>
+                {% endfor %}
+            {% endif %}
+            <form method="post" id="applicationForm">
+                {% csrf_token %}
+                <input type="hidden" name="school_id" value="{{ school.id }}">
+                <div class="form-section">
+                    <h4>Select Cycle, Class, and Section</h4>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.cycle.label }}</label>
+                        {{ form.cycle }}
+                        {% if form.cycle.errors %}
+                            <div class="error-message">{{ form.cycle.errors|join:", " }}</div>
                         {% endif %}
-                        <div class="form-group">
-                            <label for="{{ application_form.parent_name.id_for_label }}" class="form-label">Parent Name</label>
-                            {{ application_form.parent_name }}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ application_form.contact_number.id_for_label }}" class="form-label">Contact Number</label>
-                            {{ application_form.contact_number }}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ application_form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ application_form.email }}
-                        </div>
-                        <button type="submit" name="apply" class="btn btn-primary">Submit Application</button>
                     </div>
-                </form>
-                <div class="mt-3">
-                    <a href="{% url 'schools:school_list' %}" class="btn btn-primary">Apply by Selecting a Seat</a>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.school_class.label }}</label>
+                        {{ form.school_class }}
+                        {% if form.school_class.errors %}
+                            <div class="error-message">{{ form.school_class.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.section.label }}</label>
+                        {{ form.section }}
+                        {% if form.section.errors %}
+                            <div class="error-message">{{ form.section.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
                 </div>
+
+                <div class="form-section">
+                    <h4>Your Details</h4>
+                    <p><strong>Student:</strong> {{ request.user.username }}</p>
+                    {% if form.non_field_errors %}
+                        <div class="error-message">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error|safe }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label class="form-label">{{ form.parent_name.label }}</label>
+                        {{ form.parent_name }}
+                        {% if form.parent_name.errors %}
+                            <div class="error-message">{{ form.parent_name.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.contact_number.label }}</label>
+                        {{ form.contact_number }}
+                        {% if form.contact_number.errors %}
+                            <div class="error-message">{{ form.contact_number.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="error-message">{{ form.email.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Submit Application</button>
+                </div>
+            </form>
+            <div class="mt-3">
+                <a href="{% url 'schools:school_list' %}" class="btn btn-secondary">Back to Schools</a>
             </div>
+            {% if active_application %}
+                <div class="alert alert-warning mt-3">
+                    You have an active application for {{ active_application.school_class.grade }} at {{ active_application.school.school_name }} (Status: {{ active_application.status }}).
+                </div>
+            {% endif %}
         </div>
     </div>
+</div>
 
-    <script>
-        document.getElementById('school-select').addEventListener('change', function() {
-            const schoolId = this.value;
-            const classSelect = document.getElementById('class-select');
-            const sectionSelect = document.getElementById('section-select');
+<script>
+    function updateForm(element) {
+        const form = document.getElementById('applicationForm');
+        form.submit();
+    }
 
-            classSelect.innerHTML = '<option value="">Select a Class</option>';
-            sectionSelect.innerHTML = '<option value="">Select a Section</option>';
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('applicationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const requiredFields = form.querySelectorAll('select[required], input[required]');
 
-            if (schoolId) {
-                fetch(`/schools/get-classes/?school_id=${schoolId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.classes.forEach(cls => {
-                            const option = document.createElement('option');
-                            option.value = cls.id;
-                            option.textContent = cls.grade;
-                            classSelect.appendChild(option);
-                        });
-                    });
-            }
+        function checkForm() {
+            let allFilled = true;
+            requiredFields.forEach(field => {
+                if (!field.value || field.value === '') {
+                    allFilled = false;
+                }
+            });
+            submitBtn.disabled = !allFilled;
+        }
+
+        requiredFields.forEach(field => {
+            field.addEventListener('change', checkForm);
         });
 
-        document.getElementById('class-select').addEventListener('change', function() {
-            const classId = this.value;
-            const sectionSelect = document.getElementById('section-select');
-
-            sectionSelect.innerHTML = '<option value="">Select a Section</option>';
-
-            if (classId) {
-                fetch(`/schools/get-sections/?class_id=${classId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.sections.forEach(section => {
-                            const option = document.createElement('option');
-                            option.value = section.id;
-                            option.textContent = `${section.section_name} (${section.available_seats} seats available)`;
-                            sectionSelect.appendChild(option);
-                        });
-                    });
-            }
-        });
-    </script>
+        checkForm(); // Initial check
+    });
+</script>
 {% endblock %}

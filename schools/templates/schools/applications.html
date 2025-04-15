@@ -3,452 +3,296 @@
 {% block title %}Applications{% endblock %}
 
 {% block content %}
-    <!-- <h1>Applications</h1> -->
+    <style>
+        /* Custom styles for pending applications actions */
+        .actions-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        .actions-container select {
+            width: 100px;
+            height: 30px;
+            font-size: 0.85rem;
+            padding: 3px;
+        }
+        .actions-container .btn {
+            height: 30px;
+            font-size: 0.8rem;
+            padding: 3px 6px;
+            line-height: 1.2;
+        }
+        .actions-container .form-check {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .actions-container .form-check-input {
+            margin-top: 0;
+            width: 14px;
+            height: 14px;
+        }
+        .actions-container .form-check-label {
+            font-size: 0.8rem;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 6px; /* Reduced padding for compact rows */
+        }
+        @media (max-width: 768px) {
+            .actions-container {
+                gap: 3px;
+                flex-wrap: nowrap; /* Try to keep in one line */
+            }
+            .actions-container select {
+                width: 60px; /* Tighter dropdown */
+                font-size: 0.75rem;
+                padding: 2px;
+            }
+            .actions-container .btn {
+                font-size: 0.7rem;
+                padding: 2px 4px;
+                min-width: 50px; /* Prevent buttons from collapsing too small */
+            }
+            .actions-container .form-check-input {
+                width: 12px;
+                height: 12px;
+            }
+            .actions-container .form-check-label {
+                font-size: 0.7rem;
+            }
+            .table td {
+                padding: 4px; /* Tighter padding on mobile */
+            }
+        }
+        @media (max-width: 576px) {
+            .actions-container {
+                flex-direction: column; /* Stack if it’s too tight */
+                align-items: flex-start;
+                gap: 2px;
+            }
+            .actions-container select, .actions-container .btn {
+                width: 100%; /* Full width for stacked elements */
+                font-size: 0.75rem;
+            }
+            .actions-container .form-check {
+                width: 100%;
+            }
+        }
+    </style>
 
-    <!-- Check if SchoolProfile exists -->
     {% if not school %}
-        <div class="alert alert-warning" role="alert">
-            Please set up your school profile to manage applications. 
+        <div class="alert alert-warning mt-4" role="alert">
+            Please set up your school profile to manage applications.
             <a href="{% url 'schools:school_profile' %}" class="alert-link">Set up your profile here</a>.
         </div>
     {% else %}
         <!-- Search Form -->
-        <div class="card shadow-sm mb-4" style="margin-top: 50px;">
+        <div class="card shadow-sm mb-4 mt-4">
             <div class="card-body">
                 <form method="get" action="{% url 'schools:applications' %}" class="row g-3">
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3">
                         <label for="admission_id" class="form-label">Search by Admission ID</label>
                         <input type="text" name="admission_id" id="admission_id" class="form-control" value="{{ request.GET.admission_id }}" placeholder="Enter Admission ID">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3">
                         <label for="student_name" class="form-label">Search by Student Name</label>
                         <input type="text" name="student_name" id="student_name" class="form-control" value="{{ request.GET.student_name }}" placeholder="Enter Student Name">
                     </div>
-                    <div class="col-md-2">
-                        <label for="class_id" class="form-label">Filter by Class</label>
-                        <select name="class_id" id="class_id" class="form-control">
-                            <option value="">All Classes</option>
-                            {% for class in classes %}
-                                <option value="{{ class.id }}" {% if request.GET.class_id == class.id|stringformat:"s" %}selected{% endif %}>{{ class.grade }}</option>
+                    <div class="col-12 col-md-3">
+                        <label for="cycle_id" class="form-label">Filter by Cycle</label>
+                        <select name="cycle_id" id="cycle_id" class="form-control">
+                            <option value="">All Cycles</option>
+                            {% for cycle in cycles %}
+                                <option value="{{ cycle.id }}" {% if cycle_id == cycle.id|stringformat:"s" %}selected{% endif %}>{{ cycle.year }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label for="section_id" class="form-label">Filter by Section</label>
-                        <select name="section_id" id="section_id" class="form-control">
-                            <option value="">All Sections</option>
-                            {% for section in sections %}
-                                <option value="{{ section.id }}" {% if request.GET.section_id == section.id|stringformat:"s" %}selected{% endif %}>{{ section.section_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>Search</button>
+                    <div class="col-12 col-md-3 d-grid">
+                        <button type="submit" class="btn btn-primary mt-md-4 mt-2"><i class="fas fa-search me-2"></i>Search</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Pending Applications -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0">Pending Applications</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Admission ID</th>
-                                <th>Student</th>
-                                <th>Class</th>
-                                <th>Section</th>
-                                <th>Selected Seat</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for application in pending_applications %}
-                                <tr>
-                                    <td>{{ application.admission_id }}</td>
-                                    <td><a href="{% url 'schools:student_details' student_id=application.student.id %}">{{ application.student.username }}</a></td>
-                                    <td>{{ application.school_class.grade }}</td>
-                                    <td>{{ application.section.section_name }}</td>
-                                    <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
-                                    <td>{{ application.status }}</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            {% if application.status == 'Pending' %}
-                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#approveModal-{{ application.id }}">Approve</button>
-                                                <form method="post" style="display: inline;">
+        <!-- Applications by Cycle -->
+        {% for cycle, apps in cycle_applications.items %}
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Cycle: {{ cycle.year }}</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Pending Applications -->
+                    {% if apps.pending %}
+                        <h6>Pending Applications</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Admission ID</th>
+                                        <th>Student</th>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                        <th>Selected Seat</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in apps.pending %}
+                                        <tr>
+                                            <td>{{ application.admission_id }}</td>
+                                            <td><a href="{% url 'schools:student_details' student_id=application.student.id %}">{{ application.student.username }}</a></td>
+                                            <td>{{ application.school_class.grade }}</td>
+                                            <td>{{ application.section.section_name }}</td>
+                                            <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
+                                            <td>{{ application.status }}</td>
+                                            <td>
+                                                <form method="post" class="actions-container">
                                                     {% csrf_token %}
-                                                    <input type="hidden" name="reject_application" value="true">
                                                     <input type="hidden" name="application_id" value="{{ application.id }}">
-                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                    <input type="hidden" name="class_id" value="{{ application.school_class.id }}">
+                                                    <input type="hidden" name="section_id" value="{{ application.section.id }}">
+                                                    <select name="seat_id" class="form-select">
+                                                        <option value="">Seat</option>
+                                                        {% for seat in application.section.seats.all %}
+                                                            {% if not seat.is_filled %}
+                                                                <option value="{{ seat.id }}">{{ seat.seat_number }}</option>
+                                                            {% endif %}
+                                                        {% empty %}
+                                                            <option value="" disabled>No seats</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="auto_assign" value="true" class="form-check-input" id="autoAssign{{ application.id }}">
+                                                        <label class="form-check-label" for="autoAssign{{ application.id }}">Auto</label>
+                                                    </div>
+                                                    <button type="submit" name="approve_application" value="true" class="btn btn-success">Approve</button>
+                                                    <button type="submit" name="reject_application" value="true" class="btn btn-danger">Reject</button>
                                                 </form>
-                                            {% endif %}
-                                        </div>
-                                        <button class="action-modal-trigger" type="button" data-bs-toggle="modal" data-bs-target="#actionModal-{{ application.id }}">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <!-- Approve Modal -->
-                                        <div class="modal fade" id="approveModal-{{ application.id }}" tabindex="-1" aria-labelledby="approveModalLabel-{{ application.id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="approveModalLabel-{{ application.id }}">Approve Application for {{ application.student.username }}</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form method="post">
-                                                            {% csrf_token %}
-                                                            <div class="mb-3">
-                                                                <label for="class_id_{{ application.id }}" class="form-label">Class</label>
-                                                                <select name="class_id" id="class_id_{{ application.id }}" class="form-control" required>
-                                                                    <option value="">Select Class</option>
-                                                                    {% for class in classes %}
-                                                                        <option value="{{ class.id }}" {% if class.id == application.school_class.id %}selected{% endif %}>{{ class.grade }}</option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="section_id_{{ application.id }}" class="form-label">Section</label>
-                                                                <select name="section_id" id="section_id_{{ application.id }}" class="form-control" required>
-                                                                    <option value="">Select Section</option>
-                                                                    {% for section in application.school_class.sections.all %}
-                                                                        <option value="{{ section.id }}" {% if section.id == application.section.id %}selected{% endif %}>{{ section.section_name }}</option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="seat_id_{{ application.id }}" class="form-label">Seat</label>
-                                                                <select name="seat_id" id="seat_id_{{ application.id }}" class="form-control" required>
-                                                                    <option value="">Select Seat</option>
-                                                                    {% for seat in application.section.seats.all %}
-                                                                        {% if not seat.is_filled %}
-                                                                            <option value="{{ seat.id }}">{{ seat.seat_number }}</option>
-                                                                        {% endif %}
-                                                                    {% empty %}
-                                                                        <option value="" disabled>No available seats in this section</option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                            </div>
-                                                            <input type="hidden" name="approve_application" value="true">
-                                                            <input type="hidden" name="application_id" value="{{ application.id }}">
-                                                            <button type="submit" class="btn btn-success">Confirm Approval</button>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Action Modal -->
-                                        <div class="modal fade action-modal" id="actionModal-{{ application.id }}" tabindex="-1" aria-labelledby="actionModalLabel-{{ application.id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="actionModalLabel-{{ application.id }}">Actions for {{ application.student.username }}</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        {% if application.status == 'Pending' %}
-                                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal-{{ application.id }}">Approve</button>
-                                                            <form method="post" style="display: inline;">
-                                                                {% csrf_token %}
-                                                                <input type="hidden" name="reject_application" value="true">
-                                                                <input type="hidden" name="application_id" value="{{ application.id }}">
-                                                                <button type="submit" class="btn btn-danger">Reject</button>
-                                                            </form>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="7">No pending applications.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr><td colspan="7">No pending applications for this cycle.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">No pending applications for Cycle {{ cycle.year }}.</div>
+                    {% endif %}
 
-        <!-- Approved Applications -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0">Approved Applications</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Admission ID</th>
-                                <th>Student</th>
-                                <th>Class</th>
-                                <th>Section</th>
-                                <th>Selected Seat</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for application in approved_applications %}
-                                <tr>
-                                    <td>{{ application.admission_id }}</td>
-                                    <td><a href="{% url 'schools:student_details' student_id=application.student.id %}">{{ application.student.username }}</a></td>
-                                    <td>{{ application.school_class.grade }}</td>
-                                    <td>{{ application.section.section_name }}</td>
-                                    <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
-                                    <td>{{ application.status }}</td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="6">No approved applications.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                    <!-- Approved Applications -->
+                    {% if apps.approved %}
+                        <h6>Approved Applications</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Admission ID</th>
+                                        <th>Student</th>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                        <th>Selected Seat</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in apps.approved %}
+                                        <tr>
+                                            <td>{{ application.admission_id }}</td>
+                                            <td><a href="{% url 'schools:student_details' student_id=application.student.id %}">{{ application.student.username }}</a></td>
+                                            <td>{{ application.school_class.grade }}</td>
+                                            <td>{{ application.section.section_name }}</td>
+                                            <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
+                                            <td>{{ application.status }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr><td colspan="6">No approved applications for this cycle.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">No approved applications for Cycle {{ cycle.year }}.</div>
+                    {% endif %}
 
-        <!-- Rejected Applications -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0">Rejected Applications</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Admission ID</th>
-                                <th>Student</th>
-                                <th>Class</th>
-                                <th>Section</th>
-                                <th>Selected Seat</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for application in rejected_applications %}
-                                <tr>
-                                    <td>{{ application.admission_id }}</td>
-                                    <td><a href="{% url 'schools:student_details' student_id=application.student.id %}">{{ application.student.username }}</a></td>
-                                    <td>{{ application.school_class.grade }}</td>
-                                    <td>{{ application.section.section_name }}</td>
-                                    <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
-                                    <td>{{ application.status }}</td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="6">No rejected applications.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <!-- Rejected Applications -->
+                    {% if apps.rejected %}
+                        <h6>Rejected Applications</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Admission ID</th>
+                                        <th>Student</th>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                        <th>Selected Seat</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in apps.rejected %}
+                                        <tr>
+                                            <td>{{ application.admission_id }}</td>
+                                            <td><a href="{% url 'schools:student_details' student_id=application.student.id %}">{{ application.student.username }}</a></td>
+                                            <td>{{ application.school_class.grade }}</td>
+                                            <td>{{ application.section.section_name }}</td>
+                                            <td>{{ application.seat.seat_number|default:"Not Selected" }}</td>
+                                            <td>{{ application.status }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr><td colspan="6">No rejected applications for this cycle.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">No rejected applications for Cycle {{ cycle.year }}.</div>
+                    {% endif %}
                 </div>
             </div>
-        </div>
+        {% empty %}
+            <div class="alert alert-info mt-4">No applications found for any cycle.</div>
+        {% endfor %}
     {% endif %}
 
-    <!-- JavaScript for Dynamic Dropdowns -->
-   <!-- JavaScript for Dynamic Dropdowns -->
-   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // For Search Form: Dynamic Section Dropdown
-        const classSelect = document.getElementById('class_id');
-        const sectionSelect = document.getElementById('section_id');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const classSelect = document.getElementById('class_id');
+            const sectionSelect = document.getElementById('section_id');
 
-        classSelect.addEventListener('change', function() {
-            const classId = this.value;
-            sectionSelect.innerHTML = '<option value="">All Sections</option>';
+            if (classSelect && sectionSelect) {
+                classSelect.addEventListener('change', function () {
+                    const classId = this.value;
+                    sectionSelect.innerHTML = '<option value="">All Sections</option>';
 
-            if (classId) {
-                console.log(`[Search Form] Fetching sections for classId: ${classId}`);
-                fetch(`/schools/get-sections/${classId}/`, {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    redirect: 'manual'
-                })
-                    .then(response => {
-                        console.log(`[Search Form] Response status: ${response.status}, ok: ${response.ok}`);
-                        if (response.status === 0 || response.type === 'opaqueredirect') {
-                            throw new Error('Request was redirected (possibly to login page) - authentication issue');
-                        }
-                        if (!response.ok) {
-                            return response.json().then(errData => {
-                                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error || 'Unknown error'}`);
-                            }).catch(() => {
-                                // Fallback to response.text() if JSON parsing fails
-                                return response.text().then(text => {
-                                    console.error('[Search Form] Raw response body:', text);
-                                    throw new Error(`HTTP error! Status: ${response.status}, Message: Unable to parse error response as JSON. Raw response logged above.`);
-                                });
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('[Search Form] Sections data:', data);
-                        if (data.error) {
-                            console.error('[Search Form] Server returned an error:', data.error);
-                            sectionSelect.innerHTML = '<option value="">Failed to load sections</option>';
-                        } else if (data.sections && data.sections.length > 0) {
-                            data.sections.forEach(section => {
-                                console.log(`[Search Form] Section:`, section); // Log the full section data
-                                const option = document.createElement('option');
-                                option.value = section.id;
-                                option.textContent = section.section_name;
-                                sectionSelect.appendChild(option);
-                            });
-                        } else {
-                            console.log('[Search Form] No sections found for class ID:', classId);
-                            sectionSelect.innerHTML = '<option value="">No sections available</option>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('[Search Form] Error fetching sections:', error.message);
-                        sectionSelect.innerHTML = '<option value="">Failed to load sections</option>';
-                    });
-            }
-        });
-
-        // For Approve Modals
-        document.querySelectorAll('[id^="class_id_"]').forEach(classSelect => {
-            const modalId = classSelect.id.split('_').slice(-1)[0];
-            const sectionSelect = document.getElementById(`section_id_${modalId}`);
-            const seatSelect = document.getElementById(`seat_id_${modalId}`);
-
-            classSelect.addEventListener('change', function() {
-                const classId = this.value;
-                sectionSelect.innerHTML = '<option value="">Select Section</option>';
-                seatSelect.innerHTML = '<option value="">Select Seat</option>';
-
-                if (classId) {
-                    console.log(`[Modal ${modalId}] Fetching sections for classId: ${classId}`);
-                    fetch(`/schools/get-sections/${classId}/`, {
-                        method: 'GET',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        redirect: 'manual'
-                    })
-                        .then(response => {
-                            console.log(`[Modal ${modalId}] Response status: ${response.status}, ok: ${response.ok}`);
-                            if (response.status === 0 || response.type === 'opaqueredirect') {
-                                throw new Error('Request was redirected (possibly to login page) - authentication issue');
+                    if (classId) {
+                        fetch(`/schools/get-sections/${classId}/`, {
+                            method: 'GET',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             }
-                            if (!response.ok) {
-                                return response.json().then(errData => {
-                                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error || 'Unknown error'}`);
-                                }).catch(() => {
-                                    // Fallback to response.text() if JSON parsing fails
-                                    return response.text().then(text => {
-                                        console.error(`[Modal ${modalId}] Raw response body:`, text);
-                                        throw new Error(`HTTP error! Status: ${response.status}, Message: Unable to parse error response as JSON. Raw response logged above.`);
-                                    });
-                                });
-                            }
-                            return response.json();
                         })
+                        .then(response => response.json())
                         .then(data => {
-                            console.log(`[Modal ${modalId}] Sections data:`, data);
-                            if (data.error) {
-                                console.error(`[Modal ${modalId}] Server returned an error:`, data.error);
-                                sectionSelect.innerHTML = '<option value="">Failed to load sections</option>';
-                            } else if (data.sections && data.sections.length > 0) {
+                            if (data.sections?.length) {
                                 data.sections.forEach(section => {
-                                    console.log(`[Modal ${modalId}] Section:`, section); // Log the full section data
                                     const option = document.createElement('option');
                                     option.value = section.id;
                                     option.textContent = section.section_name;
                                     sectionSelect.appendChild(option);
                                 });
-                            } else {
-                                console.log(`[Modal ${modalId}] No sections found for class ID:`, classId);
-                                sectionSelect.innerHTML = '<option value="">No sections available</option>';
                             }
-                        })
-                        .catch(error => {
-                            console.error(`[Modal ${modalId}] Error fetching sections:`, error.message);
-                            sectionSelect.innerHTML = '<option value="">Failed to load sections</option>';
                         });
-                }
-            });
-
-            sectionSelect.addEventListener('change', function() {
-                const sectionId = this.value;
-                seatSelect.innerHTML = '<option value="">Select Seat</option>';
-
-                if (sectionId) {
-                    console.log(`[Modal ${modalId}] Fetching seats for sectionId: ${sectionId}`);
-                    fetch(`/schools/get-seats/${sectionId}/`, {
-                        method: 'GET',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        redirect: 'manual'
-                    })
-                        .then(response => {
-                            console.log(`[Modal ${modalId}] Response status: ${response.status}, ok: ${response.ok}`);
-                            if (response.status === 0 || response.type === 'opaqueredirect') {
-                                throw new Error('Request was redirected (possibly to login page) - authentication issue');
-                            }
-                            if (!response.ok) {
-                                return response.json().then(errData => {
-                                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error || 'Unknown error'}`);
-                                }).catch(() => {
-                                    // Fallback to response.text() if JSON parsing fails
-                                    return response.text().then(text => {
-                                        console.error(`[Modal ${modalId}] Raw response body:`, text);
-                                        throw new Error(`HTTP error! Status: ${response.status}, Message: Unable to parse error response as JSON. Raw response logged above.`);
-                                    });
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log(`[Modal ${modalId}] Seats data:`, data);
-                            if (data.seats && data.seats.length > 0) {
-                                data.seats.forEach(seat => {
-                                    if (!seat.is_filled) {
-                                        const option = document.createElement('option');
-                                        option.value = seat.id;
-                                        option.textContent = seat.seat_number;
-                                        seatSelect.appendChild(option);
-                                    }
-                                });
-                            } else {
-                                console.log(`[Modal ${modalId}] No seats found for section ID:`, sectionId);
-                                seatSelect.innerHTML = '<option value="">No seats available</option>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error(`[Modal ${modalId}] Error fetching seats:`, error.message);
-                            seatSelect.innerHTML = '<option value="">Error loading seats</option>';
-                        });
-                }
-            });
+                    }
+                });
+            }
         });
-    });
-</script>
+    </script>
 {% endblock %}
