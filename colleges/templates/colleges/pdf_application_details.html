@@ -1,0 +1,300 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Application Details - {{ application.admission_id }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            color: #333;
+        }
+        .container {
+            max-width: 720pt;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #1a2a6c;
+            color: white;
+            padding: 10pt;
+            text-align: center;
+            border-radius: 4pt;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18pt;
+        }
+        .section {
+            margin-bottom: 15pt;
+        }
+        .section h2 {
+            color: #1a2a6c;
+            font-size: 14pt;
+            border-bottom: 1pt solid #e0e0e0;
+            padding-bottom: 5pt;
+            margin-bottom: 10pt;
+        }
+        .field-row {
+            display: table-row;
+            padding: 5pt 0;
+            border-bottom: 1pt solid #f0f0f0;
+        }
+        .field-label, .field-value {
+            display: table-cell;
+            padding: 5pt;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #1a2a6c;
+            width: 35%;
+        }
+        .field-value {
+            width: 65%;
+        }
+        .footer {
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+            margin-top: 20pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Application Details - {{ application.admission_id }}</h1>
+        </div>
+
+        <!-- Application Information -->
+        <div class="section">
+            <h2>Application Information</h2>
+            <div class="field-row">
+                <div class="field-label">Admission ID</div>
+                <div class="field-value">{{ application.admission_id|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Status</div>
+                <div class="field-value">{{ application.status|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Apply Date</div>
+                <div class="field-value">{{ application.apply_date|date:"Y-m-d H:i"|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Department</div>
+                <div class="field-value">{{ application.department.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Section</div>
+                <div class="field-value">{{ application.section.section_name|default:"Not Assigned" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Seat</div>
+                <div class="field-value">{{ application.seat.seat_number|default:"Not Assigned" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Entrance Exam</div>
+                <div class="field-value">{{ application.entrance_exam|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Entrance Score/Rank</div>
+                <div class="field-value">{{ application.entrance_score|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="section">
+            <h2>Personal Information</h2>
+            <div class="field-row">
+                <div class="field-label">Full Name</div>
+                <div class="field-value">{{ application.first_name }} {% if application.middle_name %}{{ application.middle_name }} {% endif %}{{ application.last_name }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Date of Birth</div>
+                <div class="field-value">{{ application.date_of_birth|date:"d M Y"|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Gender</div>
+                <div class="field-value">{{ application.get_gender_display|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Nationality</div>
+                <div class="field-value">{{ application.nationality|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Aadhaar Number</div>
+                <div class="field-value">{{ application.aadhaar_number|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Contact Number</div>
+                <div class="field-value">{{ application.contact_number|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Email</div>
+                <div class="field-value">{{ application.email|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Permanent Address</div>
+                <div class="field-value">{{ application.permanent_address|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Correspondence Address</div>
+                <div class="field-value">{{ application.correspondence_address|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Caste/Category</div>
+                <div class="field-value">{{ application.caste|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Religion</div>
+                <div class="field-value">{{ application.religion|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Mother Tongue</div>
+                <div class="field-value">{{ application.mother_tongue|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <!-- Parent Information -->
+        <div class="section">
+            <h2>Parent/Guardian Information</h2>
+            <div class="field-row">
+                <div class="field-label">Father’s Name</div>
+                <div class="field-value">{{ application.father_name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Father’s Occupation</div>
+                <div class="field-value">{{ application.father_occupation|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Father’s Contact</div>
+                <div class="field-value">{{ application.father_contact|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Mother’s Name</div>
+                <div class="field-value">{{ application.mother_name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Mother’s Occupation</div>
+                <div class="field-value">{{ application.mother_occupation|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Mother’s Contact</div>
+                <div class="field-value">{{ application.mother_contact|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Annual Family Income</div>
+                <div class="field-value">{{ application.family_income|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="section">
+            <h2>Academic Information</h2>
+            <div class="field-row">
+                <div class="field-label">Class 12 School</div>
+                <div class="field-value">{{ application.class_12_school|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 12 Address</div>
+                <div class="field-value">{{ application.class_12_address|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 12 Board</div>
+                <div class="field-value">{{ application.class_12_board|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 12 Year</div>
+                <div class="field-value">{{ application.class_12_year|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 12 Percentage/CGPA</div>
+                <div class="field-value">{{ application.class_12_percentage|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 12 Stream</div>
+                <div class="field-value">{{ application.class_12_stream|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 10 School</div>
+                <div class="field-value">{{ application.class_10_school|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 10 Board</div>
+                <div class="field-value">{{ application.class_10_board|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 10 Year</div>
+                <div class="field-value">{{ application.class_10_year|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 10 Percentage/CGPA</div>
+                <div class="field-value">{{ application.class_10_percentage|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Other Qualifications</div>
+                <div class="field-value">{{ application.other_qualifications|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Achievements</div>
+                <div class="field-value">{{ application.achievements|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="section">
+            <h2>Documents</h2>
+            <div class="field-row">
+                <div class="field-label">Birth Certificate</div>
+                <div class="field-value">{{ application.birth_certificate.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Aadhaar Card</div>
+                <div class="field-value">{{ application.aadhaar_card.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Caste Certificate</div>
+                <div class="field-value">{{ application.caste_certificate.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 12 Mark Sheet</div>
+                <div class="field-value">{{ application.class_12_mark_sheet.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Class 10 Mark Sheet</div>
+                <div class="field-value">{{ application.class_10_mark_sheet.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Transfer Certificate</div>
+                <div class="field-value">{{ application.transfer_certificate.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Passport Photo</div>
+                <div class="field-value">{{ application.passport_photo.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Address Proof</div>
+                <div class="field-value">{{ application.address_proof.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Entrance Exam Scorecard</div>
+                <div class="field-value">{{ application.entrance_scorecard.name|default:"N/A" }}</div>
+            </div>
+            <div class="field-row">
+                <div class="field-label">Recommendation Letter</div>
+                <div class="field-value">{{ application.recommendation_letter.name|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Generated by {{ college.college_name }} on {{ today|date:"d M Y" }}
+        </div>
+    </div>
+</body>
+</html>

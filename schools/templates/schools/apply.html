@@ -5,56 +5,47 @@
 {% block content %}
 <style>
     .apply-container {
-        max-width: 800px;
+        max-width: 1000px;
         margin: 0 auto;
         padding: 20px;
     }
 
     .form-section {
         margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #ddd;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
     }
 
     .form-section h4 {
         color: #1a2a6c;
         margin-bottom: 20px;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: 600;
     }
 
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
     .form-label {
         font-weight: 600;
         color: #1a2a6c;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         display: block;
         font-size: 1rem;
     }
 
-    select.form-control {
+    .form-control {
         width: 100%;
         min-height: 40px;
-        max-height: 40px;
         border: 2px solid #1a2a6c;
         border-radius: 4px;
         padding: 8px 12px;
         font-size: 0.95rem;
         box-sizing: border-box;
-        display: block;
         background-color: #fff;
-    }
-
-    select.form-control option {
-        padding: 5px 10px;
-    }
-
-    select.form-control option::after {
-        content: " - " attr(data-seats) " seats available";
-        color: #666;
     }
 
     .form-control:focus {
@@ -63,10 +54,15 @@
         outline: none;
     }
 
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
     .btn-primary {
         background-color: #1a2a6c;
         border-color: #1a2a6c;
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 1rem;
         border-radius: 5px;
         cursor: pointer;
@@ -82,7 +78,7 @@
     .btn-secondary {
         background-color: #6c757d;
         border-color: #6c757d;
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 1rem;
         border-radius: 5px;
         color: white;
@@ -105,14 +101,29 @@
     }
 
     .card {
-        margin: 50px 15px;
+        margin: 40px 15px;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     .card-header {
         padding: 15px 20px;
         background-color: #f8f9fa;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
     }
 
     @media (max-width: 768px) {
@@ -122,30 +133,30 @@
         .card {
             margin: 20px 10px;
         }
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
         .form-control {
             font-size: 0.9rem;
-            padding: 8px 10px;
         }
         .btn-primary, .btn-secondary {
             font-size: 0.9rem;
-            padding: 8px 15px;
         }
     }
 
     @media (max-width: 480px) {
         .form-control {
             font-size: 0.85rem;
-            padding: 6px 8px;
         }
         .btn-primary, .btn-secondary {
             font-size: 0.85rem;
-            padding: 8px 12px;
         }
         .card {
             margin: 10px 5px;
         }
         .card-header h3 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
     }
 </style>
@@ -163,76 +174,357 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            <form method="post" id="applicationForm">
-                {% csrf_token %}
-                <input type="hidden" name="school_id" value="{{ school.id }}">
-                <div class="form-section">
-                    <h4>Select Cycle, Class, and Section</h4>
-                    <div class="form-group">
-                        <label class="form-label">{{ form.cycle.label }}</label>
-                        {{ form.cycle }}
-                        {% if form.cycle.errors %}
-                            <div class="error-message">{{ form.cycle.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{{ form.school_class.label }}</label>
-                        {{ form.school_class }}
-                        {% if form.school_class.errors %}
-                            <div class="error-message">{{ form.school_class.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{{ form.section.label }}</label>
-                        {{ form.section }}
-                        {% if form.section.errors %}
-                            <div class="error-message">{{ form.section.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h4>Your Details</h4>
-                    <p><strong>Student:</strong> {{ request.user.username }}</p>
-                    {% if form.non_field_errors %}
-                        <div class="error-message">
-                            {% for error in form.non_field_errors %}
-                                <p>{{ error|safe }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    <div class="form-group">
-                        <label class="form-label">{{ form.parent_name.label }}</label>
-                        {{ form.parent_name }}
-                        {% if form.parent_name.errors %}
-                            <div class="error-message">{{ form.parent_name.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{{ form.contact_number.label }}</label>
-                        {{ form.contact_number }}
-                        {% if form.contact_number.errors %}
-                            <div class="error-message">{{ form.contact_number.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{{ form.email.label }}</label>
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                            <div class="error-message">{{ form.email.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Submit Application</button>
-                </div>
-            </form>
-            <div class="mt-3">
-                <a href="{% url 'schools:school_list' %}" class="btn btn-secondary">Back to Schools</a>
-            </div>
             {% if active_application %}
                 <div class="alert alert-warning mt-3">
                     You have an active application for {{ active_application.school_class.grade }} at {{ active_application.school.school_name }} (Status: {{ active_application.status }}).
                 </div>
             {% endif %}
+            <form method="post" id="applicationForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="school_id" value="{{ school.id }}">
+
+                <!-- Cycle, Class, Section -->
+                <div class="form-section">
+                    <h4>Cycle, Class, and Section</h4>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.cycle.label }}</label>
+                            {{ form.cycle }}
+                            {% if form.cycle.errors %}
+                                <div class="error-message">{{ form.cycle.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.school_class.label }}</label>
+                            {{ form.school_class }}
+                            {% if form.school_class.errors %}
+                                <div class="error-message">{{ form.school_class.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.section.label }}</label>
+                            {{ form.section }}
+                            {% if form.section.errors %}
+                                <div class="error-message">{{ form.section.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <h4>Personal Information</h4>
+                    <p><strong>Student:</strong> {{ request.user.username }}</p>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="error-message">{{ form.first_name.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.middle_name.label }}</label>
+                            {{ form.middle_name }}
+                            {% if form.middle_name.errors %}
+                                <div class="error-message">{{ form.middle_name.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="error-message">{{ form.last_name.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.date_of_birth.label }}</label>
+                            {{ form.date_of_birth }}
+                            {% if form.date_of_birth.errors %}
+                                <div class="error-message">{{ form.date_of_birth.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.gender.label }}</label>
+                            {{ form.gender }}
+                            {% if form.gender.errors %}
+                                <div class="error-message">{{ form.gender.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.nationality.label }}</label>
+                            {{ form.nationality }}
+                            {% if form.nationality.errors %}
+                                <div class="error-message">{{ form.nationality.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.aadhaar_number.label }}</label>
+                            {{ form.aadhaar_number }}
+                            {% if form.aadhaar_number.errors %}
+                                <div class="error-message">{{ form.aadhaar_number.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.student_contact_number.label }}</label>
+                            {{ form.student_contact_number }}
+                            {% if form.student_contact_number.errors %}
+                                <div class="error-message">{{ form.student_contact_number.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-message">{{ form.email.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.permanent_address.label }}</label>
+                            {{ form.permanent_address }}
+                            {% if form.permanent_address.errors %}
+                                <div class="error-message">{{ form.permanent_address.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.correspondence_address.label }}</label>
+                            {{ form.correspondence_address }}
+                            {% if form.correspondence_address.errors %}
+                                <div class="error-message">{{ form.correspondence_address.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.caste.label }}</label>
+                            {{ form.caste }}
+                            {% if form.caste.errors %}
+                                <div class="error-message">{{ form.caste.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.religion.label }}</label>
+                            {{ form.religion }}
+                            {% if form.religion.errors %}
+                                <div class="error-message">{{ form.religion.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.mother_tongue.label }}</label>
+                            {{ form.mother_tongue }}
+                            {% if form.mother_tongue.errors %}
+                                <div class="error-message">{{ form.mother_tongue.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.blood_group.label }}</label>
+                            {{ form.blood_group }}
+                            {% if form.blood_group.errors %}
+                                <div class="error-message">{{ form.blood_group.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Information -->
+                <div class="form-section">
+                    <h4>Parent Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.father_name.label }}</label>
+                            {{ form.father_name }}
+                            {% if form.father_name.errors %}
+                                <div class="error-message">{{ form.father_name.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.father_occupation.label }}</label>
+                            {{ form.father_occupation }}
+                            {% if form.father_occupation.errors %}
+                                <div class="error-message">{{ form.father_occupation.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.father_contact_number.label }}</label>
+                            {{ form.father_contact_number }}
+                            {% if form.father_contact_number.errors %}
+                                <div class="error-message">{{ form.father_contact_number.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.mother_name.label }}</label>
+                            {{ form.mother_name }}
+                            {% if form.mother_name.errors %}
+                                <div class="error-message">{{ form.mother_name.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.mother_occupation.label }}</label>
+                            {{ form.mother_occupation }}
+                            {% if form.mother_occupation.errors %}
+                                <div class="error-message">{{ form.mother_occupation.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.mother_contact_number.label }}</label>
+                            {{ form.mother_contact_number }}
+                            {% if form.mother_contact_number.errors %}
+                                <div class="error-message">{{ form.mother_contact_number.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Information -->
+                <div class="form-section">
+                    <h4>Academic Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.previous_school_name.label }}</label>
+                            {{ form.previous_school_name }}
+                            {% if form.previous_school_name.errors %}
+                                <div class="error-message">{{ form.previous_school_name.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.previous_school_address.label }}</label>
+                            {{ form.previous_school_address }}
+                            {% if form.previous_school_address.errors %}
+                                <div class="error-message">{{ form.previous_school_address.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.board_of_education.label }}</label>
+                            {{ form.board_of_education }}
+                            {% if form.board_of_education.errors %}
+                                <div class="error-message">{{ form.board_of_education.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.class_last_attended.label }}</label>
+                            {{ form.class_last_attended }}
+                            {% if form.class_last_attended.errors %}
+                                <div class="error-message">{{ form.class_last_attended.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.year_of_passing.label }}</label>
+                            {{ form.year_of_passing }}
+                            {% if form.year_of_passing.errors %}
+                                <div class="error-message">{{ form.year_of_passing.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.percentage_obtained.label }}</label>
+                            {{ form.percentage_obtained }}
+                            {% if form.percentage_obtained.errors %}
+                                <div class="error-message">{{ form.percentage_obtained.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.reason_for_leaving.label }}</label>
+                            {{ form.reason_for_leaving }}
+                            {% if form.reason_for_leaving.errors %}
+                                <div class="error-message">{{ form.reason_for_leaving.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents -->
+                <div class="form-section">
+                    <h4>Documents</h4>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.birth_certificate.label }}</label>
+                            {{ form.birth_certificate }}
+                            {% if form.birth_certificate.errors %}
+                                <div class="error-message">{{ form.birth_certificate.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.aadhaar_card.label }}</label>
+                            {{ form.aadhaar_card }}
+                            {% if form.aadhaar_card.errors %}
+                                <div class="error-message">{{ form.aadhaar_card.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group" id="caste_certificate_group">
+                            <label class="form-label">{{ form.caste_certificate.label }}</label>
+                            {{ form.caste_certificate }}
+                            {% if form.caste_certificate.errors %}
+                                <div class="error-message">{{ form.caste_certificate.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.previous_mark_sheet.label }}</label>
+                            {{ form.previous_mark_sheet }}
+                            {% if form.previous_mark_sheet.errors %}
+                                <div class="error-message">{{ form.previous_mark_sheet.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.transfer_certificate.label }}</label>
+                            {{ form.transfer_certificate }}
+                            {% if form.transfer_certificate.errors %}
+                                <div class="error-message">{{ form.transfer_certificate.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.passport_photo.label }}</label>
+                            {{ form.passport_photo }}
+                            {% if form.passport_photo.errors %}
+                                <div class="error-message">{{ form.passport_photo.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">{{ form.address_proof.label }}</label>
+                            {{ form.address_proof }}
+                            {% if form.address_proof.errors %}
+                                <div class="error-message">{{ form.address_proof.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" name="submit_application" id="submitBtn" disabled>Submit Application</button>
+                </div>
+            </form>
+            <div class="mt-3">
+                <a href="{% url 'schools:school_list' %}" class="btn btn-secondary">Back to Schools</a>
+            </div>
         </div>
     </div>
 </div>
@@ -240,13 +532,98 @@
 <script>
     function updateForm(element) {
         const form = document.getElementById('applicationForm');
-        form.submit();
+        const schoolId = form.querySelector('input[name="school_id"]').value;
+        const fieldName = element.name;
+        const fieldValue = element.value;
+
+        console.log(`Updating ${fieldName} to value: ${fieldValue}`);
+
+        const data = new FormData();
+        data.append('csrfmiddlewaretoken', form.querySelector('[name=csrfmiddlewaretoken]').value);
+        data.append(fieldName, fieldValue);
+        data.append('school_id', schoolId);
+
+        // Include cycle when updating school_class
+        if (fieldName === 'school_class') {
+            const cycleValue = form.querySelector('select[name="cycle"]').value;
+            if (cycleValue) {
+                data.append('cycle', cycleValue);
+            } else {
+                console.warn('No cycle selected when updating school_class');
+            }
+        }
+
+        console.log('Sending FormData:', Object.fromEntries(data));
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: data,
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            console.log('Received HTML length:', html.length);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newForm = doc.getElementById('applicationForm');
+
+            if (!newForm) {
+                console.error('No applicationForm found in response');
+                return;
+            }
+
+            const classField = form.querySelector('select[name="school_class"]');
+            const sectionField = form.querySelector('select[name="section"]');
+
+            // Update dropdowns
+            classField.innerHTML = newForm.querySelector('select[name="school_class"]').innerHTML;
+            sectionField.innerHTML = newForm.querySelector('select[name="section"]').innerHTML;
+
+            console.log('Updated school_class options:', classField.options.length);
+            console.log('Updated section options:', sectionField.options.length);
+
+            // Restore selected values
+            if (fieldName === 'cycle' && fieldValue) {
+                form.querySelector('select[name="cycle"]').value = fieldValue;
+                // Reset school_class and section
+                classField.value = '';
+                sectionField.value = '';
+            }
+            if (fieldName === 'school_class' && fieldValue) {
+                classField.value = fieldValue;
+                // Reset section
+                sectionField.value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error updating form:', error);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('applicationForm');
         const submitBtn = document.getElementById('submitBtn');
-        const requiredFields = form.querySelectorAll('select[required], input[required]');
+        const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+        const casteField = document.getElementById('caste_field');
+        const casteCertificateGroup = document.getElementById('caste_certificate_group');
+        const casteCertificateField = document.getElementById('caste_certificate_field');
+
+        function toggleCasteCertificate() {
+            const caste = casteField.value;
+            if (['OBC', 'SC', 'ST', 'EWS'].includes(caste)) {
+                casteCertificateGroup.style.display = 'block';
+                casteCertificateField.required = true;
+            } else {
+                casteCertificateGroup.style.display = 'none';
+                casteCertificateField.required = false;
+                casteCertificateField.value = '';
+            }
+        }
 
         function checkForm() {
             let allFilled = true;
@@ -258,11 +635,29 @@
             submitBtn.disabled = !allFilled;
         }
 
+        // Initial checks
+        toggleCasteCertificate();
+        checkForm();
+
+        // Event listeners
         requiredFields.forEach(field => {
             field.addEventListener('change', checkForm);
+            field.addEventListener('input', checkForm);
         });
 
-        checkForm(); // Initial check
+        casteField.addEventListener('change', toggleCasteCertificate);
+
+        // Ensure onchange is triggered programmatically if needed
+        const cycleField = form.querySelector('select[name="cycle"]');
+        const classField = form.querySelector('select[name="school_class"]');
+        if (cycleField.value) {
+            console.log('Initial cycle value:', cycleField.value);
+            updateForm(cycleField);
+        }
+        if (classField.value) {
+            console.log('Initial class value:', classField.value);
+            updateForm(classField);
+        }
     });
 </script>
 {% endblock %}

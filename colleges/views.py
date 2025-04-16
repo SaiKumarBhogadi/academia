@@ -495,8 +495,7 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import AdmissionCycle
-from colleges.models import CollegeProfile, Application, Section, Seat
+from .models import AdmissionCycle, CollegeProfile, Application, Section, Seat
 from core.signals import application_status_updated, application_submitted
 import logging
 
@@ -547,7 +546,7 @@ def manage_applications(request, college_id):
             old_status = application.status
             if action == 'approve':
                 if application.status == 'Approved':
-                    response = {'success': False, 'message': f"Application from {application.student.username if application.student else 'Unknown'} is already approved."}
+                    response = {'success': False, 'message': f"Application {application.admission_id} is already approved."}
                 else:
                     section = application.section
                     if not section:
@@ -569,7 +568,7 @@ def manage_applications(request, college_id):
                                 application.save()
                                 response = {
                                     'success': True,
-                                    'message': f"Application from {application.student.username if application.student else 'Unknown'} approved and seat {seat.seat_number} assigned.",
+                                    'message': f"Application {application.admission_id} approved and seat {seat.seat_number} assigned.",
                                     'status': 'Approved',
                                     'seat_number': seat.seat_number
                                 }
@@ -581,7 +580,7 @@ def manage_applications(request, college_id):
                             response = {'success': False, 'message': "No available seats in the selected section."}
             elif action == 'reject':
                 if application.status == 'Rejected':
-                    response = {'success': False, 'message': f"Application from {application.student.username if application.student else 'Unknown'} is already rejected."}
+                    response = {'success': False, 'message': f"Application {application.admission_id} is already rejected."}
                 else:
                     if application.seat:
                         application.seat.is_filled = False
@@ -590,7 +589,7 @@ def manage_applications(request, college_id):
                     application.save()
                     response = {
                         'success': True,
-                        'message': f"Application from {application.student.username if application.student else 'Unknown'} rejected.",
+                        'message': f"Application {application.admission_id} rejected.",
                         'status': 'Rejected',
                         'seat_number': None
                     }
@@ -623,6 +622,23 @@ def manage_applications(request, college_id):
         'active_cycles': active_cycles,
     }
     return render(request, 'colleges/manage_applications.html', context)
+
+@login_required
+def view_application_details(request, college_id, application_id):
+    if not hasattr(request.user, 'college_profile') or request.user.user_type != 'college' or not request.user.is_approved:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+
+    college = get_object_or_404(CollegeProfile, id=college_id, user=request.user)
+    application = get_object_or_404(Application, id=application_id, department__college=college)
+    
+    context = {
+        'college': college,
+        'application': application,
+    }
+    return render(request, 'colleges/view_application_details.html', context)
+
+
+
 
 
 from django.shortcuts import render, get_object_or_404
@@ -1488,11 +1504,10 @@ def department_seats(request, college_id, degree_id, department_id):
 
 
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from .models import CollegeProfile, AdmissionCycle, Degree, Department, Application, Section
 from .forms import ApplicationForm
 from core.signals import application_submitted
@@ -1516,7 +1531,13 @@ def apply_direct(request, college_id):
 
     active_applications = Application.objects.filter(student=request.user, department__college=college, status__in=['Pending', 'Approved'])
     withdrawn_applications = Application.objects.filter(student=request.user, department__college=college, status='Withdrawn')
-    application_form = ApplicationForm(college=college, data=request.POST or None, request=request, initial={'college_id': college_id, 'cycle': selected_cycle.id})
+    application_form = ApplicationForm(
+        college=college,
+        data=request.POST or None,
+        files=request.FILES or None,
+        request=request,
+        initial={'college_id': college_id, 'cycle': selected_cycle.id}
+    )
 
     if request.method == 'POST' and 'apply' in request.POST:
         cycle_id = request.POST.get('cycle')
@@ -1551,6 +1572,8 @@ def apply_direct(request, college_id):
                 application_submitted.send(sender=Application, student=request.user, institution=college, application=application)
                 messages.success(request, "Application submitted successfully! Awaiting college approval.")
                 return redirect('colleges:application_success')
+        else:
+            messages.error(request, "Please correct the errors in the form.")
 
     context = {
         'college': college,
@@ -1565,7 +1588,68 @@ def apply_direct(request, college_id):
     return render(request, 'colleges/apply_direct.html', context)
 
 
-
 @login_required
 def application_success(request):
     return render(request, 'colleges/application_success.html', context={})
+
+
+# colleges/views.py (assumed)
+from django.shortcuts import render
+
+def packages(request):
+    context = {
+        'institution_type': 'college',
+        'digital_marketing_packages': [
+            {
+                'name': 'Basic Package',
+                'price': '₹14,999/month',
+                'features': [
+                    '5 Social Media Posts (Facebook, Instagram)',
+                    '1 Promotional Video for College Events',
+                    'Basic SEO for College Website',
+                    'Google My Business Optimization',
+                    'Lead Generation Form for Admissions',
+                ],
+            },
+            {
+                'name': 'Standard Package',
+                'price': '₹24,999/month',
+                'features': [
+                    '10 Social Media Posts (FB, Insta, LinkedIn)',
+                    '2 Promotional Videos + Reels',
+                    'Advanced SEO & Website Optimization',
+                    'Facebook & Instagram Ads (₹4,000 Ad Budget Included)',
+                    'Google My Business & Reviews Management',
+                    'Lead Generation Campaigns for College Admissions',
+                ],
+            },
+            {
+                'name': 'Premium Package',
+                'price': '₹39,999/month',
+                'features': [
+                    '15 Social Media Posts (FB, Insta, LinkedIn, Twitter)',
+                    '3 Promotional Videos + Reels',
+                    'Full SEO + Blog Writing (3 Blogs/Month)',
+                    'Paid Ad Campaigns on FB, Insta (₹7,000 Ad Budget Included)',
+                    'College Admission Landing Page',
+                    'Google My Business & Reviews Management',
+                ],
+            },
+        ],
+        'academia_package': {
+            'name': 'Academia Admission Package',
+            'price': '₹TBD/month',
+            'features': [
+                'Online Application Form',
+                'Student Data Management',
+                'College Listing & Filtering',
+                '3000 Applications/Month',
+                'Email Notifications',
+                'College Data Analytics',
+                'Admin Seat Visualization',
+                'College Landing Page',
+                'Payment Gateway Integration',
+            ],
+        },
+    }
+    return render(request, 'colleges/packages.html', context)

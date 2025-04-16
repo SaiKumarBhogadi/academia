@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Application - {{ application.admission_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #1a2a6c;
+            font-size: 18px;
+            border-bottom: 2px solid #1a2a6c;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #1a2a6c;
+            width: 120px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .field-value {
+            display: inline-block;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1a2a6c;
+            font-size: 24px;
+        }
+        .signature-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .signature-section h2 {
+            font-size: 18px;
+            color: #1a2a6c;
+            border-bottom: 2px solid #1a2a6c;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+        .signature-field {
+            display: inline-block;
+            margin: 0 20px;
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            width: 150px;
+            margin: 5px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>College Application Details</h1>
+            <p>Admission ID: {{ application.admission_id }}</p>
+            <p>College: {{ college.college_name }}</p>
+        </div>
+
+        <!-- Application Information -->
+        <div class="section">
+            <h2>Application Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Cycle</span> <span class="field-value">{{ application.cycle.year }}</span></td>
+                    <td><span class="field-label">Degree</span> <span class="field-value">{{ application.degree.name|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Department</span> <span class="field-value">{{ application.department.name|default:"N/A" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Section</span> <span class="field-value">{{ application.section.section_name|default:"Not Assigned" }}</span></td>
+                    <td><span class="field-label">Status</span> <span class="field-value">{{ application.status }}</span></td>
+                    <td><span class="field-label">Apply Date</span> <span class="field-value">{{ application.apply_date|date:"F d, Y" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Seat</span> <span class="field-value">{{ application.seat.seat_number|default:"Not Assigned" }}</span></td>
+                    <td><span class="field-label">Entrance Exam</span> <span class="field-value">{{ application.entrance_exam|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Entrance Score</span> <span class="field-value">{{ application.entrance_score|default:"N/A" }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="section">
+            <h2>Personal Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Full Name</span> <span class="field-value">{{ application.first_name }} {% if application.middle_name %}{{ application.middle_name }} {% endif %}{{ application.last_name }}</span></td>
+                    <td><span class="field-label">Date of Birth</span> <span class="field-value">{{ application.date_of_birth|date:"F d, Y" }}</span></td>
+                    <td><span class="field-label">Gender</span> <span class="field-value">{{ application.gender }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Nationality</span> <span class="field-value">{{ application.nationality }}</span></td>
+                    <td><span class="field-label">Aadhaar Number</span> <span class="field-value">{{ application.aadhaar_number|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Contact Number</span> <span class="field-value">{{ application.contact_number }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Email</span> <span class="field-value">{{ application.email }}</span></td>
+                    <td><span class="field-label">Permanent Address</span> <span class="field-value">{{ application.permanent_address }}</span></td>
+                    <td><span class="field-label">Correspondence Address</span> <span class="field-value">{{ application.correspondence_address|default:"N/A" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Caste</span> <span class="field-value">{{ application.caste|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Religion</span> <span class="field-value">{{ application.religion|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Mother Tongue</span> <span class="field-value">{{ application.mother_tongue|default:"N/A" }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Parent Information -->
+        <div class="section">
+            <h2>Parent Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Father’s Name</span> <span class="field-value">{{ application.father_name }}</span></td>
+                    <td><span class="field-label">Father’s Occupation</span> <span class="field-value">{{ application.father_occupation|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Father’s Contact</span> <span class="field-value">{{ application.father_contact|default:"N/A" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Mother’s Name</span> <span class="field-value">{{ application.mother_name }}</span></td>
+                    <td><span class="field-label">Mother’s Occupation</span> <span class="field-value">{{ application.mother_occupation|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Mother’s Contact</span> <span class="field-value">{{ application.mother_contact|default:"N/A" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Family Income</span> <span class="field-value">{{ application.family_income|default:"N/A" }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="section">
+            <h2>Academic Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Class 12 School</span> <span class="field-value">{{ application.class_12_school }}</span></td>
+                    <td><span class="field-label">Class 12 Address</span> <span class="field-value">{{ application.class_12_address }}</span></td>
+                    <td><span class="field-label">Class 12 Board</span> <span class="field-value">{{ application.class_12_board }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Class 12 Year</span> <span class="field-value">{{ application.class_12_year }}</span></td>
+                    <td><span class="field-label">Class 12 Percentage</span> <span class="field-value">{{ application.class_12_percentage }}</span></td>
+                    <td><span class="field-label">Class 12 Stream</span> <span class="field-value">{{ application.class_12_stream }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Class 10 School</span> <span class="field-value">{{ application.class_10_school }}</span></td>
+                    <td><span class="field-label">Class 10 Board</span> <span class="field-value">{{ application.class_10_board }}</span></td>
+                    <td><span class="field-label">Class 10 Year</span> <span class="field-value">{{ application.class_10_year }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Class 10 Percentage</span> <span class="field-value">{{ application.class_10_percentage }}</span></td>
+                    <td><span class="field-label">Other Qualifications</span> <span class="field-value">{{ application.other_qualifications|default:"N/A" }}</span></td>
+                    <td><span class="field-label">Achievements</span> <span class="field-value">{{ application.achievements|default:"N/A" }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Documents -->
+        <div class="section">
+            <h2>Documents</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Birth Certificate</span> <span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Aadhaar Card</span> <span class="field-value">{{ application.aadhaar_card|yesno:"Submitted,Not Submitted" }}</span></td>
+                    <td><span class="field-label">Caste Certificate</span> <span class="field-value">{{ application.caste_certificate|yesno:"Submitted,Not Submitted" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Class 12 Mark Sheet</span> <span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Class 10 Mark Sheet</span> <span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Transfer Certificate</span> <span class="field-value">Submitted</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Passport Photo</span> <span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Address Proof</span> <span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Entrance Scorecard</span> <span class="field-value">{{ application.entrance_scorecard|yesno:"Submitted,Not Submitted" }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Recommendation Letter</span> <span class="field-value">{{ application.recommendation_letter|yesno:"Submitted,Not Submitted" }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="section signature-section">
+            <h2>Authorization</h2>
+            <div class="signature-field">
+                <span class="field-label">Name</span><span class="field-value">_________________________</span>
+            </div>
+            <div class="signature-field">
+                <span class="field-label">Signature</span><div class="signature-line"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

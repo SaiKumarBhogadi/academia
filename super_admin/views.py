@@ -94,9 +94,11 @@ def add_user(request):
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from core.models import User  # Adjust based on your custom user model location
 from core.forms import AdminAddUserForm  # Import from core app
 
+@login_required
 def manage_users(request):
     if request.user.user_type != 'super_admin':
         return redirect('core:login')
@@ -127,6 +129,7 @@ def manage_users(request):
 
     return render(request, 'super_admin/manage_users.html', context)
 
+@login_required
 def toggle_user_active(request, user_id):
     if request.user.user_type != 'super_admin':
         return redirect('core:login')
@@ -140,6 +143,7 @@ def toggle_user_active(request, user_id):
         messages.success(request, f'{user.username} has been {status}.')
     return redirect('super_admin:manage_users')
 
+@login_required
 def delete_user(request, user_id):
     if request.user.user_type != 'super_admin':
         return redirect('core:login')
@@ -151,6 +155,7 @@ def delete_user(request, user_id):
         messages.success(request, f'{user.username} has been deleted.')
     return redirect('super_admin:manage_users')
 
+@login_required
 def edit_user(request, user_id):
     if request.user.user_type != 'super_admin':
         return redirect('core:login')

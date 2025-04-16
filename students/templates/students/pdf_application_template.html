@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Application - {{ admission.admission_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #1a2a6c;
+            font-size: 18px;
+            border-bottom: 2px solid #1a2a6c;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #1a2a6c;
+            width: 120px;
+            display: inline-block;
+            margin-right: 10px; /* Space between label and value */
+        }
+        .field-value {
+            display: inline-block;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1a2a6c;
+            font-size: 24px;
+        }
+        .signature-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .signature-section h2 {
+            font-size: 18px;
+            color: #1a2a6c;
+            border-bottom: 2px solid #1a2a6c;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+        .signature-field {
+            display: inline-block;
+            margin: 0 20px;
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            width: 150px;
+            margin: 5px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Application Details</h1>
+            <p>Admission ID: {{ admission.admission_id }}</p>
+            <p>School: {{ admission.school.school_name }}</p>
+        </div>
+
+        <!-- Application Information -->
+        <div class="section">
+            <h2>Application Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Cycle</span>&nbsp;&nbsp;<span class="field-value">{{ admission.cycle.year }}</span></td>
+                    <td><span class="field-label">Class</span>&nbsp;&nbsp;<span class="field-value">{{ admission.school_class.grade }}</span></td>
+                    <td><span class="field-label">Section</span>&nbsp;&nbsp;<span class="field-value">{{ admission.section.section_name }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Status</span>&nbsp;&nbsp;<span class="field-value">{{ admission.status }}</span></td>
+                    <td><span class="field-label">Date Applied</span>&nbsp;&nbsp;<span class="field-value">{{ admission.admission_date|date:"F d, Y" }}</span></td>
+                    {% if admission.seat %}
+                        <td><span class="field-label">Seat Number</span>&nbsp;&nbsp;<span class="field-value">{{ admission.seat.seat_number }}</span></td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="section">
+            <h2>Personal Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Full Name</span>&nbsp;&nbsp;<span class="field-value">{{ admission.first_name }} {% if admission.middle_name %}{{ admission.middle_name }} {% endif %}{{ admission.last_name }}</span></td>
+                    <td><span class="field-label">Date of Birth</span>&nbsp;&nbsp;<span class="field-value">{{ admission.date_of_birth|date:"F d, Y" }}</span></td>
+                    <td><span class="field-label">Gender</span>&nbsp;&nbsp;<span class="field-value">{{ admission.gender }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Nationality</span>&nbsp;&nbsp;<span class="field-value">{{ admission.nationality }}</span></td>
+                    {% if admission.aadhaar_number %}
+                        <td><span class="field-label">Aadhaar Number</span>&nbsp;&nbsp;<span class="field-value">{{ admission.aadhaar_number }}</span></td>
+                    {% endif %}
+                    {% if admission.student_contact_number %}
+                        <td><span class="field-label">Contact Number</span>&nbsp;&nbsp;<span class="field-value">{{ admission.student_contact_number }}</span></td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td><span class="field-label">Email</span>&nbsp;&nbsp;<span class="field-value">{{ admission.email }}</span></td>
+                    <td><span class="field-label">Permanent Address</span>&nbsp;&nbsp;<span class="field-value">{{ admission.permanent_address }}</span></td>
+                    {% if admission.correspondence_address %}
+                        <td><span class="field-label">Correspondence Address</span>&nbsp;&nbsp;<span class="field-value">{{ admission.correspondence_address }}</span></td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td><span class="field-label">Caste</span>&nbsp;&nbsp;<span class="field-value">{{ admission.caste }}</span></td>
+                    <td><span class="field-label">Religion</span>&nbsp;&nbsp;<span class="field-value">{{ admission.religion }}</span></td>
+                    <td><span class="field-label">Mother Tongue</span>&nbsp;&nbsp;<span class="field-value">{{ admission.mother_tongue }}</span></td>
+                </tr>
+                {% if admission.blood_group %}
+                    <tr>
+                        <td><span class="field-label">Blood Group</span>&nbsp;&nbsp;<span class="field-value">{{ admission.blood_group }}</span></td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+
+        <!-- Parent Information -->
+        <div class="section">
+            <h2>Parent Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Father’s Name</span>&nbsp;&nbsp;<span class="field-value">{{ admission.father_name }}</span></td>
+                    <td><span class="field-label">Father’s Occupation</span>&nbsp;&nbsp;<span class="field-value">{{ admission.father_occupation }}</span></td>
+                    <td><span class="field-label">Father’s Contact Number</span>&nbsp;&nbsp;<span class="field-value">{{ admission.father_contact_number }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Mother’s Name</span>&nbsp;&nbsp;<span class="field-value">{{ admission.mother_name }}</span></td>
+                    <td><span class="field-label">Mother’s Occupation</span>&nbsp;&nbsp;<span class="field-value">{{ admission.mother_occupation }}</span></td>
+                    <td><span class="field-label">Mother’s Contact Number</span>&nbsp;&nbsp;<span class="field-value">{{ admission.mother_contact_number }}</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="section">
+            <h2>Academic Information</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Previous School Name</span>&nbsp;&nbsp;<span class="field-value">{{ admission.previous_school_name }}</span></td>
+                    <td><span class="field-label">Previous School Address</span>&nbsp;&nbsp;<span class="field-value">{{ admission.previous_school_address }}</span></td>
+                    <td><span class="field-label">Board of Education</span>&nbsp;&nbsp;<span class="field-value">{{ admission.board_of_education }}</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Class Last Attended</span>&nbsp;&nbsp;<span class="field-value">{{ admission.class_last_attended }}</span></td>
+                    <td><span class="field-label">Year of Passing</span>&nbsp;&nbsp;<span class="field-value">{{ admission.year_of_passing }}</span></td>
+                    <td><span class="field-label">Percentage Obtained</span>&nbsp;&nbsp;<span class="field-value">{{ admission.percentage_obtained }}%</span></td>
+                </tr>
+                {% if admission.reason_for_leaving %}
+                    <tr>
+                        <td><span class="field-label">Reason for Leaving</span>&nbsp;&nbsp;<span class="field-value">{{ admission.reason_for_leaving }}</span></td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+
+        <!-- Documents -->
+        <div class="section">
+            <h2>Documents</h2>
+            <table>
+                <tr>
+                    <td><span class="field-label">Birth Certificate</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                    {% if admission.aadhaar_card %}
+                        <td><span class="field-label">Aadhaar Card</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                    {% endif %}
+                    {% if admission.caste_certificate %}
+                        <td><span class="field-label">Caste Certificate</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td><span class="field-label">Previous Mark Sheet</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Transfer Certificate</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                    <td><span class="field-label">Passport Photo</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-label">Address Proof</span>&nbsp;&nbsp;<span class="field-value">Submitted</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="section signature-section">
+            <h2>Authorization</h2>
+            <div class="signature-field">
+                <span class="field-label">Name</span><span class="field-value">_________________________</span>
+            </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="signature-field">
+                <span class="field-label">Signature</span><div class="signature-line"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

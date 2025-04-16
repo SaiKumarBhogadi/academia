@@ -1,0 +1,340 @@
+{% extends 'schools/base.html' %}
+
+{% block title %}Application - {{ admission.admission_id }}{% endblock %}
+
+{% block content %}
+<style>
+    .application-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f1f3f8;
+        padding: 20px 30px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.6rem;
+        color: #1a2a6c;
+        font-weight: 600;
+    }
+    .section {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    .section h4 {
+        color: #4b3c9d;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        font-weight: 600;
+        border-left: 4px solid #6c63ff;
+        padding-left: 12px;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .field {
+        display: flex;
+        flex-direction: column;
+    }
+    .field-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+    }
+    .field-value {
+        font-size: 1rem;
+        color: #555;
+    }
+    .file-link {
+        color: #6c63ff;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .file-link:hover {
+        text-decoration: underline;
+        color: #b21f1f;
+    }
+    .btn-primary {
+        background-color: #6c63ff;
+        border-color: #6c63ff;
+        padding: 10px 24px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 6px;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #554eea;
+        border-color: #554eea;
+    }
+    .btn-secondary {
+        background-color: #e0e0e0;
+        color: #333;
+        padding: 8px 18px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+        text-decoration: none;
+        border: none;
+        transition: 0.3s ease;
+    }
+    .btn-secondary:hover {
+        background-color: #ccc;
+        color: #111;
+    }
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Application Details - {{ admission.admission_id }}</h3>
+        <a href="{% url 'schools:applications' %}" class="btn btn-secondary btn-sm">Back to Applications</a>
+    </div>
+    <div class="card-body">
+        <div class="application-container">
+            <!-- Application Info -->
+            <div class="section">
+                <h4>Application Information</h4>
+                <div class="grid">
+                    <div class="field">
+                        <div class="field-label">School</div>
+                        <div class="field-value">{{ admission.school.school_name }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Admission ID</div>
+                        <div class="field-value">{{ admission.admission_id }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Cycle</div>
+                        <div class="field-value">{{ admission.cycle.year }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Class</div>
+                        <div class="field-value">{{ admission.school_class.grade }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Section</div>
+                        <div class="field-value">{{ admission.section.section_name }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Status</div>
+                        <div class="field-value">{{ admission.status }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Date Applied</div>
+                        <div class="field-value">{{ admission.admission_date|date:"F d, Y" }}</div>
+                    </div>
+                    {% if admission.seat %}
+                        <div class="field">
+                            <div class="field-label">Seat Number</div>
+                            <div class="field-value">{{ admission.seat.seat_number }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Personal Info -->
+            <div class="section">
+                <h4>Personal Information</h4>
+                <div class="grid">
+                    <div class="field">
+                        <div class="field-label">Full Name</div>
+                        <div class="field-value">{{ admission.first_name }} {% if admission.middle_name %}{{ admission.middle_name }} {% endif %}{{ admission.last_name }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Date of Birth</div>
+                        <div class="field-value">{{ admission.date_of_birth|date:"F d, Y" }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Gender</div>
+                        <div class="field-value">{{ admission.gender }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Nationality</div>
+                        <div class="field-value">{{ admission.nationality }}</div>
+                    </div>
+                    {% if admission.aadhaar_number %}
+                        <div class="field">
+                            <div class="field-label">Aadhaar Number</div>
+                            <div class="field-value">{{ admission.aadhaar_number }}</div>
+                        </div>
+                    {% endif %}
+                    {% if admission.student_contact_number %}
+                        <div class="field">
+                            <div class="field-label">Contact Number</div>
+                            <div class="field-value">{{ admission.student_contact_number }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="field">
+                        <div class="field-label">Email</div>
+                        <div class="field-value">{{ admission.email }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Permanent Address</div>
+                        <div class="field-value">{{ admission.permanent_address }}</div>
+                    </div>
+                    {% if admission.correspondence_address %}
+                        <div class="field">
+                            <div class="field-label">Correspondence Address</div>
+                            <div class="field-value">{{ admission.correspondence_address }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="field">
+                        <div class="field-label">Caste</div>
+                        <div class="field-value">{{ admission.caste }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Religion</div>
+                        <div class="field-value">{{ admission.religion }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Mother Tongue</div>
+                        <div class="field-value">{{ admission.mother_tongue }}</div>
+                    </div>
+                    {% if admission.blood_group %}
+                        <div class="field">
+                            <div class="field-label">Blood Group</div>
+                            <div class="field-value">{{ admission.blood_group }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Parent Info -->
+            <div class="section">
+                <h4>Parent Information</h4>
+                <div class="grid">
+                    <div class="field">
+                        <div class="field-label">Father’s Name</div>
+                        <div class="field-value">{{ admission.father_name }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Father’s Occupation</div>
+                        <div class="field-value">{{ admission.father_occupation }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Father’s Contact</div>
+                        <div class="field-value">{{ admission.father_contact_number }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Mother’s Name</div>
+                        <div class="field-value">{{ admission.mother_name }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Mother’s Occupation</div>
+                        <div class="field-value">{{ admission.mother_occupation }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Mother’s Contact</div>
+                        <div class="field-value">{{ admission.mother_contact_number }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Info -->
+            <div class="section">
+                <h4>Academic Background</h4>
+                <div class="grid">
+                    <div class="field">
+                        <div class="field-label">Previous School</div>
+                        <div class="field-value">{{ admission.previous_school_name }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">School Address</div>
+                        <div class="field-value">{{ admission.previous_school_address }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Board</div>
+                        <div class="field-value">{{ admission.board_of_education }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Class Last Attended</div>
+                        <div class="field-value">{{ admission.class_last_attended }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Year of Passing</div>
+                        <div class="field-value">{{ admission.year_of_passing }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Percentage</div>
+                        <div class="field-value">{{ admission.percentage_obtained }}%</div>
+                    </div>
+                    {% if admission.reason_for_leaving %}
+                        <div class="field">
+                            <div class="field-label">Reason for Leaving</div>
+                            <div class="field-value">{{ admission.reason_for_leaving }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="section">
+                <h4>Submitted Documents</h4>
+                <div class="grid">
+                    <div class="field">
+                        <div class="field-label">Birth Certificate</div>
+                        <div class="field-value"><a href="{{ admission.birth_certificate.url }}" class="file-link" target="_blank">View</a></div>
+                    </div>
+                    {% if admission.aadhaar_card %}
+                        <div class="field">
+                            <div class="field-label">Aadhaar Card</div>
+                            <div class="field-value"><a href="{{ admission.aadhaar_card.url }}" class="file-link" target="_blank">View</a></div>
+                        </div>
+                    {% endif %}
+                    {% if admission.caste_certificate %}
+                        <div class="field">
+                            <div class="field-label">Caste Certificate</div>
+                            <div class="field-value"><a href="{{ admission.caste_certificate.url }}" class="file-link" target="_blank">View</a></div>
+                        </div>
+                    {% endif %}
+                    <div class="field">
+                        <div class="field-label">Previous Mark Sheet</div>
+                        <div class="field-value"><a href="{{ admission.previous_mark_sheet.url }}" class="file-link" target="_blank">View</a></div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Transfer Certificate</div>
+                        <div class="field-value"><a href="{{ admission.transfer_certificate.url }}" class="file-link" target="_blank">View</a></div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Passport Photo</div>
+                        <div class="field-value"><a href="{{ admission.passport_photo.url }}" class="file-link" target="_blank">View</a></div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Address Proof</div>
+                        <div class="field-value"><a href="{{ admission.address_proof.url }}" class="file-link" target="_blank">View</a></div>
+                    </div>
+                </div>
+            </div>
+
+            
+           
+        </div>
+    </div>
+</div>
+{% endblock %}
+

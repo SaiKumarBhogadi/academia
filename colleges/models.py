@@ -47,7 +47,7 @@ from django.db import models
 
 class AdmissionCycle(models.Model):
     college = models.ForeignKey(CollegeProfile, on_delete=models.CASCADE)
-    year = models.PositiveIntegerField()  # Remove unique=True
+    year = models.CharField(max_length=9)  # Remove unique=True
     start_date = models.DateField()
     end_date = models.DateField()
     is_active = models.BooleanField(default=False)
@@ -97,7 +97,7 @@ class Department(models.Model):
 class Section(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='sections')
     cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, help_text="The cycle this section is offered in")
-    section_name = models.CharField(max_length=10)
+    section_name = models.CharField(max_length=50)
     total_seats = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -133,10 +133,88 @@ class Seat(models.Model):
         super().save(*args, **kwargs)
 
 class Application(models.Model):
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+        ('Withdrawn', 'Withdrawn'),
+    )
+
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
+    degree = models.ForeignKey('Degree', on_delete=models.CASCADE, related_name='applications', null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='applications')
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='applications', null=True, blank=True)
-    seat = models.ForeignKey(Seat, on_delete=models.SET_NULL, null=True, blank=True)  # Link to specific seat
-    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
+    seat = models.ForeignKey(Seat, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     apply_date = models.DateTimeField(auto_now_add=True)
-    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, null=True, blank=True, help_text="The admission cycle this application belongs to")
+    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, related_name='applications')
+
+    # Application Information (Category 1)
+    admission_id = models.CharField(max_length=20, unique=True, blank=True)  # e.g., "COL-2025-001"
+    entrance_exam = models.CharField(max_length=100, blank=True)  # e.g., "JEE Main"
+    entrance_score = models.CharField(max_length=50, blank=True)  # e.g., "Rank: 1500"
+
+    # Personal Information (Category 2)
+    first_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10, choices=(('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')))
+    nationality = models.CharField(max_length=50, default="Indian")
+    aadhaar_number = models.CharField(max_length=12, blank=True)
+    contact_number = models.CharField(max_length=15)
+    email = models.EmailField()
+    permanent_address = models.TextField()
+    correspondence_address = models.TextField(blank=True)
+    caste = models.CharField(max_length=50, blank=True)  # e.g., "General", "OBC"
+    religion = models.CharField(max_length=50, blank=True)
+    mother_tongue = models.CharField(max_length=50, blank=True)
+
+    # Parent Information (Category 3)
+    father_name = models.CharField(max_length=100)
+    father_occupation = models.CharField(max_length=100, blank=True)
+    father_contact = models.CharField(max_length=15, blank=True)
+    mother_name = models.CharField(max_length=100)
+    mother_occupation = models.CharField(max_length=100, blank=True)
+    mother_contact = models.CharField(max_length=15, blank=True)
+    family_income = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    # Academic Information (Category 4)
+    class_12_school = models.CharField(max_length=200)
+    class_12_address = models.TextField()
+    class_12_board = models.CharField(max_length=50, choices=(('CBSE', 'CBSE'), ('ICSE', 'ICSE'), ('State', 'State Board'), ('IB', 'IB'), ('Other', 'Other')))
+    class_12_year = models.CharField(max_length=4)
+    class_12_percentage = models.CharField(max_length=10)  # e.g., "92%"
+    class_12_stream = models.CharField(max_length=50)
+    class_10_school = models.CharField(max_length=200)
+    class_10_board = models.CharField(max_length=50, choices=(('CBSE', 'CBSE'), ('ICSE', 'ICSE'), ('State', 'State Board'), ('IB', 'IB'), ('Other', 'Other')))
+    class_10_year = models.CharField(max_length=4)
+    class_10_percentage = models.CharField(max_length=10)  # e.g., "95%"
+    other_qualifications = models.TextField(blank=True)
+    achievements = models.TextField(blank=True)
+
+    # Documents (Category 5)
+    birth_certificate = models.FileField(upload_to='applications/documents/%Y/%m/%d/')
+    aadhaar_card = models.FileField(upload_to='applications/documents/%Y/%m/%d/', blank=True)
+    caste_certificate = models.FileField(upload_to='applications/documents/%Y/%m/%d/', blank=True)
+    class_12_mark_sheet = models.FileField(upload_to='applications/documents/%Y/%m/%d/')
+    class_10_mark_sheet = models.FileField(upload_to='applications/documents/%Y/%m/%d/')
+    transfer_certificate = models.FileField(upload_to='applications/documents/%Y/%m/%d/')
+    passport_photo = models.FileField(upload_to='applications/documents/%Y/%m/%d/')
+    address_proof = models.FileField(upload_to='applications/documents/%Y/%m/%d/')
+    entrance_scorecard = models.FileField(upload_to='applications/documents/%Y/%m/%d/', blank=True)
+    recommendation_letter = models.FileField(upload_to='applications/documents/%Y/%m/%d/', blank=True)
+
+    class Meta:
+        verbose_name = "College Application"
+        verbose_name_plural = "College Applications"
+
+    def save(self, *args, **kwargs):
+        if not self.admission_id:
+            year = self.cycle.year.split('-')[0]
+            count = Application.objects.filter(cycle=self.cycle).count() + 1
+            self.admission_id = f"COL-{year}-{count:03d}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.admission_id} - {self.student.username} - {self.department.name}"

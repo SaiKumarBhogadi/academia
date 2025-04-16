@@ -91,7 +91,7 @@
         font-size: 1.1rem;
     }
 
-    .form-control {
+    .form-control, .form-control-file {
         border: 2px solid #1a2a6c;
         border-radius: 5px;
         padding: 12px;
@@ -101,7 +101,7 @@
         transition: border-color 0.3s ease;
     }
 
-    .form-control:focus {
+    .form-control:focus, .form-control-file:focus {
         border-color: #b21f1f;
         outline: none;
         box-shadow: 0 0 5px rgba(178, 31, 31, 0.5);
@@ -257,8 +257,8 @@
                             <!-- Application Form -->
                             <div class="form-section">
                                 <h4>Apply for Admission</h4>
-                                <p>Select your degree, department, section, and provide your details below.</p>
-                                <form method="post" id="application-form-{{ cycle.id }}" data-cycle-id="{{ cycle.id }}">
+                                <p>Complete the form below, including degree, department, section, and all required details.</p>
+                                <form method="post" id="application-form-{{ cycle.id }}" data-cycle-id="{{ cycle.id }}" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input type="hidden" name="college_id" value="{{ college.id }}">
                                     <input type="hidden" name="cycle" value="{{ cycle.id }}">
@@ -269,39 +269,131 @@
                                         {% endfor %}
                                     </div>
                                     {% endif %}
-                                    <div class="form-group">
-                                        <label for="degree_id_{{ cycle.id }}" class="form-label">Degree</label>
-                                        <select name="degree_id" id="degree_id_{{ cycle.id }}" class="form-control degree-select" required>
-                                            <option value="">-- Loading Degrees --</option>
-                                        </select>
+
+                                    <!-- Degree, Department, Section -->
+                                    <div class="form-section">
+                                        <h5>Program Selection</h5>
+                                        <div class="form-group">
+                                            <label for="degree_id_{{ cycle.id }}" class="form-label">Degree</label>
+                                            
+                                            <select name="degree" id="degree_id_{{ cycle.id }}" class="form-control degree-select" required>
+                                                <option value="">-- Select a Degree --</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="department_id_{{ cycle.id }}" class="form-label">Department</label>
+                                            <select name="department_id" id="department_id_{{ cycle.id }}" class="form-control department-select" required>
+                                                <option value="">-- Select a Department --</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="section_id_{{ cycle.id }}" class="form-label">Section</label>
+                                            <select name="section_id" id="section_id_{{ cycle.id }}" class="form-control section-select" required>
+                                                <option value="">-- Select a Section --</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="department_id_{{ cycle.id }}" class="form-label">Department</label>
-                                        <select name="department_id" id="department_id_{{ cycle.id }}" class="form-control department-select" required>
-                                            <option value="">-- Select a Department --</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="section_id_{{ cycle.id }}" class="form-label">Section</label>
-                                        <select name="section_id" id="section_id_{{ cycle.id }}" class="form-control section-select" required>
-                                            <option value="">-- Select a Section --</option>
-                                        </select>
-                                    </div>
-                                    {% for field in application_form %}
-                                        {% if field.name != 'cycle' %}
-                                            <div class="form-group">
-                                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                                <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control" value="{{ field.value|default_if_none:'' }}" {% if field.field.required %}required{% endif %}>
-                                                {% if field.errors %}
-                                                    <div class="error-message">
-                                                        {% for error in field.errors %}
-                                                            <p>{{ error }}</p>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
+
+                                    <!-- Application Information -->
+                                    <div class="form-section">
+                                        <h5>Application Information</h5>
+                                        {% for field in application_form %}
+                                        {% if field.name in 'entrance_exam,entrance_score' %}
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="error-message">
+                                                {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                                {% endfor %}
                                             </div>
+                                            {% endif %}
+                                        </div>
                                         {% endif %}
-                                    {% endfor %}
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Personal Information -->
+                                    <div class="form-section">
+                                        <h5>Personal Information</h5>
+                                        {% for field in application_form %}
+                                        {% if field.name in 'first_name,middle_name,last_name,date_of_birth,gender,nationality,aadhaar_number,contact_number,email,permanent_address,correspondence_address,caste,religion,mother_tongue' %}
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="error-message">
+                                                {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Parent Information -->
+                                    <div class="form-section">
+                                        <h5>Parent/Guardian Information</h5>
+                                        {% for field in application_form %}
+                                        {% if field.name in 'father_name,father_occupation,father_contact,mother_name,mother_occupation,mother_contact,family_income' %}
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="error-message">
+                                                {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Academic Information -->
+                                    <div class="form-section">
+                                        <h5>Academic Information</h5>
+                                        {% for field in application_form %}
+                                        {% if field.name in 'class_12_school,class_12_address,class_12_board,class_12_year,class_12_percentage,class_12_stream,class_10_school,class_10_board,class_10_year,class_10_percentage,other_qualifications,achievements' %}
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="error-message">
+                                                {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Documents -->
+                                    <div class="form-section">
+                                        <h5>Documents</h5>
+                                        {% for field in application_form %}
+                                        {% if field.name in 'birth_certificate,aadhaar_card,caste_certificate,class_12_mark_sheet,class_10_mark_sheet,transfer_certificate,passport_photo,address_proof,entrance_scorecard,recommendation_letter' %}
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="error-message">
+                                                {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+
                                     <button type="submit" name="apply" class="btn btn-primary">Submit Application</button>
                                     <div id="apply-error_{{ cycle.id }}" class="error-message"></div>
                                 </form>
@@ -330,7 +422,7 @@ $(document).ready(function() {
         var cycleId = $(this).closest('.accordion-item').find('form').data('cycle-id');
         var degreeSelect = $('#degree_id_' + cycleId);
         $.ajax({
-            url: '{% url "colleges:get_degrees" %}', // New endpoint for degrees
+            url: '{% url "colleges:get_degrees" %}',
             data: {
                 'cycle_id': cycleId
             },

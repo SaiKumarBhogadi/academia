@@ -27,6 +27,7 @@ urlpatterns = [
     path('get-sections/<int:class_id>/', views.get_sections, name='get_sections'),
     path('get-seats/<int:section_id>/', views.get_seats, name='get_seats'),
     path('applications/', views.applications, name='applications'),
+    path('application/<int:application_id>/details/', views.view_application_details, name='view_application_details'),
     path('student-details/<int:student_id>/', views.student_details, name='student_details'),
 
 

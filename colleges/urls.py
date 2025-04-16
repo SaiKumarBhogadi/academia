@@ -70,4 +70,8 @@ urlpatterns = [
     path('courses/add/<int:degree_id>/<int:department_id>/', views.add_course, name='add_course'),
     path('courses/edit/<int:course_id>/', views.edit_course, name='edit_course'),
     path('courses/delete/<int:course_id>/', views.delete_course, name='delete_course'),
+
+    path('packages/', views.packages, name='packages'),
+     path('college/<int:college_id>/application/<int:application_id>/', views.view_application_details, name='view_application_details'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

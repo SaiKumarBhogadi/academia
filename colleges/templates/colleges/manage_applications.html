@@ -48,7 +48,8 @@
         }
         .btn-approve { background-color: #28a745; border-color: #28a745; }
         .btn-reject { background-color: #dc3545; border-color: #dc3545; }
-        .btn-approve:hover, .btn-reject:hover { opacity: 0.8; }
+        .btn-view { background-color: #007bff; border-color: #007bff; }
+        .btn-approve:hover, .btn-reject:hover, .btn-view:hover { opacity: 0.8; }
         .status-approved { color: #28a745; font-weight: bold; }
         .status-rejected { color: #dc3545; font-weight: bold; }
         .status-pending { color: #ff9800; font-weight: bold; }
@@ -95,7 +96,7 @@
                 font-weight: bold;
                 text-align: left;
             }
-            .table td:nth-child(1)::before { content: "Application ID"; }
+            .table td:nth-child(1)::before { content: "Admission ID"; }
             .table td:nth-child(2)::before { content: "Name"; }
             .table td:nth-child(3)::before { content: "Department"; }
             .table td:nth-child(4)::before { content: "Section"; }
@@ -142,7 +143,76 @@
                                     <table class="table" id="pending-table-{{ cycle.id }}">
                                         <thead>
                                             <tr>
-                                                <th>Application ID</th>
+                                                <th>Admission ID</th>
+                                                <th>Name</th>
+                                                <th>Department</th>
+                                                <th>Section</th>
+                                                <!-- <th>Seat</th> -->
+                                                <th>Status</th>
+                                                <th>Apply Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for application in apps.pending %}
+                                                <tr data-application-id="{{ application.id }}">
+                                                    <td data-label="Admission ID">{{ application.admission_id }}</td>
+                                                    <td data-label="Name">
+                                                        <a href="{% url 'colleges:college_student_details' college_id=college.id student_id=application.student.id %}" class="student-name">
+                                                            {% if application.student %}
+                                                                {% with profile=application.student.student_profile %}
+                                                                    {% if profile %}
+                                                                        {% with full_name=profile.first_name|add:" "|add:profile.last_name %}
+                                                                            {{ full_name|default:application.student.username|default:"Unknown (No Name)" }}
+                                                                        {% endwith %}
+                                                                    {% else %}
+                                                                        {{ application.student.username|default:"Unknown (No Profile)" }}
+                                                                    {% endif %}
+                                                                {% endwith %}
+                                                            {% else %}
+                                                                Unknown (No Student)
+                                                            {% endif %}
+                                                        </a>
+                                                    </td>
+                                                    <td data-label="Department">{{ application.department.name|default:"N/A" }}</td>
+                                                    <td data-label="Section">{{ application.section.section_name|default:"Not Assigned" }}</td>
+                                                    <!-- <td data-label="Seat">{{ application.seat.seat_number|default:"Not Assigned" }}</td> -->
+                                                    <td data-label="Status" class="status-{{ application.status|lower }}">{{ application.status }}</td>
+                                                    <td data-label="Apply Date">{{ application.apply_date|date:"Y-m-d H:i"|default:"N/A" }}</td>
+                                                    <td data-label="Actions">
+                                                        <form method="post" class="action-form" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="application_id" value="{{ application.id }}">
+                                                            <select name="seat_id" class="form-control d-inline seat-select" style="width: auto; display: block;">
+                                                                <option value="">Auto Assign</option>
+                                                                {% for seat in application.section.seats.all %}
+                                                                    {% if not seat.is_filled %}
+                                                                        <option value="{{ seat.id }}">{{ seat.seat_number }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                            <button type="submit" name="action" value="approve" class="btn btn-approve btn-sm">Approve</button>
+                                                            <button type="submit" name="action" value="reject" class="btn btn-reject btn-sm">Reject</button>
+                                                        </form>
+                                                        <a href="{% url 'colleges:view_application_details' college_id=college.id application_id=application.id %}" class="btn btn-view btn-sm">View Application</a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p>No pending applications for this cycle.</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Approved Applications -->
+                            <div class="table-section">
+                                <h4>Approved Applications</h4>
+                                {% if apps.approved %}
+                                    <table class="table" id="approved-table-{{ cycle.id }}">
+                                        <thead>
+                                            <tr>
+                                                <th>Admission ID</th>
                                                 <th>Name</th>
                                                 <th>Department</th>
                                                 <th>Section</th>
@@ -153,9 +223,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for application in apps.pending %}
+                                            {% for application in apps.approved %}
                                                 <tr data-application-id="{{ application.id }}">
-                                                    <td data-label="Application ID">{{ application.id }}</td>
+                                                    <td data-label="Admission ID">{{ application.admission_id }}</td>
                                                     <td data-label="Name">
                                                         <a href="{% url 'colleges:college_student_details' college_id=college.id student_id=application.student.id %}" class="student-name">
                                                             {% if application.student %}
@@ -179,72 +249,8 @@
                                                     <td data-label="Status" class="status-{{ application.status|lower }}">{{ application.status }}</td>
                                                     <td data-label="Apply Date">{{ application.apply_date|date:"Y-m-d H:i"|default:"N/A" }}</td>
                                                     <td data-label="Actions">
-                                                        <form method="post" class="action-form" style="display:inline;">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" name="application_id" value="{{ application.id }}">
-                                                            <select name="seat_id" class="form-control d-inline seat-select" style="width: auto; display: block;">
-                                                                <option value="">Auto Assign</option>
-                                                                {% for seat in application.section.seats.all %}
-                                                                    {% if not seat.is_filled %}
-                                                                        <option value="{{ seat.id }}">{{ seat.seat_number }}</option>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            </select>
-                                                            <button type="submit" name="action" value="approve" class="btn btn-approve btn-sm">Approve</button>
-                                                            <button type="submit" name="action" value="reject" class="btn btn-reject btn-sm">Reject</button>
-                                                        </form>
+                                                        <a href="{% url 'colleges:view_application_details' college_id=college.id application_id=application.id %}" class="btn btn-view btn-sm">View Application</a>
                                                     </td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% else %}
-                                    <p>No pending applications for this cycle.</p>
-                                {% endif %}
-                            </div>
-
-                            <!-- Approved Applications -->
-                            <div class="table-section">
-                                <h4>Approved Applications</h4>
-                                {% if apps.approved %}
-                                    <table class="table" id="approved-table-{{ cycle.id }}">
-                                        <thead>
-                                            <tr>
-                                                <th>Application ID</th>
-                                                <th>Name</th>
-                                                <th>Department</th>
-                                                <th>Section</th>
-                                                <th>Seat</th>
-                                                <th>Status</th>
-                                                <th>Apply Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for application in apps.approved %}
-                                                <tr data-application-id="{{ application.id }}">
-                                                    <td data-label="Application ID">{{ application.id }}</td>
-                                                    <td data-label="Name">
-                                                        <a href="{% url 'colleges:college_student_details' college_id=college.id student_id=application.student.id %}" class="student-name">
-                                                            {% if application.student %}
-                                                                {% with profile=application.student.student_profile %}
-                                                                    {% if profile %}
-                                                                        {% with full_name=profile.first_name|add:" "|add:profile.last_name %}
-                                                                            {{ full_name|default:application.student.username|default:"Unknown (No Name)" }}
-                                                                        {% endwith %}
-                                                                    {% else %}
-                                                                        {{ application.student.username|default:"Unknown (No Profile)" }}
-                                                                    {% endif %}
-                                                                {% endwith %}
-                                                            {% else %}
-                                                                Unknown (No Student)
-                                                            {% endif %}
-                                                        </a>
-                                                    </td>
-                                                    <td data-label="Department">{{ application.department.name|default:"N/A" }}</td>
-                                                    <td data-label="Section">{{ application.section.section_name|default:"Not Assigned" }}</td>
-                                                    <td data-label="Seat">{{ application.seat.seat_number|default:"Not Assigned" }}</td>
-                                                    <td data-label="Status" class="status-{{ application.status|lower }}">{{ application.status }}</td>
-                                                    <td data-label="Apply Date">{{ application.apply_date|date:"Y-m-d H:i"|default:"N/A" }}</td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
@@ -261,19 +267,20 @@
                                     <table class="table" id="rejected-table-{{ cycle.id }}">
                                         <thead>
                                             <tr>
-                                                <th>Application ID</th>
+                                                <th>Admission ID</th>
                                                 <th>Name</th>
                                                 <th>Department</th>
                                                 <th>Section</th>
                                                 <th>Seat</th>
                                                 <th>Status</th>
                                                 <th>Apply Date</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for application in apps.rejected %}
                                                 <tr data-application-id="{{ application.id }}">
-                                                    <td data-label="Application ID">{{ application.id }}</td>
+                                                    <td data-label="Admission ID">{{ application.admission_id }}</td>
                                                     <td data-label="Name">
                                                         <a href="{% url 'colleges:college_student_details' college_id=college.id student_id=application.student.id %}" class="student-name">
                                                             {% if application.student %}
@@ -296,6 +303,9 @@
                                                     <td data-label="Seat">{{ application.seat.seat_number|default:"Not Assigned" }}</td>
                                                     <td data-label="Status" class="status-{{ application.status|lower }}">{{ application.status }}</td>
                                                     <td data-label="Apply Date">{{ application.apply_date|date:"Y-m-d H:i"|default:"N/A" }}</td>
+                                                    <td data-label="Actions">
+                                                        <a href="{% url 'colleges:view_application_details' college_id=college.id application_id=application.id %}" class="btn btn-view btn-sm">View Application</a>
+                                                    </td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
@@ -361,9 +371,12 @@
                             if (newTable) {
                                 pendingTable.removeChild(row); // Remove from pending table
                                 const newRow = row.cloneNode(true); // Clone the row
-                                // Remove the action form in the new row
+                                // Update Admission ID in cloned row
+                                const admissionIdCell = newRow.querySelector('td:nth-child(1)');
+                                admissionIdCell.textContent = row.querySelector('td:nth-child(1)').textContent;
+                                // Remove the action form in the new row, keep view button
                                 const newActionsCell = newRow.querySelector('td:last-child');
-                                newActionsCell.innerHTML = `<span>${data.status}</span>`; // Replace with status text
+                                newActionsCell.innerHTML = `<a href="{% url 'colleges:view_application_details' college_id=college.id application_id=${row.dataset.applicationId}%" class="btn btn-view btn-sm">View Application</a>`;
                                 newTable.appendChild(newRow); // Add cloned row to new table
                                 // Show success alert without delay
                                 const alert = document.createElement('div');

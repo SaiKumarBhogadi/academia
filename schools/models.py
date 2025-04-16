@@ -48,7 +48,7 @@ from django.db import models
 
 class AdmissionCycle(models.Model):
     school = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='cycles')
-    year = models.PositiveIntegerField()  # Removed unique=True, relying on unique_together
+    year = models.CharField(max_length=9)  # Removed unique=True, relying on unique_together
     start_date = models.DateField()
     end_date = models.DateField()
     is_active = models.BooleanField(default=True)
@@ -105,6 +105,10 @@ class Seat(models.Model):
         return f"{self.section} - Seat {self.seat_number}"
 
 # Admission Model (Added cycle)
+from django.db import models
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+# from core.models import User, SchoolProfile, AdmissionCycle, SchoolClass, ClassSection, Seat
+
 class Admission(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -112,19 +116,110 @@ class Admission(models.Model):
         ('Rejected', 'Rejected'),
         ('Withdrawn', 'Withdrawn'),
     ]
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+    CASTE_CHOICES = [
+        ('General', 'General'),
+        ('OBC', 'OBC'),
+        ('SC', 'SC'),
+        ('ST', 'ST'),
+        ('EWS', 'EWS'),
+        ('Other', 'Other'),
+    ]
+    RELIGION_CHOICES = [
+        ('Hindu', 'Hindu'),
+        ('Muslim', 'Muslim'),
+        ('Christian', 'Christian'),
+        ('Sikh', 'Sikh'),
+        ('Other', 'Other'),
+    ]
+    BOARD_CHOICES = [
+        ('CBSE', 'CBSE'),
+        ('ICSE', 'ICSE'),
+        ('State Board', 'State Board'),
+        ('Other', 'Other'),
+    ]
+    BLOOD_GROUP_CHOICES = [
+        ('A+', 'A+'), ('A-', 'A-'),
+        ('B+', 'B+'), ('B-', 'B-'),
+        ('AB+', 'AB+'), ('AB-', 'AB-'),
+        ('O+', 'O+'), ('O-', 'O-'),
+    ]
 
+    # Existing fields (unchanged)
     school = models.ForeignKey(SchoolProfile, on_delete=models.CASCADE, related_name='admissions')
-    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, related_name='admissions', null=True, blank=True)  # Nullable for now
+    cycle = models.ForeignKey(AdmissionCycle, on_delete=models.CASCADE, related_name='admissions', null=True, blank=True)
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name='admissions')
     section = models.ForeignKey(ClassSection, on_delete=models.CASCADE, related_name='admissions')
     seat = models.OneToOneField(Seat, on_delete=models.CASCADE, related_name='admission', null=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admissions', null=True)
-    parent_name = models.CharField(max_length=255, blank=True)
-    contact_number = models.CharField(max_length=15, blank=True)
-    email = models.EmailField(blank=True)
+    email = models.EmailField()  # Kept, made mandatory
     admission_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     admission_id = models.CharField(max_length=20, unique=True, blank=True)
+
+    # New fields: Student Personal Information
+    first_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    nationality = models.CharField(max_length=50, default='Indian')
+    aadhaar_number = models.CharField(
+        max_length=12, 
+        blank=True, 
+        validators=[RegexValidator(r'^\d{12}$', 'Aadhaar must be 12 digits.')]
+    )
+    student_contact_number = models.CharField(
+        max_length=10, 
+        blank=True, 
+        validators=[RegexValidator(r'^\d{10}$', 'Contact number must be 10 digits.')]
+    )
+    permanent_address = models.TextField()
+    correspondence_address = models.TextField(blank=True)
+    caste = models.CharField(max_length=20, choices=CASTE_CHOICES)
+    religion = models.CharField(max_length=20, choices=RELIGION_CHOICES)
+    mother_tongue = models.CharField(max_length=50)
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, blank=True)
+
+    # New fields: Parent Information
+    father_name = models.CharField(max_length=255)
+    father_occupation = models.CharField(max_length=100)
+    father_contact_number = models.CharField(
+        max_length=10, 
+        validators=[RegexValidator(r'^\d{10}$', 'Contact number must be 10 digits.')]
+    )
+    mother_name = models.CharField(max_length=255)
+    mother_occupation = models.CharField(max_length=100)
+    mother_contact_number = models.CharField(
+        max_length=10, 
+        validators=[RegexValidator(r'^\d{10}$', 'Contact number must be 10 digits.')]
+    )
+
+    # New fields: Academic Information
+    previous_school_name = models.CharField(max_length=200)
+    previous_school_address = models.TextField()
+    board_of_education = models.CharField(max_length=20, choices=BOARD_CHOICES)
+    class_last_attended = models.CharField(max_length=20)
+    year_of_passing = models.PositiveIntegerField(
+        validators=[MinValueValidator(2000), MaxValueValidator(2025)]
+    )
+    percentage_obtained = models.FloatField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
+    reason_for_leaving = models.TextField(blank=True)
+
+    # New fields: Documents
+    birth_certificate = models.FileField(upload_to='documents/%Y/%m/%d/')
+    aadhaar_card = models.FileField(upload_to='documents/%Y/%m/%d/', blank=True)
+    caste_certificate = models.FileField(upload_to='documents/%Y/%m/%d/', blank=True)
+    previous_mark_sheet = models.FileField(upload_to='documents/%Y/%m/%d/')
+    transfer_certificate = models.FileField(upload_to='documents/%Y/%m/%d/')
+    passport_photo = models.FileField(upload_to='documents/%Y/%m/%d/')
+    address_proof = models.FileField(upload_to='documents/%Y/%m/%d/')
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -132,7 +227,9 @@ class Admission(models.Model):
 
         if not self.admission_id:
             year = self.admission_date.year
-            last_admission = Admission.objects.filter(admission_id__startswith=f"ADM-{year}-").order_by('-admission_id').first()
+            last_admission = Admission.objects.filter(
+                admission_id__startswith=f"ADM-{year}-"
+            ).order_by('-admission_id').first()
             if last_admission:
                 last_number = int(last_admission.admission_id.split('-')[-1])
                 new_number = last_number + 1
@@ -143,7 +240,14 @@ class Admission(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.student.username if self.student else 'No Student'} - {self.section.section_name if self.section else 'No Section'}"
+        return f"{self.first_name} {self.last_name} - {self.section.section_name if self.section else 'No Section'}"
+
+    class Meta:
+        verbose_name = "Admission"
+        verbose_name_plural = "Admissions"
+
+
+
 
 from django.core.validators import MinValueValidator, MaxValueValidator  # Moved here for consistency
 class SchoolRating(models.Model):

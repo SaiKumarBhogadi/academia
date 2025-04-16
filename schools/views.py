@@ -918,6 +918,37 @@ def applications(request):
     return render(request, 'schools/applications.html', context)
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseForbidden
+from django.contrib import messages
+from django.db import IntegrityError
+from django.db.models import Q
+from schools.models import Admission, SchoolProfile, SchoolClass, ClassSection, Seat, AdmissionCycle
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def view_application_details(request, application_id):
+    if request.user.user_type != 'school':
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    try:
+        school = SchoolProfile.objects.get(user=request.user)
+        admission = get_object_or_404(Admission, id=application_id, school=school)
+        logger.info("Fetched admission %s for school %s", admission.id, school.school_name)
+        
+        context = {
+            'admission': admission,
+            'school': school,
+            'app_type': 'School',
+        }
+        return render(request, 'schools/view_application_details.html', context)
+    except SchoolProfile.DoesNotExist:
+        logger.error("SchoolProfile not found for user: %s", request.user.username)
+        messages.error(request, "Please set up your school profile to view applications.")
+        return redirect('schools:applications')
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -1037,30 +1068,51 @@ from django.http import HttpResponseForbidden
 from django.contrib import messages
 from .models import SchoolProfile, AdmissionCycle, SchoolClass, ClassSection, Admission
 from .forms import StudentApplicationForm
+from django.db.models.signals import Signal
+
+# Define signal (assuming it's defined elsewhere; include if not already in your codebase)
+application_submitted = Signal()
+
+# schools/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.contrib import messages
+from .models import SchoolProfile, AdmissionCycle, SchoolClass, ClassSection, Admission
+from .forms import StudentApplicationForm
+from django.db.models.signals import Signal
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Define signal
+application_submitted = Signal()
 
 @login_required
 def apply_for_admission(request, school_id):
     if request.user.user_type != 'student':
         return HttpResponseForbidden("You are not authorized to access this page.")
-    
+
     school = get_object_or_404(SchoolProfile, id=school_id)
     cycles = AdmissionCycle.objects.filter(school=school, is_active=True).order_by('-year')
+    logger.debug(f"Found {cycles.count()} active cycles for school_id={school_id}: {[c.year for c in cycles]}")
 
-    # Check if student has an active application for this school
+    # Check for active application
     active_application = Admission.objects.filter(
         student=request.user,
         school=school,
         status__in=['Pending', 'Approved']
     ).first()
 
-    initial_data = {}
     if request.method == 'POST':
-        initial_data['cycle'] = request.POST.get('cycle')
-        initial_data['school_class'] = request.POST.get('school_class')
-        if all(key in request.POST for key in ['parent_name', 'contact_number', 'email']):
-            form = StudentApplicationForm(request.POST, school_id=school_id, initial=initial_data)
+        logger.debug(f"POST data: {request.POST}")
+        if 'submit_application' in request.POST:
+            # Full form submission
+            form = StudentApplicationForm(request.POST, request.FILES, school_id=school_id)
             if form.is_valid():
                 cycle = form.cleaned_data['cycle']
+                logger.debug(f"Submitting application for cycle_id={cycle.id}")
                 if not cycle.is_active:
                     messages.error(request, "Cannot apply for an inactive cycle.")
                 elif active_application:
@@ -1068,8 +1120,10 @@ def apply_for_admission(request, school_id):
                 else:
                     school_class = form.cleaned_data['school_class']
                     section = form.cleaned_data['section']
+                    available_seats = section.available_seats()
+                    logger.debug(f"Section {section.section_name} has {available_seats} seats available")
 
-                    if section.available_seats() > 0:
+                    if available_seats > 0:
                         admission = form.save(commit=False)
                         admission.school = school
                         admission.cycle = cycle
@@ -1086,12 +1140,36 @@ def apply_for_admission(request, school_id):
             else:
                 messages.error(request, "Please correct the errors in the form.")
                 for field, errors in form.errors.items():
-                    print(f"Field: {field}, Errors: {errors}")  # Debug field errors
+                    logger.error(f"Form error - Field: {field}, Errors: {errors}")
         else:
-            # Partial submit (cycle or class change), re-render form
-            form = StudentApplicationForm(school_id=school_id, initial=initial_data)
+            # Partial submission for dropdown updates
+            form = StudentApplicationForm(
+                data=request.POST,
+                files=request.FILES,
+                school_id=school_id
+            )
+            # Log form data for debugging
+            cycle_id = request.POST.get('cycle')
+            class_id = request.POST.get('school_class')
+            logger.debug(f"Partial submission: cycle_id={cycle_id}, class_id={class_id}")
+            if cycle_id:
+                try:
+                    cycle_id = int(cycle_id)
+                    classes = SchoolClass.objects.filter(school_id=school_id, cycle_id=cycle_id)
+                    logger.debug(f"Classes for cycle_id={cycle_id}: {[c.grade for c in classes]}")
+                except (ValueError, TypeError):
+                    logger.warning(f"Invalid cycle_id: {cycle_id}")
+            if class_id and cycle_id:
+                try:
+                    class_id = int(class_id)
+                    cycle_id = int(cycle_id)
+                    sections = ClassSection.objects.filter(school_class_id=class_id, cycle_id=cycle_id)
+                    logger.debug(f"Sections for class_id={class_id}, cycle_id={cycle_id}: {[s.section_name for s in sections]}")
+                except (ValueError, TypeError):
+                    logger.warning(f"Invalid class_id or cycle_id: class_id={class_id}, cycle_id={cycle_id}")
     else:
         form = StudentApplicationForm(school_id=school_id)
+        logger.debug("GET request: Initial form loaded")
 
     context = {
         'school': school,

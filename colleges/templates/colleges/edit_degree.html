@@ -1,11 +1,11 @@
 {% extends 'colleges/base.html' %}
 
-{% block title %}Edit Course - {{ college_profile.college_name }}{% endblock %}
+{% block title %}Edit Degree - {{ college_profile.college_name }}{% endblock %}
 
 {% block content %}
 <style>
-    /* Custom styles for the Edit Course page */
-    .edit-course-container {
+    /* Custom styles for the Edit Degree page */
+    .edit-degree-container {
         max-width: 700px;
         margin: 0 auto;
         padding: 20px 15px;
@@ -90,7 +90,7 @@
         border-radius: 5px;
     }
     @media (max-width: 576px) {
-        .edit-course-container {
+        .edit-degree-container {
             padding: 15px 10px;
         }
         .card-header h3 {
@@ -117,10 +117,10 @@
     }
 </style>
 
-<div class="edit-course-container mt-5">
+<div class="edit-degree-container mt-5">
     <div class="card">
         <div class="card-header">
-            <h3>Edit Course - {{ college_profile.college_name }} (Degree: {{ degree.name }}, Department: {{ department.name }}, Cycle: {{ selected_cycle.year }})</h3>
+            <h3>Edit Degree - {{ college_profile.college_name }} (Degree: {{ degree.name }}, Cycle: {{ selected_cycle.year }})</h3>
         </div>
         <div class="card-body">
             {% if messages %}
@@ -131,36 +131,29 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Course Name</label>
+                    <label for="{{ form.name.id_for_label }}">Degree Name</label>
                     {{ form.name }}
                     {% if form.name.errors %}
                         <div class="text-danger">{{ form.name.errors|join:", " }}</div>
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <label for="{{ form.course_code.id_for_label }}">Course Code</label>
-                    {{ form.course_code }}
-                    {% if form.course_code.errors %}
-                        <div class="text-danger">{{ form.course_code.errors|join:", " }}</div>
+                    <label for="{{ form.duration.id_for_label }}">Duration (Years)</label>
+                    {{ form.duration }}
+                    {% if form.duration.errors %}
+                        <div class="text-danger">{{ form.duration.errors|join:", " }}</div>
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <label for="{{ form.semester.id_for_label }}">Semester</label>
-                    {{ form.semester }}
-                    {% if form.semester.errors %}
-                        <div class="text-danger">{{ form.semester.errors|join:", " }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.credits.id_for_label }}">Credits</label>
-                    {{ form.credits }}
-                    {% if form.credits.errors %}
-                        <div class="text-danger">{{ form.credits.errors|join:", " }}</div>
+                    <label for="{{ form.eligibility_criteria.id_for_label }}">Eligibility Criteria</label>
+                    {{ form.eligibility_criteria }}
+                    {% if form.eligibility_criteria.errors %}
+                        <div class="text-danger">{{ form.eligibility_criteria.errors|join:", " }}</div>
                     {% endif %}
                 </div>
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">Update Course</button>
-                    <a href="{% url 'colleges:course_list_all' %}?cycle_id={{ selected_cycle.id }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Degree</button>
+                    <a href="{% url 'colleges:degree_list' %}?cycle_id={{ selected_cycle.id }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>

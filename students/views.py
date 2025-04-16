@@ -300,3 +300,163 @@ def school_applications(request):
         'app_type': 'School',
     }
     return render(request, 'students/student_applications.html', context)
+
+
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseForbidden, HttpResponse
+from django.contrib import messages
+from schools.models import Admission, SchoolProfile
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def view_school_application(request, application_id):
+    if not hasattr(request.user, 'student_profile'):
+        return HttpResponseForbidden("You are not authorized to access this page as a student.")
+
+    admission = get_object_or_404(Admission, id=application_id, student=request.user)
+    logger.info("Fetched admission %s for user %s", admission.id, request.user.username)
+
+    context = {
+        'admission': admission,
+        'school': admission.school,
+        'app_type': 'School',
+    }
+    return render(request, 'students/view_school_application.html', context)
+
+@login_required
+def download_school_application(request, application_id):
+    if not hasattr(request.user, 'student_profile'):
+        return HttpResponseForbidden("You are not authorized to access this page as a student.")
+
+    admission = get_object_or_404(Admission, id=application_id, student=request.user)
+    logger.info("Generating PDF for admission %s for user %s", admission.id, request.user.username)
+
+    # Render HTML for PDF
+    html_string = render_to_string('students/pdf_application_template.html', {
+        'admission': admission,
+        'school': admission.school,
+    })
+
+    # Generate PDF using xhtml2pdf
+    try:
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="application_{admission.admission_id}.pdf"'
+
+        # Create PDF
+        pisa_status = pisa.CreatePDF(
+            html_string,
+            dest=response,
+            encoding='utf-8'
+        )
+
+        if pisa_status.err:
+            logger.error("PDF generation failed for admission %s: %s", admission.id, pisa_status.err)
+            messages.error(request, "Failed to generate PDF. Please try again later.")
+            return render(request, 'students/view_school_application.html', {
+                'admission': admission,
+                'school': admission.school,
+                'app_type': 'School',
+            })
+
+        return response
+    except Exception as e:
+        logger.error("PDF generation failed for admission %s: %s", admission.id, str(e))
+        messages.error(request, "Failed to generate PDF. Please try again later.")
+        return render(request, 'students/view_school_application.html', {
+            'admission': admission,
+            'school': admission.school,
+            'app_type': 'School',
+        })
+
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, render
+from colleges.models import Application, CollegeProfile
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def view_application_details(request, application_id):
+    if not hasattr(request.user, 'student_profile'):
+        return HttpResponseForbidden("You are not authorized to access this page as a student.")
+
+    application = get_object_or_404(Application, id=application_id, student=request.user)
+    college = application.department.college
+    logger.info("Viewing application details %s for user %s", application.id, request.user.username)
+
+    context = {
+        'application': application,
+        'college': college,
+        'app_type': 'College',
+    }
+    return render(request, 'students/view_application_details.html', context)
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
+from colleges.models import Application, CollegeProfile
+from xhtml2pdf import pisa
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def download_college_application(request, application_id):
+    if not hasattr(request.user, 'student_profile'):
+        return HttpResponseForbidden("You are not authorized to access this page as a student.")
+
+    application = get_object_or_404(Application, id=application_id, student=request.user)
+    college = application.department.college
+    logger.info("Generating PDF for application %s for user %s", application.id, request.user.username)
+
+    # Render HTML for PDF
+    html_string = render_to_string('students/college_pdf_application_template.html', {
+        'application': application,
+        'college': college,
+    })
+
+    # Generate PDF using xhtml2pdf
+    try:
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="application_{application.admission_id}.pdf"'
+
+        # Create PDF
+        pisa_status = pisa.CreatePDF(
+            html_string,
+            dest=response,
+            encoding='utf-8'
+        )
+
+        if pisa_status.err:
+            logger.error("PDF generation failed for application %s: %s", application.id, pisa_status.err)
+            messages.error(request, "Failed to generate PDF. Please try again later.")
+            return render(request, 'students/view_application_details.html', {
+                'application': application,
+                'college': college,
+                'app_type': 'College',
+            })
+
+        return response
+    except Exception as e:
+        logger.error("PDF generation failed for application %s: %s", application.id, str(e))
+        messages.error(request, "Failed to generate PDF. Please try again later.")
+        return render(request, 'students/view_application_details.html', {
+            'application': application,
+            'college': college,
+            'app_type': 'College',
+        })
+    
