@@ -395,3 +395,15 @@ def handle_application_submitted(sender, student, institution, application, **kw
         },
         to_email=admin_user.email
     )
+
+
+from django.contrib.auth.signals import user_logged_out
+from django.dispatch import receiver
+from django.utils import timezone
+from core.models import User
+
+@receiver(user_logged_out)
+def update_last_logout(sender, user, request, **kwargs):
+    if user:
+        user.last_logout = timezone.now()
+        user.save()

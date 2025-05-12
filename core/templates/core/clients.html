@@ -1,0 +1,538 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Admit</title>
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+
+  <!-- Top Bar -->
+<nav class="topbar navbar navbar-expand-md bg-light py-1 border-bottom">
+  <div class="container d-flex justify-content-between align-items-center">
+    <!-- Left Side: Contact Info -->
+    <div class="d-flex align-items-center">
+      <span class="me-3 small" style="color: #FFB300 !important;font-weight:600;"><i class="bi bi-telephone"></i> +91-0000000000</span>
+      <span class="small" style="color: #FFB300 !important;font-weight:600;"><i class="bi bi-envelope"></i>info@academiaadmit.in</span>
+    </div>
+
+    <!-- Toggle Button for Small Screens -->
+    <!-- Toggle Button with 3 Vertical Dots -->
+<button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topbarLinks" aria-controls="topbarLinks" aria-expanded="false" aria-label="Toggle topbar">
+  <span style="font-size: 1.5rem; line-height: 1;">&#8942;</span> <!-- Unicode for vertical dots (⋮) -->
+</button>
+
+
+    <!-- Right Side Links (Collapsible on small screens) -->
+    <div class="collapse navbar-collapse justify-content-end" id="topbarLinks">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link small px-2" href="#" id="top-link">Fee Payment</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link small px-2" href="{% url 'core:online_admission' %}" id="top-link">Online Admission</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link small px-2" href="{% url 'core:login' %}" id="top-link">Login</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md shadow-sm">
+    <div class="container">
+      <!-- Logo (Left Side) -->
+      <a class="navbar-brand" href="/">
+        <img src="{% static 'images/logo.png' %}" alt="Academia Admit Logo" class="logo-img">
+      </a>
+
+      <!-- Toggler for Mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Menu Links (Right Side) -->
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#home">Home</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="#about">About Us</a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:clients' %}">Our Clients</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:testimonials' %}">Testimonials</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:contact' %}">Contact</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link btn btn-login px-3 py-1" href="/login">Login</a>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+
+
+<!-- Clients Header -->
+<header class="clients-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-7">
+          <h1>Our Clients</h1>
+          <p>Thank you for your trust, all our Academia Admit Clients!</p>
+        </div>
+      </div>
+    </div>
+    <div class="image"></div>
+  </header>
+
+  <!-- Breadcrumb -->
+  <nav class="clients-breadcrumb">
+    <div class="container">
+      <a href="{% url 'core:home' %}">Home</a> / <span>Our Clients</span>
+    </div>
+  </nav>
+
+  <!-- Clients Section -->
+  <section class="clients-section" id="clients">
+    <div class="container">
+      <div class="row g-4">
+        <!-- AP and TG Institutions -->
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client1.jpeg' %}" alt="Client Logo 1">
+            <h4>Sri Chaitanya Educational Institutions</h4>
+            <p>Vijayawada, Andhra Pradesh</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client2.jpeg' %}" alt="Client Logo 2">
+            <h4>Narayana Junior Colleges</h4>
+            <p>Hyderabad, Telangana</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client3.jpeg' %}" alt="Client Logo 3">
+            <h4>Andhra Loyola College</h4>
+            <p>Vijayawada, Andhra Pradesh</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client4.jpeg' %}" alt="Client Logo 4">
+            <h4>Oakridge International School</h4>
+            <p>Hyderabad, Telangana</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client5.jpg' %}" alt="Client Logo 5">
+            <h4>Vignan's Lara Institute of Technology</h4>
+            <p>Guntur, Andhra Pradesh</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client6.png' %}" alt="Client Logo 6">
+            <h4>Delhi Public School</h4>
+            <p>Nacharam, Telangana</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client7.jpeg' %}" alt="Client Logo 7">
+            <h4>SRM University, AP</h4>
+            <p>Amaravati, Andhra Pradesh</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client8.jpeg' %}" alt="Client Logo 8">
+            <h4>Little Flower High School</h4>
+            <p>Hyderabad, Telangana</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client9.png' %}" alt="Client Logo 9">
+            <h4>GITAM University</h4>
+            <p>Visakhapatnam, Andhra Pradesh</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client10.jpeg' %}" alt="Client Logo 10">
+            <h4>ICFAI Foundation for Higher Education</h4>
+            <p>Hyderabad, Telangana</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client11.png' %}" alt="Client Logo 11">
+            <h4>Aditya Engineering College</h4>
+            <p>Surampalem, Andhra Pradesh</p>
+          </div>
+        </div>
+  
+        <div class="col-md-3">
+          <div class="client-card">
+            <img src="{% static 'images/client12.jpeg' %}" alt="Client Logo 12">
+            <h4>Silver Oaks International School</h4>
+            <p>Bachupally, Telangana</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+
+
+
+
+
+
+<!-- Our Impact Section -->
+<section class="impact" id="impact">
+    <!-- Top: Stats with Background Image -->
+    <div class="impact-top">
+      <div class="impact-top-content">
+        <h2>Trusted by <span>500+ Institutions</span> | <span>20+ Regions</span></h2>
+        <p>10,000+ Admissions Facilitated for Schools and Colleges</p>
+      </div>
+    </div>
+    <!-- Bottom: Description -->
+    <!-- <div class="impact-bottom">
+      <p>Academia Admit is a leading admission portal, empowering schools and colleges with innovative solutions. From K-12 admissions to higher education placements, we’ve helped over 500 institutions across 20+ regions achieve their goals. Our data-driven approach ensures success, having facilitated over 10,000 admissions with tailored strategies and seamless processes.</p>
+    </div> -->
+  </section>
+
+
+
+
+  <!-- Our Achievements Section -->
+  <section class="achievements" id="achievements">
+    <div class="container">
+      <h2>Trusted by <span>500+ Institutions</span> | <span>20+ Regions</span></h2>
+      <p>Academia Admit is a leading admission portal, empowering schools and colleges with innovative solutions. From K-12 admissions to higher education placements, we’ve helped over 500 institutions across 20+ regions achieve their goals. Our data-driven approach ensures success, having facilitated over 10,000 admissions with tailored strategies and seamless processes.</p>
+      <div class="row g-4">
+        <!-- Achievement 1: New Institution Setups -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-building"></i>
+            <div class="number">50+</div>
+            <h3>New Institution Setups</h3>
+          </div>
+        </div>
+        <!-- Achievement 2: Admission Campaigns -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-bullhorn"></i>
+            <div class="number">300+</div>
+            <h3>Admission Campaigns</h3>
+          </div>
+        </div>
+        <!-- Achievement 3: Admission Drives -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-users"></i>
+            <div class="number">400+</div>
+            <h3>Admission Drives</h3>
+          </div>
+        </div>
+        <!-- Achievement 4: Process Optimizations -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-cogs"></i>
+            <div class="number">200+</div>
+            <h3>Process Optimizations</h3>
+          </div>
+        </div>
+        <!-- Achievement 5: International Admissions -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-globe"></i>
+            <div class="number">150+</div>
+            <h3>International Admissions</h3>
+          </div>
+        </div>
+        <!-- Achievement 6: Analytics Projects -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-chart-line"></i>
+            <div class="number">180+</div>
+            <h3>Analytics Admissions</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+   <!-- Why Choose Us Section -->
+   <section class="why-choose-us" id="why-choose-us">
+    <div class="container">
+      <!-- Top: Tagline and Description -->
+      <h2>Why Choose Academia Admit?</h2>
+      <p class="intro">As a leading admission portal, we specialize in helping schools and colleges achieve their admission goals with tailored strategies, data-driven insights, and seamless processes.</p>
+      <!-- Bottom: Benefits for Schools and Colleges -->
+      <div class="row g-4">
+        <!-- Schools -->
+        <div class="col-md-6">
+          <h3 class="category-title">For Schools</h3>
+          <div class="benefit-card">
+            <i class="fas fa-users"></i>
+            <p>Boost admissions with targeted marketing and CBSE/IB affiliation support.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-cogs"></i>
+            <p>Streamline admission processes with automation and parent engagement tools.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-chart-line"></i>
+            <p>Access analytics to track admission trends and optimize strategies.</p>
+          </div>
+        </div>
+        <!-- Colleges -->
+        <div class="col-md-6">
+          <h3 class="category-title">For Colleges</h3>
+          <div class="benefit-card">
+            <i class="fas fa-globe"></i>
+            <p>Attract international students with global partnerships and visa guidance.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-bullhorn"></i>
+            <p>Increase visibility through digital marketing and NAAC accreditation support.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-chart-bar"></i>
+            <p>Leverage data insights to improve enrollment and student diversity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="is-testimonials-section">
+    <div class="is-testimonials-container">
+        <h2 class="is-testimonials-subtitle">Learner Success Stories</h2>
+        <h1 class="is-testimonials-title">Happy With Expertise</h1>
+        <div class="is-testimonials-slider">
+            <div class="is-testimonials-wrapper">
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“We have been working with for several years and have always been satisfied with their services. They have a great team and are very responsive.”</p>
+                        <cite>Jane Smith</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“Has been a valuable partner for our company. They have helped us to develop several software solutions that have improved our business.”</p>
+                        <cite>Bob Johnson</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“Their expertise in software development has been instrumental in scaling our operations efficiently.”</p>
+                        <cite>Alice Brown</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“The team delivered a fantastic solution that exceeded our expectations. Highly recommended!”</p>
+                        <cite>Tom Wilson</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“Their support and maintenance services have been exceptional, ensuring our systems run smoothly.”</p>
+                        <cite>Emily Davis</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        <div class="is-testimonials-dots">
+            <!-- Dots will be dynamically generated by JavaScript -->
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- Contact Us Section -->
+<section class="contact-us" id="contact">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- Left side -->
+      <div class="col-md-5 contact-left">
+        <h3>Talk to Our Consultancy Expert</h3>
+        <p>Start to Work</p>
+        <ul>
+          <li>Fill out the Contact form.</li>
+          <li>Arrange a one-on-one consultation to discuss your admission needs.</li>
+          <li>Get a FREE Demo (We’re here to answer all your questions!)</li>
+          <li>BOOK A BUSINESS MEETING WITH US</li>
+        </ul>
+        <p>Contact us for services like Admissions, Affiliation, Marketing, or Process Optimization for Schools and Colleges.</p>
+      </div>
+
+      <!-- Right side -->
+      <div class="col-md-7 contact-form">
+        <h3>Contact Us</h3>
+
+        <!-- Show success or error messages -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="firstName">First Name(*)</label>
+              <input type="text" class="form-control" id="firstName" name="first_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="lastName">Last Name(*)</label>
+              <input type="text" class="form-control" id="lastName" name="last_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="email">Email(*)</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="col-md-6">
+              <label for="mobile">Mobile Number(*)</label>
+              <input type="tel" class="form-control" id="mobile" name="mobile" required>
+            </div>
+            <div class="col-12">
+              <label for="organization">Organization / School / College Name(*)</label>
+              <input type="text" class="form-control" id="organization" name="organization" required>
+            </div>
+            <div class="col-md-6">
+              <label for="type">Type of Institution(*)</label>
+              <select class="form-control" id="type" name="type" required>
+                <option value="">Select Institution</option>
+                <option value="school">School</option>
+                <option value="college">College</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="location">Location(*)</label>
+              <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <div class="col-12">
+              <label for="inquiry">Nature of Inquiry(*)</label>
+              <select class="form-control" id="inquiry" name="inquiry" required>
+                <option value="">Select Inquiry</option>
+                <option value="admissions">Admissions Support</option>
+                <option value="affiliation">Affiliation Assistance</option>
+                <option value="marketing">Admission Marketing</option>
+                <option value="optimization">Process Optimization</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="services">Admission Services Needed(*)</label>
+              <input type="text" class="form-control" id="services" name="services">
+            </div>
+            <div class="col-md-6">
+              <label for="role">Role of Contact(*)</label>
+              <select class="form-control" id="role" name="role" required>
+                <option value="">Select Role</option>
+                <option value="owner">School Owner</option>
+                <option value="admin">College Admin</option>
+                <option value="principal">Principal</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="details">Briefly About Your Institution & Requirements(*)</label>
+              <textarea class="form-control" id="details" name="details" rows="3" required></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <!-- Contact Info -->
+        <div class="col-md-4">
+          <h4>Contact Us</h4>
+          <p><i class="fas fa-map-marker-alt"></i>Near N Convention Lane , Hyderabad, India</p>
+          <p><i class="fas fa-phone"></i>+91 9177120736</p>
+          <p><i class="fas fa-envelope"></i> info@academiaadmit.com</p>
+        </div>
+        <!-- Quick Links -->
+        <div class="col-md-4">
+          <h4>Quick Links</h4>
+          <p><a href="#home">Home</a></p>
+          <p><a href="#about">About Us</a></p>
+          <p><a href="#services">Our Services</a></p>
+          <p><a href="#contact">Contact Us</a></p>
+        </div>
+        <!-- Social Media -->
+        <div class="col-md-4">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 Academia Admit. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Bootstrap 5 JS and Popper.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

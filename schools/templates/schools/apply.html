@@ -475,13 +475,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 form-group" id="caste_certificate_group">
+                        <!-- <div class="col-md-6 form-group" id="caste_certificate_group">
                             <label class="form-label">{{ form.caste_certificate.label }}</label>
                             {{ form.caste_certificate }}
                             {% if form.caste_certificate.errors %}
                                 <div class="error-message">{{ form.caste_certificate.errors|join:", " }}</div>
                             {% endif %}
-                        </div>
+                        </div> -->
                         <div class="col-md-6 form-group">
                             <label class="form-label">{{ form.previous_mark_sheet.label }}</label>
                             {{ form.previous_mark_sheet }}
@@ -519,7 +519,7 @@
 
                 <!-- Submit Button -->
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary" name="submit_application" id="submitBtn" disabled>Submit Application</button>
+                    <button type="submit" class="btn btn-primary" name="submit_application" id="submitBtn" >Submit Application</button>
                 </div>
             </form>
             <div class="mt-3">

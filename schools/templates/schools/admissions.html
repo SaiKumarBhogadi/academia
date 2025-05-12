@@ -3,40 +3,107 @@
 {% block title %}Admissions{% endblock %}
 
 {% block content %}
-    <!-- Bootstrap CSS (if not already in base.html) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
 
     <!-- Custom CSS -->
     <style>
         .management-container {
-            padding: 20px;
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
         }
 
         .card-header {
-            background-color: #1a2a6c;
-            color: white;
-            border-radius: 5px 5px 0 0;
-        }
-
-        .card-body {
+            background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+            color: #ffffff;
+            border-radius: 16px 16px 0 0;
             padding: 1.5rem;
         }
 
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
         .alert-warning {
+            background: #fef9e7;
+            border: 1px solid #f9e4a0;
+            color: #7A4B00;
+            border-radius: 8px;
+            padding: 1rem;
             margin-bottom: 1.5rem;
-            border-radius: 5px;
+            text-align: center;
+        }
+
+        .alert-link {
+            color: #E67E22;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .alert-link:hover {
+            color: #F39C12;
+            text-decoration: underline;
         }
 
         .accordion-button {
-            font-weight: 500;
-            color: #1a2a6c;
+            font-weight: 600;
+            color: #2C3E50;
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
         }
 
         .accordion-button:not(.collapsed) {
-            background-color: #e9ecef;
-            color: #1a2a6c;
+            background: linear-gradient(135deg, #e6f0fa 0%, #ffffff 100%);
+            color: #2C3E50;
+            box-shadow: none;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .accordion-button::after {
+            background-image: none;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            content: '\f078'; /* Chevron down */
+            color: #E67E22;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-button:not(.collapsed)::after {
+            transform: rotate(180deg);
+        }
+
+        .accordion-item {
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-body {
+            padding: 1.5rem;
         }
 
         .seat-card {
@@ -45,27 +112,35 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, opacity 0.2s;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
             font-size: 0.85rem;
             overflow: hidden;
         }
 
         .seat-card.available {
-            background-color: #28a745;
-            color: white;
+            background-color: #4CAF50;
+            color: #ffffff;
         }
 
         .seat-card.filled {
-            background-color: #dc3545;
-            color: white;
+            background-color: #EF5350;
+            color: #ffffff;
             cursor: pointer;
         }
 
         .seat-card:hover {
             transform: scale(1.05);
-            opacity: 0.9;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .seat-card.available:hover {
+            background-color: #388E3C;
+        }
+
+        .seat-card.filled:hover {
+            background-color: #D32F2F;
         }
 
         .seat-card .student-name {
@@ -79,20 +154,54 @@
 
         .seat-status {
             font-size: 0.75rem;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
+            background-color: #3498DB;
+            border: none;
+            color: #ffffff;
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
+            background-color: #2980B9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .text-muted {
+            font-size: 0.9rem;
+            color: #666666;
+            padding: 1rem;
         }
 
         @media (max-width: 768px) {
+            .management-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .accordion-button {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            .accordion-body {
+                padding: 1rem;
+            }
+
             .seat-card {
                 height: 60px;
                 font-size: 0.75rem;
@@ -105,6 +214,11 @@
             .seat-status {
                 font-size: 0.7rem;
             }
+
+            .btn-primary {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
         }
 
         @media (max-width: 576px) {
@@ -115,6 +229,11 @@
 
             .seat-card .student-name {
                 display: none; /* Hide student name on very small screens */
+            }
+
+            .btn-primary {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
             }
         }
     </style>
@@ -161,7 +280,7 @@
                                                                         <div class="accordion-item">
                                                                             <h2 class="accordion-header" id="sectionHeading-{{ section.id }}">
                                                                                 <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sectionCollapse-{{ section.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="sectionCollapse-{{ section.id }}">
-                                                                                    Section: {{ section.section_name }} (Filled: {{ section.filled_seats_dynamic }} / Total: {{ section.total_seats_dynamic }})
+                                                                                    Section: {{ section.section_name }}  (Filled: {{ section.filled_seats_dynamic }} / Total: {{ section.total_seats_dynamic }})
                                                                                 </button>
                                                                             </h2>
                                                                             <div id="sectionCollapse-{{ section.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="sectionHeading-{{ section.id }}" data-bs-parent="#sectionAccordion-{{ class.id }}">

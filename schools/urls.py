@@ -5,7 +5,9 @@ app_name = 'schools'
 
 urlpatterns = [
     path('dashboard/', views.school_dashboard, name='dashboard'),
+     path('school-register/', views.school_register, name='school_register'),
     path('profile/', views.school_profile, name='school_profile'),
+    path('edit/', views.edit_school_profile, name='edit_school_profile'),
     path('class-section-management/', views.class_section_management, name='class_section_management'),
     path('admissions/', views.admissions, name='admissions'),
     path('apply/<int:school_id>/', views.apply_for_admission, name='apply_for_admission'),
@@ -18,6 +20,8 @@ urlpatterns = [
 
     path('public-profile/<int:school_id>/', views.public_school_profile, name='public_school_profile'),
     path('change-password/', views.school_change_password, name='change_password'),
+    path('update-details/', views.update_school_details, name='update_school_details'),
+    path('details-updated/', views.school_details_updated, name='school_details_updated'),
    
 
   
@@ -34,6 +38,7 @@ urlpatterns = [
     path('create-cycle/', views.create_cycle, name='create_cycle'),
     path('edit-cycle/<int:cycle_id>/', views.edit_cycle, name='edit_cycle'),
     path('cycle-list/', views.cycle_list, name='cycle_list'),
+    path('delete-cycle/<int:cycle_id>/', views.delete_cycle, name='delete_cycle'),
 
     path('packages/', views.packages, name='packages'),
     

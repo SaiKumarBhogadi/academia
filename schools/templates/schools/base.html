@@ -15,7 +15,7 @@
         }
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #1a2a6c, #b21f1f);
+            background-color: #2C3E50;
             color: white;
             padding-top: 20px;
             position: fixed;
@@ -92,19 +92,19 @@
         }
         .notifications-icon {
             font-size: 1.5rem;
-            color: #1a2a6c;
+            color: #2C3E50;
             cursor: pointer;
             position: relative;
         }
         .notifications-icon:hover {
-            color: #b21f1f;
+            color: #3498DB;
         }
         .notifications-badge {
             position: absolute;
             top: -5px;
             right: -10px;
-            background-color: #b21f1f;
-            color: white;
+            background-color: #F1C40F;
+            color: black;
             font-size: 0.75rem;
             font-weight: 600;
             border-radius: 50%;
@@ -118,9 +118,10 @@
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 0;
+            z-index: 1100; /* Ensure it’s above other elements */
         }
         .notifications-dropdown .dropdown-header {
-            background-color: #1a2a6c;
+            background-color: #2C3E50;
             color: white;
             text-align: center;
             padding: 10px;
@@ -142,7 +143,7 @@
         }
         .notifications-dropdown .dropdown-item.unread {
             background-color: #e6f0fa;
-            border-left: 3px solid #1a2a6c;
+            border-left: 3px solid #2C3E50;
         }
         .notifications-dropdown .dropdown-item.read {
             background-color: #f0f0f0;
@@ -158,7 +159,7 @@
             margin-right: 10px;
         }
         .notifications-dropdown .mark-read-btn {
-            background-color: #1a2a6c;
+            background-color: #2C3E50;
             color: #fff;
             border: none;
             padding: 5px 10px;
@@ -169,7 +170,7 @@
             transition: background-color 0.3s ease;
         }
         .notifications-dropdown .mark-read-btn:hover {
-            background-color: #b21f1f;
+            background-color: #3498DB;
         }
         .notifications-dropdown .mark-read-btn:disabled {
             background-color: #ccc;
@@ -187,12 +188,12 @@
             border-top: 1px solid #e0e0e0;
         }
         .notifications-dropdown .view-all-link a {
-            color: #1a2a6c;
+            color: #2C3E50;
             text-decoration: none;
             font-weight: 600;
         }
         .notifications-dropdown .view-all-link a:hover {
-            color: #b21f1f;
+            color: #3498DB;
         }
         /* Other existing styles */
         .stat-card {
@@ -225,7 +226,7 @@
             background-color: white;
         }
         .table th {
-            background-color: #1a2a6c;
+            background-color: #2C3E50;
             color: white;
         }
         .table-hover tbody tr:hover {
@@ -244,27 +245,27 @@
         }
         .search-form .form-control {
             border-radius: 50px 0 0 50px;
-            border: 2px solid #1a2a6c;
+            border: 2px solid #2C3E50;
             padding: 10px 20px;
             font-size: 1rem;
             box-shadow: none;
             transition: border-color 0.3s ease;
         }
         .search-form .form-control:focus {
-            border-color: #b21f1f;
+            border-color: #3498DB;
             outline: none;
         }
         .search-form .btn-primary {
             border-radius: 0 50px 50px 0;
-            background-color: #1a2a6c;
-            border: 2px solid #1a2a6c;
+            background-color: #2C3E50;
+            border: 2px solid #2C3E50;
             padding: 10px 20px;
             font-size: 1rem;
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .search-form .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
+            background-color: #3498DB;
+            border-color: #3498DB;
         }
         .row.stat-cards {
             display: flex;
@@ -286,17 +287,17 @@
             background: none;
             border: none;
             padding: 5px;
-            color: #1a2a6c;
+            color: #2C3E50;
             font-size: 1.2rem;
         }
         .action-modal-trigger:hover {
-            color: #b21f1f;
+            color: #3498DB;
         }
         .action-modal .modal-content {
             border-radius: 10px;
         }
         .action-modal .modal-header {
-            background-color: #1a2a6c;
+            background-color: #2C3E50;
             color: white;
             border-bottom: none;
         }
@@ -420,8 +421,12 @@
                 <i class="fas fa-file-alt me-2"></i> Applications
             </a>
         
-            <a href="{% url 'schools:change_password' %}">
+            <!-- <a href="{% url 'schools:change_password' %}">
                 <i class="fas fa-key me-2"></i> Change Password
+            </a> -->
+
+            <a href="{% url 'schools:update_school_details' %}">
+                <i class="fas fa-user-edit"></i> Update Account Details
             </a>
         
             <a href="{% url 'core:logout' %}">

@@ -3,31 +3,31 @@
 {% block title %}Packages - {{ institution_type|title }} Portal{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="display-5 text-center text-primary fw-bold mb-4">Subscription Packages</h1>
+<div class="packages-container">
+    <h1 class="display-5 text-center fw-bold mb-4">Subscription Packages</h1>
     <p class="lead text-center text-muted mb-5">Elevate your {{ institution_type|title }} with our premium solutions.</p>
 
     <!-- Academia Admission Package -->
     <section class="mb-5">
-        <h2 class="h4 text-success text-center mb-4">Academia Admission Package</h2>
+        <h2 class="h4 text-center mb-4">Academia Admission Package</h2>
         <div class="row justify-content-center">
             <div class="col-12 col-lg-6">
                 <div class="card h-100 d-flex flex-column border-0 shadow-lg rounded-3 overflow-hidden">
-                    <div class="card-body d-flex flex-column justify-content-between p-3 bg-white">
+                    <div class="card-body d-flex flex-column justify-content-between p-4">
                         <div>
-                            <h3 class="card-title text-dark fw-bold">{{ academia_package.name }}</h3>
-                            <h4 class="card-subtitle text-success mb-2">{{ academia_package.price }}</h4>
+                            <h3 class="card-title fw-bold">{{ academia_package.name }}</h3>
+                            <h4 class="card-subtitle mb-3">{{ academia_package.price }}</h4>
                             <ul class="list-group list-group-flush">
                                 {% for feature in academia_package.features %}
-                                <li class="list-group-item bg-white border-0 py-1 d-flex align-items-center">
-                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <li class="list-group-item py-2 d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
                                     <span>{{ feature }}</span>
                                 </li>
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="text-center mt-3">
-                            <a href="#" class="btn btn-success">Select Plan</a>
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-academia">Select Plan</a>
                         </div>
                     </div>
                 </div>
@@ -37,27 +37,27 @@
 
     <!-- Digital Marketing Packages -->
     <section>
-        <h2 class="h4 text-primary text-center mb-4">Digital Marketing Packages</h2>
-        <p class="text-muted text-center mb-4">Boost your {{ institution_type|title }}'s online presence and admissions!</p>
+        <h2 class="h4 text-center mb-4">Digital Marketing Packages</h2>
+        <p class="text-muted text-center mb-5">Boost your {{ institution_type|title }}'s online presence and admissions!</p>
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for package in digital_marketing_packages %}
             <div class="col">
                 <div class="card h-100 d-flex flex-column border-0 shadow-lg rounded-3 overflow-hidden">
-                    <div class="card-body d-flex flex-column justify-content-between p-3 bg-white">
+                    <div class="card-body d-flex flex-column justify-content-between p-4">
                         <div>
-                            <h3 class="card-title text-dark fw-bold">{{ package.name }}</h3>
-                            <h4 class="card-subtitle text-primary mb-2">{{ package.price }}</h4>
+                            <h3 class="card-title fw-bold">{{ package.name }}</h3>
+                            <h4 class="card-subtitle mb-3">{{ package.price }}</h4>
                             <ul class="list-group list-group-flush">
                                 {% for feature in package.features %}
-                                <li class="list-group-item bg-white border-0 py-1 d-flex align-items-center">
-                                    <i class="bi bi-check-circle-fill text-primary me-2"></i>
+                                <li class="list-group-item py-2 d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
                                     <span>{{ feature }}</span>
                                 </li>
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="text-center mt-3">
-                            <a href="#" class="btn btn-primary">Select Plan</a>
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-digital">Select Plan</a>
                         </div>
                     </div>
                 </div>
@@ -69,55 +69,157 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <style>
-    body {
-        background: #fff;
-        color: black;
+    .packages-container {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 1rem;
     }
 
-    h1, h2, h3, h4 {
-        color: #b12229;
+    .packages-container h1 {
+        color: #2C3E50;
+        font-size: 2.5rem;
+        font-weight: 700;
     }
 
-    .glass-card {
-        background-color: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        color: white;
-        transition: all 0.3s ease-in-out;
+    .packages-container h2 {
+        color: #2C3E50;
+        font-size: 1.75rem;
+        font-weight: 600;
     }
 
-    .glass-card:hover {
+    .packages-container .text-muted {
+        color: #666666 !important;
+        font-size: 1.1rem;
+    }
+
+    .packages-container p {
+        color: #333333;
+    }
+
+    .packages-container .card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .packages-container .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
     }
 
-    .btn-theme {
-        background-color: #8d2449;
-        color: white;
+    .packages-container .card-body {
+        padding: 2rem;
+    }
+
+    .packages-container .card-title {
+        color: #2C3E50;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .packages-container .card-subtitle {
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .packages-container .card-subtitle.text-success {
+        color: #2ECC71;
+    }
+
+    .packages-container .card-subtitle.text-primary {
+        color: #3498DB;
+    }
+
+    .packages-container .list-group-item {
+        background: transparent;
         border: none;
-        transition: background-color 0.3s ease;
+        color: #333333;
+        font-size: 1rem;
+        padding: 0.5rem 0;
     }
 
-    .btn-theme:hover {
-        background-color: #b12229;
+    .packages-container .list-group-item .bi-check-circle-fill.text-success {
+        color: #2ECC71;
     }
 
-    .card-subtitle,
-    .text-accent {
-        color: #f9c74f;
+    .packages-container .list-group-item .bi-check-circle-fill.text-primary {
+        color: #3498DB;
     }
 
-    .list-group-item {
-        background-color: transparent;
+    .packages-container .btn-academia {
+        background-color: #2ECC71;
         border: none;
-        color: black;
+        color: #ffffff;
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .bi-check-circle-fill {
-        color: #f9c74f;
+    .packages-container .btn-academia:hover {
+        background-color: #27AE60;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
     }
 
-    p {
-        color: black;
+    .packages-container .btn-digital {
+        background-color: #2C3E50;
+        border: none;
+        color: #ffffff;
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .packages-container .btn-digital:hover {
+        background-color: #3498DB;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    @media (max-width: 576px) {
+        .packages-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .packages-container h1 {
+            font-size: 2rem;
+        }
+
+        .packages-container h2 {
+            font-size: 1.5rem;
+        }
+
+        .packages-container .text-muted {
+            font-size: 1rem;
+        }
+
+        .packages-container .card-body {
+            padding: 1.5rem;
+        }
+
+        .packages-container .card-title {
+            font-size: 1.25rem;
+        }
+
+        .packages-container .card-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .packages-container .list-group-item {
+            font-size: 0.9rem;
+        }
+
+        .packages-container .btn-academia,
+        .packages-container .btn-digital {
+            font-size: 0.9rem;
+            padding: 0.6rem 1.2rem;
+        }
     }
 </style>
 {% endblock %}

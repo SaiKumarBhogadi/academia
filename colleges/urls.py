@@ -7,6 +7,7 @@ app_name = 'colleges'  # Namespace for the colleges app
 
 urlpatterns = [
     # College Profile Management
+     path('college-register/', views.college_register, name='college_register'),
     path('profile/', views.college_profile, name='college_profile'),
 
     # Dashboard
@@ -70,8 +71,12 @@ urlpatterns = [
     path('courses/add/<int:degree_id>/<int:department_id>/', views.add_course, name='add_course'),
     path('courses/edit/<int:course_id>/', views.edit_course, name='edit_course'),
     path('courses/delete/<int:course_id>/', views.delete_course, name='delete_course'),
-
-    path('packages/', views.packages, name='packages'),
+     path('packages/', views.packages, name='packages'),
      path('college/<int:college_id>/application/<int:application_id>/', views.view_application_details, name='view_application_details'),
-    
+     path('edit_profile/', views.edit_college_profile, name='edit_college_profile'),
+
+
+
+      path('update-details/', views.update_college_details, name='update_college_details'),
+    path('details-updated/', views.college_details_updated, name='college_details_updated'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

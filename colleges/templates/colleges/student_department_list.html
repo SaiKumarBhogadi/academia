@@ -7,7 +7,7 @@
     <div class="container mt-5">
         <div class="card shadow-sm">
             <!-- Degree Header with Image -->
-            <div class="card-header text-white p-4" style="background: linear-gradient(to bottom, #1a2a6c, #b21f1f); display: flex; align-items: center;">
+            <div class="card-header text-white p-4" style=" background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%); display: flex; align-items: center;">
                 <div class="degree-image me-3">
                     <img src="{% if college.profile_pic and college.profile_pic.url %}{{ college.profile_pic.url }}{% else %}{% static 'images/no-images.avif' %}{% endif %}" alt="{{ degree.name }} Logo" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #ffffff;">
                 </div>

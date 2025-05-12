@@ -4,82 +4,152 @@
 
 {% block content %}
 <style>
-    /* Custom styles for the Delete Department page */
     .delete-department-container {
-        max-width: 700px;
-        margin: 0 auto;
-        padding: 20px 15px;
+        max-width: 800px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
     }
+
     .card {
         border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
     }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
     .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
-        border-radius: 10px 10px 0 0;
-        padding: 15px 20px;
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
     }
+
     .card-header h3 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: 600;
-        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
+
     .card-body {
-        padding: 20px;
+        padding: 2rem;
     }
+
     .alert {
-        margin-bottom: 20px;
-        border-radius: 5px;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        border: none;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .alert-success {
+        background: #e6f4ea;
+        color: #2c6b40;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #E74C3C;
+    }
+
+    .text-muted {
+        color: #666666 !important;
+        font-weight: 500;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .text-muted strong {
+        color: #2C3E50;
+    }
+
+    .text-danger {
+        color: #E74C3C !important;
+        font-style: italic;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
     .btn-group {
         display: flex;
-        gap: 10px;
-        margin-top: 20px;
+        gap: 1rem;
+        margin-top: 1.5rem;
     }
+
     .btn {
-        padding: 10px 20px;
-        font-size: 0.95rem;
-        border-radius: 5px;
-        transition: background-color 0.2s;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
     .btn-danger {
-        background-color: #dc3545;
+        background-color: #E74C3C;
         border: none;
+        color: #ffffff;
     }
+
     .btn-danger:hover {
-        background-color: #b02a37;
+        background-color: #C0392B;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
+
     .btn-secondary {
-        background-color: #6c757d;
+        background-color: #95A5A6;
         border: none;
+        color: #ffffff;
     }
+
     .btn-secondary:hover {
-        background-color: #5a6268;
+        background-color: #7F8C8D;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    .text-danger {
-        font-size: 0.9rem;
-        font-style: italic;
-    }
+
     @media (max-width: 576px) {
         .delete-department-container {
-            padding: 15px 10px;
+            padding: 1rem 0.5rem;
         }
+
         .card-header h3 {
             font-size: 1.3rem;
         }
+
         .card-body {
-            padding: 15px;
+            padding: 1rem;
         }
+
+        .text-muted {
+            font-size: 0.9rem;
+        }
+
+        .text-danger {
+            font-size: 0.85rem;
+        }
+
         .btn-group {
             flex-direction: column;
-            gap: 8px;
+            gap: 1rem;
         }
+
         .btn {
             width: 100%;
-            padding: 8px;
+            padding: 0.6rem;
+            font-size: 0.9rem;
         }
     }
 </style>

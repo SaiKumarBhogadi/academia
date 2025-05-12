@@ -1,0 +1,454 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Registration - Academia Vendors</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #f5f7fa url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ddd" fill-opacity="0.3" d="M0,192L48,186.7C96,181,192,171,288,176C384,181,480,203,576,213.3C672,224,768,224,864,202.7C960,181,1056,139,1152,133.3C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E') no-repeat bottom;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            padding: 1rem;
+        }
+        .register-container {
+            max-width: 900px;
+            width: 100%;
+            padding: 0 15px;
+        }
+        .register-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+            overflow: hidden;
+        }
+        .register-card .card-header {
+            background: none;
+            text-align: center;
+            padding: 2rem 1.5rem 1rem;
+            border-bottom: 2px solid #FFB300;
+        }
+        .register-card .card-header img {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+        .register-card .card-body {
+            padding: 2.5rem;
+        }
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 2rem 0 1.5rem;
+            border-left: 4px solid #FFB300;
+            padding-left: 0.75rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #FFB300;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(255, 179, 0, 0.2);
+            outline: none;
+        }
+        .form-group i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #EC407A;
+            font-size: 1rem;
+        }
+        .btn-register {
+            background: #FFB300;
+            border: none;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            width: 100%;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .btn-register:hover {
+            background: #EC407A;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236, 64, 122, 0.3);
+        }
+        .alert {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            border: 1px solid;
+            text-align: center;
+        }
+        .alert-success {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+            color: #0c4a6e;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 0 10px;
+            }
+            .register-card .card-body {
+                padding: 1.5rem;
+            }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 0.85rem;
+                padding: 0.65rem 1rem 0.65rem 2.25rem;
+            }
+            .form-group i {
+                font-size: 0.9rem;
+            }
+            .form-section-title {
+                font-size: 1.1rem;
+            }
+            .btn-register {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+            .register-card .card-header img {
+                max-width: 120px;
+            }
+        }
+        @media (max-width: 576px) {
+            .register-card .card-header {
+                padding: 1.5rem 1rem 0.5rem;
+            }
+            .register-card .card-header h2 {
+                font-size: 1.5rem;
+            }
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            .form-group label {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="card register-card">
+            <div class="card-header">
+                <img src="{% static 'images/logo.png' %}" alt="Academia Vendors Logo">
+                <h2>School Registration</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    {{ field.label }}: {{ field.errors.0 }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <h5 class="form-section-title">Login Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.username.id_for_label }}">Username</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}">Email Address</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.password.id_for_label }}">Set Password</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.password }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.confirm_password }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">School Details</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.school_name.id_for_label }}">School Name</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-school"></i>
+                                    {{ form.school_name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.principal_name.id_for_label }}">Principal/Head Name</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.principal_name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.contact_phone.id_for_label }}">Phone Number</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-phone"></i>
+                                    {{ form.contact_phone }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.alternate_phone_number.id_for_label }}">Alternate Phone Number (Optional)</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-phone-alt"></i>
+                                    {{ form.alternate_phone_number }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.contact_email.id_for_label }}">Email Address</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ form.contact_email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.school_type.id_for_label }}">School Type</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-building"></i>
+                                    {{ form.school_type }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.board_affiliation.id_for_label }}">Board Affiliation</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-certificate"></i>
+                                    {{ form.board_affiliation }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.medium_of_instruction.id_for_label }}">Medium of Instruction</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-language"></i>
+                                    {{ form.medium_of_instruction }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.established_year.id_for_label }}">Established Year</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ form.established_year }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.total_students.id_for_label }}">Total Number of Students</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-users"></i>
+                                    {{ form.total_students }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.total_teachers.id_for_label }}">Total Number of Teachers</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    {{ form.total_teachers }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.school_code.id_for_label }}">School Code (Optional)</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-code"></i>
+                                    {{ form.school_code }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.website.id_for_label }}">School Website (Optional)</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-globe"></i>
+                                    {{ form.website }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">Address</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.street_address.id_for_label }}">Street/Area</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ form.street_address }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.city.id_for_label }}">City</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-city"></i>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.state.id_for_label }}">State</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-flag"></i>
+                                    {{ form.state }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.district.id_for_label }}">District</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-map"></i>
+                                    {{ form.district }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.pincode.id_for_label }}">Pincode</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-mail-bulk"></i>
+                                    {{ form.pincode }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">Documents</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.logo.id_for_label }}">Upload Logo (Optional)</label>
+                                {{ form.logo }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.affiliation_certificate.id_for_label }}">Upload Affiliation Certificate (Optional)</label>
+                                {{ form.affiliation_certificate }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.brochure.id_for_label }}">Upload Brochure/Prospectus (Optional)</label>
+                                {{ form.brochure }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-register">Register</button>
+                </form>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        const statesDistricts = {{ states_districts|safe }};
+        const stateSelect = document.getElementById('{{ form.state.id_for_label }}');
+        const districtSelect = document.getElementById('{{ form.district.id_for_label }}');
+
+        function updateDistricts() {
+            const selectedState = stateSelect.value;
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+
+            if (selectedState && statesDistricts[selectedState]) {
+                statesDistricts[selectedState].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+
+        stateSelect.addEventListener('change', updateDistricts);
+    </script>
+</body>
+</html>

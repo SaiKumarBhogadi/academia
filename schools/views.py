@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
-from .models import SchoolProfile, SchoolClass, Admission, ClassSection
+from .models import SchoolProfile, SchoolClass, Admission, ClassSection, AdmissionCycle
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -26,47 +26,81 @@ def school_dashboard(request):
         school_profile = None
 
     # Fetch data for the dashboard
-    school = school_profile
-    if school:
-        # Total admitted students
-        total_admitted = Admission.objects.filter(school=school, status='Approved').count()
-        
-        # Pending applications
-        pending_applications = Admission.objects.filter(school=school, status='Pending').count()
-        
-        # Total classes and sections
-        total_classes = SchoolClass.objects.filter(school=school).count()
-        total_sections = ClassSection.objects.filter(school_class__school=school).count()
-        
-        # Seat availability summary
-        sections = ClassSection.objects.filter(school_class__school=school).prefetch_related('seats')
-        total_seats = sum(section.total_seats for section in sections)
-        filled_seats = sum(section.seats.filter(is_filled=True).count() for section in sections)
-        available_seats = total_seats - filled_seats
-        
-        # Data for seat availability chart (per class)
-        classes = SchoolClass.objects.filter(school=school).prefetch_related('sections__seats')
-        chart_data = {
-            'labels': [],
-            'filled_seats': [],
-            'available_seats': [],
-        }
-        for school_class in classes:
-            class_filled_seats = 0
-            class_total_seats = 0
-            for section in school_class.sections.all():
-                class_filled_seats += section.seats.filter(is_filled=True).count()
-                class_total_seats += section.total_seats
-            class_available_seats = class_total_seats - class_filled_seats
-            chart_data['labels'].append(school_class.grade)  # Changed from "Class {school_class.grade}" to "Grade {school_class.grade}"
-            chart_data['filled_seats'].append(class_filled_seats)
-            chart_data['available_seats'].append(class_available_seats)
-        
-        # Log the chart_data to debug
-        logger.info(f"Chart Data: {chart_data}")
-        
-        # Recent activity (e.g., recent applications)
-        recent_applications = Admission.objects.filter(school=school).order_by('-admission_date')[:5]
+    if school_profile:
+        # Fetch all active admission cycles for the dropdown
+        cycles = AdmissionCycle.objects.filter(school=school_profile, is_active=True, is_archived=False)
+        logger.info(f"Found {cycles.count()} active cycles for school {school_profile.id}: {list(cycles.values('id', 'year', 'is_active', 'is_archived'))}")
+
+        # Use the first active cycle for dashboard metrics, or None if no active cycles
+        active_cycle = cycles.first()
+        if not active_cycle:
+            messages.warning(request, "No active admission cycle available.")
+            total_admitted = 0
+            pending_applications = 0
+            total_classes = 0
+            total_sections = 0
+            total_seats = 0
+            filled_seats = 0
+            available_seats = 0
+            chart_data = {'labels': [], 'filled_seats': [], 'available_seats': []}
+            recent_applications = []
+        else:
+            # Total admitted students
+            total_admitted = Admission.objects.filter(school=school_profile, status='Approved', cycle=active_cycle).count()
+            
+            # Pending applications
+            pending_applications = Admission.objects.filter(school=school_profile, status='Pending', cycle=active_cycle).count()
+            
+            # Total classes and sections
+            total_classes = SchoolClass.objects.filter(school=school_profile, cycle=active_cycle).count()
+            total_sections = ClassSection.objects.filter(school_class__school=school_profile, school_class__cycle=active_cycle).count()
+            
+            # Seat availability summary
+            sections = ClassSection.objects.filter(school_class__school=school_profile, school_class__cycle=active_cycle).prefetch_related('seats')
+            total_seats = sum(section.total_seats for section in sections)
+            filled_seats = sum(section.seats.filter(is_filled=True).count() for section in sections)
+            available_seats = total_seats - filled_seats
+            
+            # Data for seat availability chart (per class)
+            classes = SchoolClass.objects.filter(school=school_profile, cycle=active_cycle).prefetch_related('sections__seats')
+            chart_data = {
+                'labels': [],
+                'filled_seats': [],
+                'available_seats': [],
+            }
+            for school_class in classes:
+                class_filled_seats = 0
+                class_total_seats = 0
+                for section in school_class.sections.all():
+                    class_filled_seats += section.seats.filter(is_filled=True).count()
+                    class_total_seats += section.total_seats
+                class_available_seats = class_total_seats - class_filled_seats
+                chart_data['labels'].append(f"Grade {school_class.grade}")
+                chart_data['filled_seats'].append(class_filled_seats)
+                chart_data['available_seats'].append(class_available_seats)
+            
+            # Log the chart_data to debug
+            logger.info(f"Chart Data: {chart_data}")
+            
+            # Recent activity (e.g., recent applications)
+            recent_applications = Admission.objects.filter(school=school_profile, cycle=active_cycle).order_by('-admission_date')[:5]
+
+        # Prepare chart data for all cycles (for the dropdown)
+        all_chart_data = {}
+        for cycle in cycles:
+            cycle_classes = SchoolClass.objects.filter(school=school_profile, cycle=cycle).prefetch_related('sections__seats')
+            cycle_chart_data = {'labels': [], 'filled_seats': [], 'available_seats': []}
+            for school_class in cycle_classes:
+                class_filled_seats = sum(section.seats.filter(is_filled=True).count() for section in school_class.sections.all())
+                class_total_seats = sum(section.total_seats for section in school_class.sections.all())
+                class_available_seats = class_total_seats - class_filled_seats
+                cycle_chart_data['labels'].append(f"Grade {school_class.grade}")
+                cycle_chart_data['filled_seats'].append(class_filled_seats)
+                cycle_chart_data['available_seats'].append(class_available_seats)
+            all_chart_data[str(cycle.year)] = cycle_chart_data
+        # Add a default entry in case no cycles are available
+        if not all_chart_data:
+            all_chart_data['default'] = {'labels': [], 'filled_seats': [], 'available_seats': []}
     else:
         total_admitted = 0
         pending_applications = 0
@@ -77,6 +111,8 @@ def school_dashboard(request):
         available_seats = 0
         chart_data = {'labels': [], 'filled_seats': [], 'available_seats': []}
         recent_applications = []
+        cycles = []
+        all_chart_data = {'default': {'labels': [], 'filled_seats': [], 'available_seats': []}}
 
     context = {
         'school_profile': school_profile,
@@ -89,9 +125,11 @@ def school_dashboard(request):
         'available_seats': available_seats,
         'chart_data': chart_data,
         'recent_applications': recent_applications,
+        'active_cycle': active_cycle,
+        'cycles': cycles,  # Pass all active cycles for the dropdown
+        'all_chart_data': all_chart_data,  # Pass chart data for all cycles
     }
     return render(request, 'schools/school_dashboard.html', context)
-
 
 
 # schools/views.py
@@ -99,7 +137,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import SchoolProfile, SchoolRating
-from .forms import SchoolProfileForm, SchoolRatingForm
+from .forms import  SchoolRatingForm
 
 def rating_view(request, school_profile):
     # Fetch the rating (if it exists)
@@ -148,114 +186,167 @@ def rating_view(request, school_profile):
 
 
 
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from schools.models import SchoolProfile
-from .forms import SchoolProfileForm
-# from .views import rating_view, gallery_view, testimonial_view
-from core.signals import profile_created, profile_updated
+from .models import SchoolProfile
+from .forms import SchoolRegistrationForm, SchoolProfileForm
+from core.signals import user_registered
+import logging
+from colleges.utils import STATES_DISTRICTS
+
+logger = logging.getLogger(__name__)
+
+def school_register(request):
+    if request.method == 'POST':
+        form = SchoolRegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            user_registered.send(sender=None, user=user)
+            messages.success(request, 'Registration successful! Please wait for admin approval.')
+            logger.info("School %s registered, awaiting approval", form.cleaned_data['school_name'])
+            return redirect('core:login')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            logger.warning("School registration failed due to form errors: %s", form.errors)
+    else:
+        form = SchoolRegistrationForm()
+    return render(request, 'schools/register.html', {
+        'form': form,
+        'states_districts': STATES_DISTRICTS
+    })
 
 @login_required
 def school_profile(request):
-    # Check if the user is a school user and is approved
     if request.user.user_type != 'school':
         messages.error(request, "You are not authorized to access this page.")
         return redirect('core:login')
     
     if not request.user.is_approved:
         messages.error(request, "Your account is not yet approved by the super admin.")
-        return redirect('core:login')
+        return redirect('core:pending_approval')
 
-    # Fetch the user's SchoolProfile with related fields (if any)
     try:
         school_profile = SchoolProfile.objects.select_related('user').get(user=request.user)
     except SchoolProfile.DoesNotExist:
-        school_profile = None
+        messages.error(request, "Profile not found. Contact support.")
+        return redirect('core:pending_approval')
 
-    # Check if the user wants to edit the profile
-    is_edit_mode = request.GET.get('edit') == 'true'
+    return render(request, 'schools/school_profile.html', {
+        'school_profile': school_profile,
+    })
 
-    # Handle form submission for the profile
-    if request.method == 'POST' and 'form_type' in request.POST and request.POST['form_type'] == 'profile':
+@login_required
+def edit_school_profile(request):
+    if request.user.user_type != 'school':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    
+    if not request.user.is_approved:
+        messages.error(request, "Your account is not yet approved by the super admin.")
+        return redirect('core:pending_approval')
+
+    try:
+        school_profile = SchoolProfile.objects.select_related('user').get(user=request.user)
+    except SchoolProfile.DoesNotExist:
+        messages.error(request, "Profile not found. Contact support.")
+        return redirect('core:pending_approval')
+
+    if request.method == 'POST':
         form = SchoolProfileForm(request.POST, request.FILES, instance=school_profile)
         if form.is_valid():
-            # Check if this is a new profile or an update
-            is_new_profile = school_profile is None
-            school_profile = form.save(commit=False)
-            school_profile.user = request.user
-            school_profile.save()
-            # Trigger the appropriate signal
-            if is_new_profile:
-                profile_created.send(sender=None, user=request.user)
-            else:
-                profile_updated.send(sender=None, user=request.user)
-            messages.success(request, "Profile updated successfully!")
+            form.save()
+            messages.success(request, "Profile updated successfully.")
             return redirect('schools:school_profile')
         else:
             messages.error(request, "Please correct the errors below.")
+            logger.warning("School profile update failed due to form errors: %s", form.errors)
     else:
         form = SchoolProfileForm(instance=school_profile)
 
-    # Decide whether to show the form
-    show_form = (school_profile is None) or is_edit_mode
-
-    # Get the rating, gallery, and testimonial contexts (only if a school profile exists)
-    rating_context = {}
-    gallery_context = {}
-    testimonial_context = {}
-    if school_profile:
-        # Defer heavy operations if possible
-        rating_context = rating_view(request, school_profile)
-        if 'redirect' in rating_context:
-            return rating_context['redirect']
-        
-        gallery_context = gallery_view(request, school_profile)
-        if 'redirect' in gallery_context:
-            return gallery_context['redirect']
-        
-        testimonial_context = testimonial_view(request, school_profile)
-        if 'redirect' in testimonial_context:
-            return testimonial_context['redirect']
-
-    # Combine all context data
-    context = {
-        'school_profile': school_profile,
+    return render(request, 'schools/edit_school_profile.html', {
         'form': form,
-        'show_form': show_form,
-    }
-    context.update(rating_context)
-    context.update(gallery_context)
-    context.update(testimonial_context)
+        'school_profile': school_profile,
+        'states_districts': STATES_DISTRICTS
+    })
 
-    return render(request, 'schools/school_profile.html', context)
 
+from core.forms import UserUpdateForm
+@login_required
+def update_school_details(request):
+    if request.user.user_type != 'school':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    
+    if not request.user.is_approved:
+        messages.error(request, "Your account is not yet approved by the super admin.")
+        return redirect('core:pending_approval')
+
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your account details have been updated successfully.")
+            return redirect('schools:school_details_updated')
+        else:
+            messages.error(request, "Please correct the errors below.")
+            logger.warning("School details update failed due to form errors: %s", form.errors)
+    else:
+        form = UserUpdateForm(instance=request.user)
+
+    return render(request, 'schools/update_school_details.html', {'form': form})
+
+@login_required
+def school_details_updated(request):
+    if request.user.user_type != 'school':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    return render(request, 'schools/school_details_updated.html')
+
+from django.shortcuts import render, get_object_or_404
+from .models import SchoolProfile, AdmissionCycle
+import logging
+
+logger = logging.getLogger(__name__)
 
 def public_school_profile(request, school_id):
     # Fetch the school profile by ID
     school_profile = get_object_or_404(SchoolProfile, id=school_id)
+    logger.debug(f"Fetching profile for school: {school_profile.school_name}")
+
+    # Get active admission cycle
+    active_cycle = AdmissionCycle.objects.filter(school=school_profile, is_active=True, is_archived=False).first()
+    
+    # Get classes for the active cycle
+    classes = school_profile.classes.filter(cycle=active_cycle) if active_cycle else school_profile.classes.all()
 
     # Get the rating, gallery, and testimonial contexts
     rating_context = rating_view(request, school_profile)
     if 'redirect' in rating_context:
+        logger.warning(f"Redirecting from rating_view for school {school_profile.school_name}")
         return rating_context['redirect']
     
     gallery_context = gallery_view(request, school_profile)
     if 'redirect' in gallery_context:
+        logger.warning(f"Redirecting from gallery_view for school {school_profile.school_name}")
         return gallery_context['redirect']
     
     testimonial_context = testimonial_view(request, school_profile)
     if 'redirect' in testimonial_context:
+        logger.warning(f"Redirecting from testimonial_view for school {school_profile.school_name}")
         return testimonial_context['redirect']
 
     # Combine all context data
     context = {
         'school_profile': school_profile,
+        'active_cycle': active_cycle,
+        'classes': classes,
     }
     context.update(rating_context)
     context.update(gallery_context)
     context.update(testimonial_context)
 
+    logger.debug(f"Rendering public profile for school: {school_profile.school_name}")
     return render(request, 'schools/public_profile.html', context)
 
 
@@ -1583,6 +1674,26 @@ def cycle_list(request):
         'cycles': cycles,
     }
     return render(request, 'schools/cycle_list.html', context)
+
+
+@login_required
+def delete_cycle(request, cycle_id):
+    if request.user.user_type != 'school':
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    cycle = get_object_or_404(AdmissionCycle, id=cycle_id, school__user=request.user)
+    
+    if request.method == 'POST':
+        cycle_year = cycle.year  # Store the year for the success message
+        cycle.delete()
+        messages.success(request, f"Admission cycle {cycle_year} deleted successfully!")
+        return redirect('schools:cycle_list')
+    
+    context = {
+        'school': cycle.school,
+        'cycle': cycle,
+    }
+    return render(request, 'schools/delete_cycle.html', context)
 
 
 

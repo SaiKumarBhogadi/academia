@@ -1,48 +1,221 @@
 from django import forms
 from .models import SchoolProfile
+from django.db import transaction
 
-class SchoolProfileForm(forms.ModelForm):
+from django import forms
+from django.db import transaction
+from core.models import User
+from .models import SchoolProfile
+from colleges.utils import STATES_DISTRICTS
+
+# Generate state choices dynamically
+INDIAN_STATES = [(state, state) for state in STATES_DISTRICTS.keys()]
+INDIAN_STATES.insert(0, ('', 'Select State'))
+
+class SchoolRegistrationForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, label="Username")
+    email = forms.EmailField(label="Email")
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+    state = forms.ChoiceField(
+        choices=INDIAN_STATES,
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_state', 'class': 'form-control'})
+    )
+    district = forms.ChoiceField(
+        choices=[('', 'Select District')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_district', 'class': 'form-control'})
+    )
+
     class Meta:
         model = SchoolProfile
-        # Exclude fields that are managed automatically
-        exclude = ['user', 'created_at', 'updated_at']
-        # Customize widgets for better user experience
+        fields = [
+            'school_name', 'principal_name', 'contact_phone', 'alternate_phone_number', 'contact_email',
+            'school_type', 'board_affiliation', 'medium_of_instruction', 'established_year',
+            'total_students', 'total_teachers', 'school_code', 'street_address', 'city', 'state',
+            'district', 'pincode', 'website', 'logo', 'affiliation_certificate', 'brochure'
+        ]
         widgets = {
-            'street_address': forms.TextInput(attrs={'placeholder': 'e.g., 123 Main Street'}),
-            'landmark': forms.TextInput(attrs={'placeholder': 'e.g., Near XYZ Park'}),
-            'city': forms.TextInput(attrs={'placeholder': 'e.g., Hyderabad'}),
-            'district': forms.TextInput(attrs={'placeholder': 'e.g., Ranga Reddy'}),
-            'state': forms.TextInput(attrs={'placeholder': 'e.g., Telangana'}),
-            'pincode': forms.TextInput(attrs={'placeholder': 'e.g., 500081'}),
-            'country': forms.TextInput(attrs={'placeholder': 'e.g., India'}),
-            'contact_email': forms.EmailInput(attrs={'placeholder': 'e.g., admin@school.com'}),
-            'contact_phone': forms.TextInput(attrs={'placeholder': 'e.g., +91 9876543210'}),
-            'principal_name': forms.TextInput(attrs={'placeholder': 'e.g., Dr. John Doe'}),
-            'accreditation': forms.TextInput(attrs={'placeholder': 'e.g., CBSE, ICSE'}),
-            'established_year': forms.NumberInput(attrs={'placeholder': 'e.g., 1995'}),
-            'website': forms.URLInput(attrs={'placeholder': 'e.g., https://school.com'}),
-            'total_students': forms.NumberInput(attrs={'placeholder': 'e.g., 1200'}),
-            'total_teachers': forms.NumberInput(attrs={'placeholder': 'e.g., 50'}),
-            'profile_pic': forms.FileInput(),
-            'school_type': forms.Select(),
-            'medium_of_instruction': forms.TextInput(attrs={'placeholder': 'e.g., English'}),
-            'start_grade': forms.Select(choices=[(i, f"Grade {i}") for i in range(1, 13)]),
-            'end_grade': forms.Select(choices=[(i, f"Grade {i}") for i in range(1, 13)]),
-            'facilities': forms.Textarea(attrs={'rows': 3, 'placeholder': 'e.g., Library, Science Labs, Sports Ground'}),
-            'school_motto': forms.TextInput(attrs={'placeholder': 'e.g., Education for All'}),
-            'affiliation_number': forms.TextInput(attrs={'placeholder': 'e.g., CBSE-12345'}),
+            'school_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'principal_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'alternate_phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'school_type': forms.Select(attrs={'class': 'form-select'}),
+            'board_affiliation': forms.Select(attrs={'class': 'form-select'}),
+            'medium_of_instruction': forms.Select(attrs={'class': 'form-select'}),
+            'established_year': forms.NumberInput(attrs={'class': 'form-control', 'min': 1900, 'max': 2025}),
+            'total_students': forms.NumberInput(attrs={'class': 'form-control'}),
+            'total_teachers': forms.NumberInput(attrs={'class': 'form-control'}),
+            'school_code': forms.TextInput(attrs={'class': 'form-control'}),
+            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'pincode': forms.TextInput(attrs={'class': 'form-control'}),
+            'website': forms.URLInput(attrs={'class': 'form-control'}),
+            'logo': forms.FileInput(attrs={'class': 'form-control'}),
+            'affiliation_certificate': forms.FileInput(attrs={'class': 'form-control'}),
+            'brochure': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Update district choices based on the selected state
+        if 'state' in self.data:
+            state = self.data.get('state')
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+            else:
+                self.fields['district'].choices = [('', 'Select District')]
+        else:
+            self.fields['district'].choices = [('', 'Select District')]
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("A user with that username already exists.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with that email already exists.")
+        return email
+
+    def clean_contact_phone(self):
+        phone = self.cleaned_data.get('contact_phone')
+        if not phone.isdigit() or len(phone) != 10:
+            raise forms.ValidationError("Contact phone must be a 10-digit number.")
+        return phone
+
+    def clean_alternate_phone_number(self):
+        phone = self.cleaned_data.get('alternate_phone_number')
+        if phone and (not phone.isdigit() or len(phone) != 10):
+            raise forms.ValidationError("Alternate phone must be a 10-digit number.")
+        return phone
 
     def clean(self):
         cleaned_data = super().clean()
-        start_grade = cleaned_data.get('start_grade')
-        end_grade = cleaned_data.get('end_grade')
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+        state = cleaned_data.get('state')
+        district = cleaned_data.get('district')
 
-        # Validation: Ensure start_grade <= end_grade
-        if start_grade and end_grade and start_grade > end_grade:
-            raise forms.ValidationError("Start grade must be less than or equal to end grade.")
+        if password and confirm_password and password != confirm_password:
+            raise forms.ValidationError("Passwords do not match.")
+
+        # Validate district based on state
+        if state and district:
+            if district not in STATES_DISTRICTS.get(state, []):
+                raise forms.ValidationError("Invalid district for the selected state.")
+        elif state and not district:
+            raise forms.ValidationError("Please select a district.")
+        elif district and not state:
+            raise forms.ValidationError("Please select a state before selecting a district.")
+
         return cleaned_data
 
+    def save(self, commit=True):
+        with transaction.atomic():
+            user = User(
+                username=self.cleaned_data['username'],
+                email=self.cleaned_data['email'],
+                user_type='school',
+                is_approved=False
+            )
+            user.set_password(self.cleaned_data['password'])
+            if commit:
+                user.save()
+                profile = super().save(commit=False)
+                profile.user = user
+                profile.save()
+            return user
+
+class SchoolProfileForm(forms.ModelForm):
+    state = forms.ChoiceField(
+        choices=INDIAN_STATES,
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_state', 'class': 'form-control'})
+    )
+    district = forms.ChoiceField(
+        choices=[('', 'Select District')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_district', 'class': 'form-control'})
+    )
+
+    class Meta:
+        model = SchoolProfile
+        fields = [
+            'school_name', 'principal_name', 'contact_phone', 'alternate_phone_number', 'contact_email',
+            'school_type', 'board_affiliation', 'medium_of_instruction', 'established_year',
+            'total_students', 'total_teachers', 'school_code', 'street_address', 'city', 'state',
+            'district', 'pincode', 'website', 'logo', 'affiliation_certificate', 'brochure'
+        ]
+        widgets = {
+            'school_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'principal_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'alternate_phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'school_type': forms.Select(attrs={'class': 'form-select'}),
+            'board_affiliation': forms.Select(attrs={'class': 'form-select'}),
+            'medium_of_instruction': forms.Select(attrs={'class': 'form-select'}),
+            'established_year': forms.NumberInput(attrs={'class': 'form-control', 'min': 1900, 'max': 2025}),
+            'total_students': forms.NumberInput(attrs={'class': 'form-control'}),
+            'total_teachers': forms.NumberInput(attrs={'class': 'form-control'}),
+            'school_code': forms.TextInput(attrs={'class': 'form-control'}),
+            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'pincode': forms.TextInput(attrs={'class': 'form-control'}),
+            'website': forms.URLInput(attrs={'class': 'form-control'}),
+            'logo': forms.FileInput(attrs={'class': 'form-control'}),
+            'affiliation_certificate': forms.FileInput(attrs={'class': 'form-control'}),
+            'brochure': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Update district choices based on the selected state
+        if 'state' in self.data:
+            state = self.data.get('state')
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+            else:
+                self.fields['district'].choices = [('', 'Select District')]
+        elif self.instance and self.instance.state:
+            state = self.instance.state
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+        else:
+            self.fields['district'].choices = [('', 'Select District')]
+
+    def clean_contact_phone(self):
+        phone = self.cleaned_data.get('contact_phone')
+        if not phone.isdigit() or len(phone) != 10:
+            raise forms.ValidationError("Contact phone must be a 10-digit number.")
+        return phone
+
+    def clean_alternate_phone_number(self):
+        phone = self.cleaned_data.get('alternate_phone_number')
+        if phone and (not phone.isdigit() or len(phone) != 10):
+            raise forms.ValidationError("Alternate phone must be a 10-digit number.")
+        return phone
+
+    def clean(self):
+        cleaned_data = super().clean()
+        state = cleaned_data.get('state')
+        district = cleaned_data.get('district')
+
+        # Validate district based on state
+        if state and district:
+            if district not in STATES_DISTRICTS.get(state, []):
+                raise forms.ValidationError("Invalid district for the selected state.")
+        elif state and not district:
+            raise forms.ValidationError("Please select a district.")
+        elif district and not state:
+            raise forms.ValidationError("Please select a state before selecting a district.")
+
+        return cleaned_data
 
 from django import forms
 from .models import SchoolClass, ClassSection, AdmissionCycle  # Added AdmissionCycle

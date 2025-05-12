@@ -3,137 +3,352 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
-    <style>
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 1rem;
+        border-left: 4px solid #3498DB;
+        padding-left: 0.75rem;
+    }
+
+    p.welcome-text {
+        font-size: 1.1rem;
+        color: #666666;
+        margin-bottom: 2rem;
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .alert-success {
+        background: #e6ffe6;
+        border: 1px solid #b3ffb3;
+        color: #2C3E50;
+    }
+
+    .alert-info {
+        background: #e6f0fa;
+        border: 1px solid #d1e7ff;
+        color: #2C3E50;
+    }
+
+    .alert-warning {
+        background: #fef9e7;
+        border: 1px solid #f9e4a0;
+        color: #7A4B00;
+    }
+
+    .btn-close {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        color: #666666;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+
+    .btn-close:hover {
+        opacity: 1;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 2rem;
+        background: #ffffff;
+    }
+
+    .profile-details p {
+        font-size: 0.9rem;
+        color: #333333;
+        margin-bottom: 0.75rem;
+    }
+
+    .profile-details strong {
+        color: #2C3E50;
+        font-weight: 600;
+        display: inline-block;
+        width: 150px;
+    }
+
+    .quick-actions .d-flex {
+        gap: 1rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .table th {
+        background: #f1f5f9;
+        color: #2C3E50;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .table td {
+        background: #ffffff;
+        color: #333333;
+        font-size: 0.9rem;
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .btn-primary {
+        background-color: #3498DB;
+        border: none;
+        color: #ffffff;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+        background-color: #2980B9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-danger {
+        background-color: #EF5350;
+        border: none;
+        color: #ffffff;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-danger:hover {
+        background-color: #D32F2F;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 83, 80, 0.3);
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    @media (max-width: 768px) {
         .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            padding: 1rem 0.5rem;
         }
-        .card {
-            margin-bottom: 20px;
+
+        h1 {
+            font-size: 1.5rem;
         }
+
+        p.welcome-text {
+            font-size: 1rem;
+        }
+
         .card-header h3 {
-            font-size: 1.25rem;
-            color: #1a2a6c;
+            font-size: 1.1rem;
         }
-        .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
+
+        .card-body {
+            padding: 1.5rem;
         }
-        .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
+
+        .profile-details p {
+            font-size: 0.85rem;
         }
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
+
+        .profile-details strong {
+            width: 120px;
         }
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #c82333;
+
+        .quick-actions .d-flex {
+            gap: 0.75rem;
         }
-        .table-container {
-            overflow-x: auto;
-        }
+
         .table th, .table td {
-            vertical-align: middle;
+            font-size: 0.85rem;
+            padding: 0.75rem;
         }
-        .alert {
-            margin-bottom: 20px;
+
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
         }
-    </style>
+    }
 
-    <div class="dashboard-container">
-        <h1>Student Dashboard</h1>
-        <p>Welcome, {{ request.user.username }}!</p>
+    @media (max-width: 576px) {
+        .profile-details strong {
+            width: 100%;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+        .quick-actions .d-flex {
+            flex-direction: column;
+        }
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="mb-0">Your Profile</h3>
-                    </div>
-                    <div class="card-body">
-                        {% if request.user.student_profile %}
-                            <p><strong>Name:</strong> {{ request.user.student_profile.first_name }} {{ request.user.student_profile.last_name }}</p>
-                            <p><strong>Email:</strong> {{ request.user.student_profile.email }}</p>
-                            <p><strong>Contact:</strong> {{ request.user.student_profile.contact_number }}</p>
-                            <a href="{% url 'students:student_profile' %}" class="btn btn-primary btn-sm">View Profile</a>
-                        {% else %}
-                            <p>You have not created a profile yet.</p>
-                            <a href="{% url 'students:student_profile' %}" class="btn btn-primary btn-sm">Create Profile</a>
-                        {% endif %}
-                    </div>
-                </div>
+        .quick-actions .btn {
+            width: 100%;
+        }
+
+        .table th, .table td {
+            font-size: 0.8rem;
+            padding: 0.5rem;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <h1>Student Dashboard</h1>
+    <p class="welcome-text">Welcome, {{ request.user.username }}!</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="mb-0">Quick Actions</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex flex-column gap-2">
-                            <a href="{% url 'schools:school_list' %}" class="btn btn-primary">Apply for Admission</a>
-                        </div>
-                    </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Your Profile</h3>
+                </div>
+                <div class="card-body profile-details">
+                    {% if request.user.student_profile %}
+                        <p><strong>Name:</strong> {{ request.user.student_profile.first_name }} {{ request.user.student_profile.last_name }}</p>
+                        <p><strong>Email:</strong> {{ request.user.student_profile.email }}</p>
+                        <p><strong>Contact:</strong> {{ request.user.student_profile.contact_number }}</p>
+                        <p><strong>Admission Preference:</strong> {{ request.user.student_profile.get_admission_preference_display|default:"Not set" }}</p>
+                        <a href="{% url 'students:student_profile' %}" class="btn btn-primary btn-sm">View Profile</a>
+                        <a href="{% url 'students:student_profile' %}?edit=true" class="btn btn-primary btn-sm">Edit Profile</a>
+                    {% else %}
+                        <p>You have not created a profile yet.</p>
+                        <a href="{% url 'students:student_profile' %}" class="btn btn-primary btn-sm">Create Profile</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h3 class="mb-0">Your Applications</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-container">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Admission ID</th>
-                                <th>School</th>
-                                <th>Class</th>
-                                <th>Section</th>
-                                <th>Status</th>
-                                <th>Applied On</th>
-                                <th>Actions</th>  <!-- Added -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for application in applications %}
-                                <tr>
-                                    <td>{{ application.admission_id }}</td>  <!-- Updated to use id since admission_id might not exist -->
-                                    <td>{{ application.school.school_name }}</td>
-                                    <td>{{ application.school_class.grade }}</td>
-                                    <td>{{ application.section.section_name }}</td>
-                                    <td>{{ application.status }}</td>
-                                    <td>{{ application.admission_date|date:"d M Y" }}</td>
-                                    <td>
-                                        {% if application.status == 'Pending' %}
-                                            <form method="post" action="{% url 'students:withdraw_application' application.id %}" style="display: inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to withdraw this application?')">Withdraw</button>
-                                            </form>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="7">You have not submitted any applications yet.</td>  <!-- Updated colspan -->
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Quick Actions</h3>
+                </div>
+                <div class="card-body quick-actions">
+                    <div class="d-flex flex-column gap-2">
+                        {% if request.user.student_profile.admission_preference == 'school' %}
+                            <a href="{% url 'schools:school_list' %}" class="btn btn-primary">Apply for School Admission</a>
+                        {% elif request.user.student_profile.admission_preference == 'college' %}
+                            <a href="{% url 'colleges:college_list' %}" class="btn btn-primary">Apply for College Admission</a>
+                        {% else %}
+                            <p>Please set your admission preference in your profile to apply.</p>
+                            <a href="{% url 'students:student_profile' %}?edit=true" class="btn btn-primary btn-sm">Set Preference</a>
+                        {% endif %}
+                        <a href="{% url 'students:my_applications' %}" class="btn btn-primary">View All Applications</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Your {{ admission_preference|title }} Applications</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Institution</th>
+                            <th>Class/Department</th>
+                            <th>Section</th>
+                            <th>Seat</th>
+                            <th>Status</th>
+                            <th>Applied On</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                            <tr>
+                                <td>{{ app.institution }}</td>
+                                <td>{{ app.department_class }}</td>
+                                <td>{{ app.section }}</td>
+                                <td>{{ app.seat_number }}</td>
+                                <td>{{ app.status }}</td>
+                                <td>{{ app.date|date:"d M Y" }}</td>
+                                <td>
+                                    <a href="{% url app.view_url app.id %}" class="btn btn-primary btn-sm">View</a>
+                                    {% if app.can_withdraw %}
+                                        <a href="{% url 'students:withdraw_application' app.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to withdraw this application?')">Withdraw</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7">You have not submitted any {{ admission_preference|title }} applications yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3">
+                <a href="{% url 'students:my_applications' %}" class="btn btn-primary btn-sm">View All Applications</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

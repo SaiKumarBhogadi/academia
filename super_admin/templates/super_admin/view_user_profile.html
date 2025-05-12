@@ -1,0 +1,609 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}View {{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- View User Profile Details -->
+    <div class="min-h-screen bg-gray-100 flex items-center justify-center py-8 px-4">
+        <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                {{ user.username }}'s Profile Details
+            </h3>
+
+            <!-- Profile Details -->
+            <div class="space-y-8">
+                {% if user.user_type == 'college' %}
+                    <!-- College Profile -->
+                    <!-- Basic Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Basic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">College Name</p>
+                                <p class="text-gray-900">{{ profile.college_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Principal Name</p>
+                                <p class="text-gray-900">{{ profile.principal_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">College Type</p>
+                                <p class="text-gray-900">{{ profile.college_type }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Affiliation</p>
+                                <p class="text-gray-900">{{ profile.affiliation }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Accreditation</p>
+                                <p class="text-gray-900">{{ profile.accreditation }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Established Year</p>
+                                <p class="text-gray-900">{{ profile.established_year }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">College Code</p>
+                                <p class="text-gray-900">{{ profile.college_code|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Medium of Instruction</p>
+                                <p class="text-gray-900">{{ profile.medium_of_instruction|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Contact Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Contact Phone</p>
+                                <p class="text-gray-900">{{ profile.contact_phone }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Alternate Phone Number</p>
+                                <p class="text-gray-900">{{ profile.alternate_phone_number|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Contact Email</p>
+                                <p class="text-gray-900">{{ profile.contact_email }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Website</p>
+                                <p class="text-gray-900">{{ profile.website|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Address</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Street Address</p>
+                                <p class="text-gray-900">{{ profile.street_address }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">City</p>
+                                <p class="text-gray-900">{{ profile.city }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">State</p>
+                                <p class="text-gray-900">{{ profile.state }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">District</p>
+                                <p class="text-gray-900">{{ profile.district|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Pincode</p>
+                                <p class="text-gray-900">{{ profile.pincode }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Academic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Courses Offered</p>
+                                <p class="text-gray-900">{{ profile.courses_offered|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Streams Available</p>
+                                <p class="text-gray-900">{{ profile.streams_available|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Total Students</p>
+                                <p class="text-gray-900">{{ profile.total_students }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Total Faculty</p>
+                                <p class="text-gray-900">{{ profile.total_faculty }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facilities -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Facilities</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Hostel Availability</p>
+                                <p class="text-gray-900">{{ profile.hostel_availability|yesno:"Yes,No" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Hostel Capacity (Boys)</p>
+                                <p class="text-gray-900">{{ profile.hostel_capacity_boys|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Hostel Capacity (Girls)</p>
+                                <p class="text-gray-900">{{ profile.hostel_capacity_girls|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Library</p>
+                                <p class="text-gray-900">{{ profile.library|yesno:"Yes,No" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Library Books Count</p>
+                                <p class="text-gray-900">{{ profile.library_books_count|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Labs</p>
+                                <p class="text-gray-900">{{ profile.labs|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Placement Cell</p>
+                                <p class="text-gray-900">{{ profile.placement_cell|yesno:"Yes,No" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Placement Percentage</p>
+                                <p class="text-gray-900">{{ profile.placement_percentage|default:"Not provided" }}%</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Top Recruiters</p>
+                                <p class="text-gray-900">{{ profile.top_recruiters|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Other Facilities</p>
+                                <p class="text-gray-900">{{ profile.other_facilities|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents and Media -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Documents and Media</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Profile Picture</p>
+                                {% if profile.profile_pic %}
+                                    <img src="{{ profile.profile_pic.url }}" alt="{{ profile.college_name }} Logo" class="h-16 w-auto mt-1">
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Accreditation Certificate</p>
+                                {% if profile.accreditation_certificate %}
+                                    <a href="{{ profile.accreditation_certificate.url }}" class="text-blue-600 hover:underline" target="_blank">View Certificate</a>
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Brochure</p>
+                                {% if profile.brochure %}
+                                    <a href="{{ profile.brochure.url }}" class="text-blue-600 hover:underline" target="_blank">View Brochure</a>
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timestamps -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Timestamps</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Created At</p>
+                                <p class="text-gray-900">{{ profile.created_at }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Updated At</p>
+                                <p class="text-gray-900">{{ profile.updated_at }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif user.user_type == 'school' %}
+                    <!-- School Profile -->
+                    <!-- Basic Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Basic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">School Name</p>
+                                <p class="text-gray-900">{{ profile.school_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Principal Name</p>
+                                <p class="text-gray-900">{{ profile.principal_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">School Type</p>
+                                <p class="text-gray-900">{{ profile.school_type }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Board Affiliation</p>
+                                <p class="text-gray-900">{{ profile.board_affiliation }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Medium of Instruction</p>
+                                <p class="text-gray-900">{{ profile.medium_of_instruction }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Established Year</p>
+                                <p class="text-gray-900">{{ profile.established_year }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">School Code</p>
+                                <p class="text-gray-900">{{ profile.school_code|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Contact Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Contact Phone</p>
+                                <p class="text-gray-900">{{ profile.contact_phone }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Alternate Phone Number</p>
+                                <p class="text-gray-900">{{ profile.alternate_phone_number|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Contact Email</p>
+                                <p class="text-gray-900">{{ profile.contact_email }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Website</p>
+                                <p class="text-gray-900">{{ profile.website|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Address</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Street Address</p>
+                                <p class="text-gray-900">{{ profile.street_address }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">City</p>
+                                <p class="text-gray-900">{{ profile.city }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">State</p>
+                                <p class="text-gray-900">{{ profile.state }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">District</p>
+                                <p class="text-gray-900">{{ profile.district|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Pincode</p>
+                                <p class="text-gray-900">{{ profile.pincode }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Academic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Total Students</p>
+                                <p class="text-gray-900">{{ profile.total_students }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Total Teachers</p>
+                                <p class="text-gray-900">{{ profile.total_teachers }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents and Media -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Documents and Media</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Logo</p>
+                                {% if profile.logo %}
+                                    <img src="{{ profile.logo.url }}" alt="{{ profile.school_name }} Logo" class="h-16 w-auto mt-1">
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Affiliation Certificate</p>
+                                {% if profile.affiliation_certificate %}
+                                    <a href="{{ profile.affiliation_certificate.url }}" class="text-blue-600 hover:underline" target="_blank">View Certificate</a>
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Brochure</p>
+                                {% if profile.brochure %}
+                                    <a href="{{ profile.brochure.url }}" class="text-blue-600 hover:underline" target="_blank">View Brochure</a>
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timestamps -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Timestamps</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Created At</p>
+                                <p class="text-gray-900">{{ profile.created_at }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Updated At</p>
+                                <p class="text-gray-900">{{ profile.updated_at }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif user.user_type == 'student' %}
+                    <!-- Student Profile -->
+                    <!-- Personal Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Personal Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">First Name</p>
+                                <p class="text-gray-900">{{ profile.first_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Last Name</p>
+                                <p class="text-gray-900">{{ profile.last_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Date of Birth</p>
+                                <p class="text-gray-900">{{ profile.date_of_birth }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Gender</p>
+                                <p class="text-gray-900">{{ profile.gender }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Nationality</p>
+                                <p class="text-gray-900">{{ profile.nationality }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Category</p>
+                                <p class="text-gray-900">{{ profile.category }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Aadhar Number</p>
+                                <p class="text-gray-900">{{ profile.aadhar_number }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Contact Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Email</p>
+                                <p class="text-gray-900">{{ profile.email }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Contact Number</p>
+                                <p class="text-gray-900">{{ profile.contact_number }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Alternate Phone Number</p>
+                                <p class="text-gray-900">{{ profile.alternate_phone_number|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Address</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Street Address</p>
+                                <p class="text-gray-900">{{ profile.street_address }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">City</p>
+                                <p class="text-gray-900">{{ profile.city }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">State</p>
+                                <p class="text-gray-900">{{ profile.state }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">District</p>
+                                <p class="text-gray-900">{{ profile.district }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Pincode</p>
+                                <p class="text-gray-900">{{ profile.pincode }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parent Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Parent Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Father's Name</p>
+                                <p class="text-gray-900">{{ profile.father_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Father's Mobile</p>
+                                <p class="text-gray-900">{{ profile.father_mobile }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Father's Email</p>
+                                <p class="text-gray-900">{{ profile.father_email|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Mother's Name</p>
+                                <p class="text-gray-900">{{ profile.mother_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Mother's Mobile</p>
+                                <p class="text-gray-900">{{ profile.mother_mobile }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Mother's Email</p>
+                                <p class="text-gray-900">{{ profile.mother_email|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Parent Income</p>
+                                <p class="text-gray-900">{{ profile.parent_income|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Academic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Admission Preference</p>
+                                <p class="text-gray-900">{{ profile.admission_preference }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Desired Course</p>
+                                <p class="text-gray-900">{{ profile.desired_course }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Last Institution</p>
+                                <p class="text-gray-900">{{ profile.last_institution }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Previous Qualification</p>
+                                <p class="text-gray-900">{{ profile.previous_qualification }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Entrance Score</p>
+                                <p class="text-gray-900">{{ profile.entrance_score|default:"Not provided" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Academic Year</p>
+                                <p class="text-gray-900">{{ profile.academic_year }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents and Media -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Documents and Media</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Profile Photo</p>
+                                {% if profile.profile_photo %}
+                                    <img src="{{ profile.profile_photo.url }}" alt="{{ profile.first_name }} {{ profile.last_name }} Photo" class="h-16 w-auto mt-1">
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Passport Photo</p>
+                                {% if profile.passport_photo %}
+                                    <img src="{{ profile.passport_photo.url }}" alt="{{ profile.first_name }} {{ profile.last_name }} Passport Photo" class="h-16 w-auto mt-1">
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Signature</p>
+                                {% if profile.signature %}
+                                    <img src="{{ profile.signature.url }}" alt="{{ profile.first_name }} {{ profile.last_name }} Signature" class="h-16 w-auto mt-1">
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Marksheet</p>
+                                <a href="{{ profile.marksheet.url }}" class="text-blue-600 hover:underline" target="_blank">View Marksheet</a>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Transfer Certificate</p>
+                                <a href="{{ profile.transfer_certificate.url }}" class="text-blue-600 hover:underline" target="_blank">View Certificate</a>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">ID Proof</p>
+                                <a href="{{ profile.id_proof.url }}" class="text-blue-600 hover:underline" target="_blank">View ID Proof</a>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Caste Certificate</p>
+                                {% if profile.caste_certificate %}
+                                    <a href="{{ profile.caste_certificate.url }}" class="text-blue-600 hover:underline" target="_blank">View Certificate</a>
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Income Certificate</p>
+                                {% if profile.income_certificate %}
+                                    <a href="{{ profile.income_certificate.url }}" class="text-blue-600 hover:underline" target="_blank">View Certificate</a>
+                                {% else %}
+                                    <p class="text-gray-900">Not provided</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timestamps -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Timestamps</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Created At</p>
+                                <p class="text-gray-900">{{ profile.created_at }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Updated At</p>
+                                <p class="text-gray-900">{{ profile.updated_at }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Back Button -->
+            <div class="flex justify-end mt-8">
+                <a href="{% url 'super_admin:manage_users' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150">
+                    Back to Manage Users
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

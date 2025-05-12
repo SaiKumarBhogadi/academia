@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'schools',
     'students',
     'colleges',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -135,7 +136,7 @@ AUTH_USER_MODEL = 'core.User'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
+    
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
@@ -154,3 +155,32 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'saibhogadi999@gmail.com'  # Replace with your Gmail address (e.g., academia.portal@gmail.com)
 EMAIL_HOST_PASSWORD = 'ayumyybravyjgutx'  # Replace with the 16-character app password (generate via Google Account with 2FA)
 DEFAULT_FROM_EMAIL = 'no-reply@academia.com'  # Default "from" address for all emails
+
+
+
+# Add this logging configuration to your settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

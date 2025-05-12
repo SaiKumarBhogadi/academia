@@ -3,9 +3,280 @@
 {% block title %}Manage Degrees - {{ college_profile.college_name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+    .degrees-container {
+        max-width: 1000px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-size: 1rem;
+        color: #333333;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-select {
+        width: 100%;
+        max-width: 300px;
+        padding: 0.8rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-select:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .alert {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        border: none;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert-success {
+        background: #e6f4ea;
+        color: #2c6b40;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #E74C3C;
+    }
+
+    .btn-success {
+        background-color: #2ECC71;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-success:hover {
+        background-color: #27AE60;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-success i {
+        margin-right: 0.5rem;
+    }
+
+    .list-group {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f9fafb;
+        transition: background-color 0.3s ease;
+        font-size: 1rem;
+        color: #333333;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .list-group-item:hover {
+        background: #e6f0fa;
+    }
+
+    .list-group-item strong {
+        color: #2C3E50;
+    }
+
+    .text-primary {
+        color: #3498DB !important;
+    }
+
+    .text-muted {
+        color: #666666 !important;
+        font-style: italic;
+        font-size: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .text-danger {
+        color: #E74C3C !important;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-warning {
+        background-color: #F1C40F;
+        border: none;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-warning:hover {
+        background-color: #E67E22;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-danger {
+        background-color: #E74C3C;
+        border: none;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-danger:hover {
+        background-color: #C0392B;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-sm i {
+        margin-right: 0.3rem;
+    }
+
+    @media (max-width: 768px) {
+        .degrees-container {
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-select {
+            max-width: 100%;
+            font-size: 0.9rem;
+            padding: 0.7rem 1rem;
+        }
+
+        .list-group-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-warning,
+        .btn-danger {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .btn-success {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .list-group-item {
+            font-size: 0.9rem;
+        }
+
+        .btn-warning,
+        .btn-danger {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="degrees-container">
     <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-header text-white rounded-top-4" style="background-color: rgb(32, 32, 74);">
+        <div class="card-header text-white rounded-top-4">
             <h3 class="mb-0"><i class="fas fa-graduation-cap me-2"></i> Manage Degrees - {{ college_profile.college_name }}</h3>
         </div>
         <div class="card-body">

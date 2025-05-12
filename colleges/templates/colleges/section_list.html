@@ -3,7 +3,253 @@
 {% block title %}Manage Sections - {{ college_profile.college_name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+    .sections-container {
+        max-width: 1000px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .accordion-item {
+        border: none;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background: #f9fafb;
+    }
+
+    .accordion-header {
+        background: #ffffff;
+        border-radius: 8px;
+    }
+
+    .accordion-button {
+        background: #ffffff;
+        color: #2C3E50;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: none !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: #e6f0fa;
+        color: #3498DB;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    .accordion-body {
+        padding: 1.5rem;
+        background: #ffffff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .btn-primary {
+        background-color: #2C3E50;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+        background-color: #3498DB;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .table {
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .table thead {
+        background: #f9fafb;
+        color: #2C3E50;
+    }
+
+    .table th {
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333333;
+    }
+
+    .table tbody tr:hover {
+        background: #e6f0fa;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-info {
+        background-color: #3498DB;
+        border: none;
+        color: #ffffff;
+    }
+
+    .btn-info:hover {
+        background-color: #2980B9;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-warning {
+        background-color: #F1C40F;
+        border: none;
+        color: #ffffff;
+    }
+
+    .btn-warning:hover {
+        background-color: #E67E22;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-danger {
+        background-color: #E74C3C;
+        border: none;
+        color: #ffffff;
+    }
+
+    .btn-danger:hover {
+        background-color: #C0392B;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .text-muted {
+        color: #666666 !important;
+        font-style: italic;
+        font-size: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .sections-container {
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .accordion-button {
+            font-size: 1rem;
+            padding: 0.8rem 1.2rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .accordion-button {
+            font-size: 0.9rem;
+        }
+
+        .table th,
+        .table td {
+            font-size: 0.85rem;
+            padding: 0.6rem;
+        }
+
+        .btn-primary {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
+<div class="sections-container">
     <div class="card">
         <div class="card-header">
             <h3>Manage Sections - {{ college_profile.college_name }} (Department: {{ department.name }})</h3>
@@ -60,5 +306,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Super Admin Account Details Updated{% endblock %}
+
+{% block content %}
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Confirmation Message -->
+    <div class="min-h-screen bg-gray-100 flex items-center justify-center py-8 px-4">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center justify-center">
+                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Super Admin Account Details Updated
+            </h3>
+            <p class="text-gray-600 mb-6">Your account details have been updated successfully.</p>
+            <a href="{% url 'super_admin:manage_users' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-150">
+                Go to Manage Users
+            </a>
+        </div>
+    </div>
+{% endblock %}

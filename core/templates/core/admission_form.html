@@ -1,0 +1,712 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admission Form - {{ institution }} - Academia Admit</title>
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="topbar navbar navbar-expand-md bg-light py-1 border-bottom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="me-3 small" style="color: #FFB300 !important;font-weight:600;"><i class="bi bi-telephone"></i> +91-0000000000</span>
+                <span class="small" style="color: #FFB300 !important;font-weight:600;"><i class="bi bi-envelope"></i> info@academiaadmit.in</span>
+            </div>
+            <button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topbarLinks" aria-controls="topbarLinks" aria-expanded="false" aria-label="Toggle topbar">
+                <span style="font-size: 1.5rem; line-height: 1;">⋮</span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="topbarLinks">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link small px-2" href="#" id="top-link">Fee Payment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link small px-2" href="{% url 'core:online_admission' %}" id="top-link">Online Admission</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link small px-2" href="{% url 'core:login' %}" id="top-link">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <nav class="navbar navbar-expand-md shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{% static 'images/logo.png' %}" alt="Academia Admit Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:clients' %}">Our Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:testimonials' %}">Testimonials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:contact' %}">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="admission-container">
+        <div class="admission-card">
+            <div class="admission-header">
+                <h3>Admission Form for {{ institution }}</h3>
+                <a href="{% url 'core:online_admission' %}" class="btn btn-secondary">← Back</a>
+            </div>
+            <div class="admission-body">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% elif message.tags == 'error' %}alert-error{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Display non-field errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Debug: Show all form errors -->
+                {% if form.errors %}
+                    <div class="debug-section">
+                        <strong>Debug: Form Errors:</strong><br>
+                        {{ form.errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="section">
+                        <h4>Personal Information</h4>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <span class="error">{{ form.first_name.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.middle_name.id_for_label }}">Middle Name</label>
+                                {{ form.middle_name }}
+                                {% if form.middle_name.errors %}
+                                    <span class="error">{{ form.middle_name.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <span class="error">{{ form.last_name.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                                {{ form.date_of_birth }}
+                                {% if form.date_of_birth.errors %}
+                                    <span class="error">{{ form.date_of_birth.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.gender.id_for_label }}">Gender</label>
+                                {{ form.gender }}
+                                {% if form.gender.errors %}
+                                    <span class="error">{{ form.gender.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.nationality.id_for_label }}">Nationality</label>
+                                {{ form.nationality }}
+                                {% if form.nationality.errors %}
+                                    <span class="error">{{ form.nationality.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.aadhaar_number.id_for_label }}">Aadhaar Number</label>
+                                {{ form.aadhaar_number }}
+                                {% if form.aadhaar_number.errors %}
+                                    <span class="error">{{ form.aadhaar_number.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <span class="error">{{ form.email.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.contact_number.id_for_label }}">Contact Number</label>
+                                {{ form.contact_number }}
+                                {% if form.contact_number.errors %}
+                                    <span class="error">{{ form.contact_number.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field full-width">
+                                <label class="form-label" for="{{ form.permanent_address.id_for_label }}">Permanent Address</label>
+                                {{ form.permanent_address }}
+                                {% if form.permanent_address.errors %}
+                                    <span class="error">{{ form.permanent_address.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field full-width">
+                                <label class="form-label" for="{{ form.correspondence_address.id_for_label }}">Correspondence Address</label>
+                                {{ form.correspondence_address }}
+                                {% if form.correspondence_address.errors %}
+                                    <span class="error">{{ form.correspondence_address.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.caste.id_for_label }}">Caste</label>
+                                {{ form.caste }}
+                                {% if form.caste.errors %}
+                                    <span class="error">{{ form.caste.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.religion.id_for_label }}">Religion</label>
+                                {{ form.religion }}
+                                {% if form.religion.errors %}
+                                    <span class="error">{{ form.religion.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.mother_tongue.id_for_label }}">Mother Tongue</label>
+                                {{ form.mother_tongue }}
+                                {% if form.mother_tongue.errors %}
+                                    <span class="error">{{ form.mother_tongue.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.blood_group.id_for_label }}">Blood Group</label>
+                                {{ form.blood_group }}
+                                {% if form.blood_group.errors %}
+                                    <span class="error">{{ form.blood_group.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.city.id_for_label }}">City</label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                    <span class="error">{{ form.city.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.state.id_for_label }}">State</label>
+                                {{ form.state }}
+                                {% if form.state.errors %}
+                                    <span class="error">{{ form.state.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.pincode.id_for_label }}">Pincode</label>
+                                {{ form.pincode }}
+                                {% if form.pincode.errors %}
+                                    <span class="error">{{ form.pincode.errors }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Parent Information</h4>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.father_name.id_for_label }}">Father Name</label>
+                                {{ form.father_name }}
+                                {% if form.father_name.errors %}
+                                    <span class="error">{{ form.father_name.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.father_occupation.id_for_label }}">Father Occupation</label>
+                                {{ form.father_occupation }}
+                                {% if form.father_occupation.errors %}
+                                    <span class="error">{{ form.father_occupation.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.father_mobile.id_for_label }}">Father Mobile</label>
+                                {{ form.father_mobile }}
+                                {% if form.father_mobile.errors %}
+                                    <span class="error">{{ form.father_mobile.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.father_email.id_for_label }}">Father Email</label>
+                                {{ form.father_email }}
+                                {% if form.father_email.errors %}
+                                    <span class="error">{{ form.father_email.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.mother_name.id_for_label }}">Mother Name</label>
+                                {{ form.mother_name }}
+                                {% if form.mother_name.errors %}
+                                    <span class="error">{{ form.mother_name.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.mother_occupation.id_for_label }}">Mother Occupation</label>
+                                {{ form.mother_occupation }}
+                                {% if form.mother_occupation.errors %}
+                                    <span class="error">{{ form.mother_occupation.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.mother_mobile.id_for_label }}">Mother Mobile</label>
+                                {{ form.mother_mobile }}
+                                {% if form.mother_mobile.errors %}
+                                    <span class="error">{{ form.mother_mobile.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.mother_email.id_for_label }}">Mother Email</label>
+                                {{ form.mother_email }}
+                                {% if form.mother_email.errors %}
+                                    <span class="error">{{ form.mother_email.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.parent_income.id_for_label }}">Parent Income</label>
+                                {{ form.parent_income }}
+                                {% if form.parent_income.errors %}
+                                    <span class="error">{{ form.parent_income.errors }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Academic Information</h4>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.desired_course.id_for_label }}">Desired Course</label>
+                                {{ form.desired_course }}
+                                {% if form.desired_course.errors %}
+                                    <span class="error">{{ form.desired_course.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.last_institution.id_for_label }}">Last Institution</label>
+                                {{ form.last_institution }}
+                                {% if form.last_institution.errors %}
+                                    <span class="error">{{ form.last_institution.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field full-width">
+                                <label class="form-label" for="{{ form.previous_school_address.id_for_label }}">Previous Institution Address</label>
+                                {{ form.previous_school_address }}
+                                {% if form.previous_school_address.errors %}
+                                    <span class="error">{{ form.previous_school_address.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.previous_qualification.id_for_label }}">Previous Qualification</label>
+                                {{ form.previous_qualification }}
+                                {% if form.previous_qualification.errors %}
+                                    <span class="error">{{ form.previous_qualification.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.board.id_for_label }}">Board</label>
+                                {{ form.board }}
+                                {% if form.board.errors %}
+                                    <span class="error">{{ form.board.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.year_of_passing.id_for_label }}">Year of Passing</label>
+                                {{ form.year_of_passing }}
+                                {% if form.year_of_passing.errors %}
+                                    <span class="error">{{ form.year_of_passing.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.percentage.id_for_label }}">Percentage</label>
+                                {{ form.percentage }}
+                                {% if form.percentage.errors %}
+                                    <span class="error">{{ form.percentage.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.entrance_score.id_for_label }}">Entrance Score</label>
+                                {{ form.entrance_score }}
+                                {% if form.entrance_score.errors %}
+                                    <span class="error">{{ form.entrance_score.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field full-width">
+                                <label class="form-label" for="{{ form.reason_for_leaving.id_for_label }}">Reason for Leaving</label>
+                                {{ form.reason_for_leaving }}
+                                {% if form.reason_for_leaving.errors %}
+                                    <span class="error">{{ form.reason_for_leaving.errors }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Documents</h4>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.marksheet.id_for_label }}">Marksheet</label>
+                                {{ form.marksheet }}
+                                {% if form.marksheet.errors %}
+                                    <span class="error">{{ form.marksheet.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.transfer_certificate.id_for_label }}">Transfer Certificate</label>
+                                {{ form.transfer_certificate }}
+                                {% if form.transfer_certificate.errors %}
+                                    <span class="error">{{ form.transfer_certificate.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.id_proof.id_for_label }}">ID Proof</label>
+                                {{ form.id_proof }}
+                                {% if form.id_proof.errors %}
+                                    <span class="error">{{ form.id_proof.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.caste_certificate.id_for_label }}">Caste Certificate</label>
+                                {{ form.caste_certificate }}
+                                {% if form.caste_certificate.errors %}
+                                    <span class="error">{{ form.caste_certificate.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.income_certificate.id_for_label }}">Income Certificate</label>
+                                {{ form.income_certificate }}
+                                {% if form.income_certificate.errors %}
+                                    <span class="error">{{ form.income_certificate.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.passport_photo.id_for_label }}">Passport Photo</label>
+                                {{ form.passport_photo }}
+                                {% if form.passport_photo.errors %}
+                                    <span class="error">{{ form.passport_photo.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.birth_certificate.id_for_label }}">Birth Certificate</label>
+                                {{ form.birth_certificate }}
+                                {% if form.birth_certificate.errors %}
+                                    <span class="error">{{ form.birth_certificate.errors }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="{{ form.address_proof.id_for_label }}">Address Proof</label>
+                                {{ form.address_proof }}
+                                {% if form.address_proof.errors %}
+                                    <span class="error">{{ form.address_proof.errors }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                        <a href="{% url 'core:online_admission' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>About Academia Admit</h5>
+                    <p>Academia Admit is your one-stop platform for seamless school and college admissions across India. We simplify the process, connecting students with top institutions.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'core:online_admission' %}" class="text-white">Online Admission</a></li>
+                        <li><a href="{% url 'core:clients' %}" class="text-white">Our Clients</a></li>
+                        <li><a href="{% url 'core:testimonials' %}" class="text-white">Testimonials</a></li>
+                        <li><a href="{% url 'core:contact' %}" class="text-white">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p><i class="bi bi-telephone"></i> +91-0000000000</p>
+                    <p><i class="bi bi-envelope"></i> info@academiaadmit.in</p>
+                    <p><i class="bi bi-geo-alt"></i> 123 Education Lane, Hyderabad, India</p>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <p>© 2025 Academia Admit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        :root {
+            --primary: #00C4B4;
+            --secondary: #FF007A;
+            --accent: #FFC107;
+            --highlight: #FF8C00;
+            --text: #2D2D2D;
+            --card-bg: #F5F7FA;
+            --border: #E0E0E0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .admission-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .admission-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .admission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 20px 30px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admission-header h3 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .admission-body {
+            padding: 30px;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .debug-section {
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--text);
+            width: 100%;
+            box-sizing: border-box;
+            min-width: 100%;
+            max-width: 100%;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 4px rgba(0,196,180,0.3);
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-top: 30px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--highlight);
+            border-color: var(--highlight);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            color: #fff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 40px 0;
+            margin-top: auto;
+        }
+
+        .footer h5 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .admission-container {
+                margin: 20px;
+                padding: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admission-body {
+                padding: 20px;
+            }
+
+            .admission-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+
+    <!-- Bootstrap JS (required for navbar) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

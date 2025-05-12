@@ -3,118 +3,374 @@
 {% block title %}Manage Applications - {{ college.college_name }}{% endblock %}
 
 {% block content %}
-    <style>
-        .accordion {
-            margin-top: 1rem;
+<style>
+    .applications-container {
+        max-width: 1200px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .applications-container .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
+    }
+
+    .applications-container .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .applications-container .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .applications-container .card-header h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .applications-container .card-body {
+        padding: 2rem;
+    }
+
+    .applications-container .alert {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        border: none;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .applications-container .alert-success {
+        background: #e6f4ea;
+        color: #2c6b40;
+    }
+
+    .applications-container .alert-danger {
+        background: #fee2e2;
+        color: #E74C3C;
+    }
+
+    .applications-container .accordion {
+        margin-top: 1.5rem;
+    }
+
+    .applications-container .accordion-item {
+        border: none;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background: #f9fafb;
+    }
+
+    .applications-container .accordion-header {
+        background: #ffffff;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .applications-container .accordion-header:hover {
+        background: #e6f0fa;
+    }
+
+    .applications-container .accordion-title {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2C3E50;
+    }
+
+    .applications-container .close-btn {
+        background: none;
+        border: none;
+        color: #E74C3C;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .applications-container .close-btn:hover {
+        color: #C0392B;
+    }
+
+    .applications-container .accordion-content {
+        padding: 1.5rem;
+        display: none;
+        background: #ffffff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .applications-container .accordion-content.active {
+        display: block;
+    }
+
+    .applications-container .table-section h4 {
+        margin-bottom: 1.5rem;
+        color: #2C3E50;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .applications-container .table {
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .applications-container .table thead {
+        background: #f9fafb;
+    }
+
+    .applications-container .table th {
+        font-weight: 600;
+        color: #2C3E50;
+        border-bottom: 2px solid #e0e0e0;
+        padding: 1rem;
+    }
+
+    .applications-container .table td {
+        vertical-align: middle;
+        font-size: 0.95rem;
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333333;
+    }
+
+    .applications-container .table tbody tr:hover {
+        background: #e6f0fa;
+    }
+
+    .applications-container .btn-approve {
+        background-color: #2ECC71;
+        border: none;
+        color: #ffffff;
+    }
+
+    .applications-container .btn-approve:hover {
+        background-color: #27AE60;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(46, 204, 113, 0.3);
+    }
+
+    .applications-container .btn-reject {
+        background-color: #E74C3C;
+        border: none;
+        color: #ffffff;
+    }
+
+    .applications-container .btn-reject:hover {
+        background-color: #C0392B;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .applications-container .btn-view {
+        background-color: #2C3E50;
+        border: none;
+        color: #ffffff;
+    }
+
+    .applications-container .btn-view:hover {
+        background-color: #3498DB;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .applications-container .btn-secondary {
+        background-color: #95A5A6;
+        border: none;
+        color: #ffffff;
+    }
+
+    .applications-container .btn-secondary:hover {
+        background-color: #7F8C8D;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .applications-container .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-right: 0.5rem;
+    }
+
+    .applications-container .status-approved {
+        color: #2ECC71;
+        font-weight: bold;
+    }
+
+    .applications-container .status-rejected {
+        color: #E74C3C;
+        font-weight: bold;
+    }
+
+    .applications-container .status-pending {
+        color: #F39C12;
+        font-weight: bold;
+    }
+
+    .applications-container .student-name {
+        color: #3498DB;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .applications-container .student-name:hover {
+        color: #2980B9;
+        text-decoration: underline;
+    }
+
+    .applications-container .form-control {
+        width: auto;
+        display: inline-block;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+        margin-right: 0.5rem;
+    }
+
+    .applications-container .form-control:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .applications-container p {
+        color: #666666;
+        font-size: 0.95rem;
+        text-align: center;
+        margin: 1.5rem 0;
+        font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+        .applications-container {
+            padding: 1rem 0.5rem;
         }
-        .accordion-item {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            margin-bottom: 1rem;
+
+        .applications-container .card-header h3 {
+            font-size: 1.5rem;
         }
-        .accordion-header {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+
+        .applications-container .card-body {
+            padding: 1.5rem;
         }
-        .accordion-header:hover {
-            background-color: #e9ecef;
+
+        .applications-container .table {
+            display: block;
+            overflow-x: auto;
         }
-        .accordion-title {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #1a2a6c;
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            color: #dc3545;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        .accordion-content {
-            padding: 1rem;
-            display: none;
-        }
-        .accordion-content.active {
+
+        .applications-container .table thead,
+        .applications-container .table tbody,
+        .applications-container .table th,
+        .applications-container .table td,
+        .applications-container .table tr {
             display: block;
         }
-        .table-section h4 {
+
+        .applications-container .table th,
+        .applications-container .table td {
+            min-width: 150px;
+            padding: 0.5rem;
+        }
+
+        .applications-container .table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .applications-container .table tr {
             margin-bottom: 1rem;
-            color: #1a2a6c;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        .btn-approve { background-color: #28a745; border-color: #28a745; }
-        .btn-reject { background-color: #dc3545; border-color: #dc3545; }
-        .btn-view { background-color: #007bff; border-color: #007bff; }
-        .btn-approve:hover, .btn-reject:hover, .btn-view:hover { opacity: 0.8; }
-        .status-approved { color: #28a745; font-weight: bold; }
-        .status-rejected { color: #dc3545; font-weight: bold; }
-        .status-pending { color: #ff9800; font-weight: bold; }
-        .student-name { color: #007bff; text-decoration: underline; }
 
-        /* Responsive Table Adjustments */
-        @media (max-width: 768px) {
-            .table {
-                display: block;
-                overflow-x: auto;
-            }
-            .table thead,
-            .table tbody,
-            .table th,
-            .table td,
-            .table tr {
-                display: block;
-            }
-            .table th,
-            .table td {
-                min-width: 150px;
-                padding: 0.5rem;
-            }
-            .table thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            .table tr {
-                margin-bottom: 1rem;
-                border: 1px solid #dee2e6;
-                border-radius: 5px;
-            }
-            .table td {
-                text-align: right;
-                position: relative;
-            }
-            .table td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 40%;
-                padding-left: 0.5rem;
-                font-weight: bold;
-                text-align: left;
-            }
-            .table td:nth-child(1)::before { content: "Admission ID"; }
-            .table td:nth-child(2)::before { content: "Name"; }
-            .table td:nth-child(3)::before { content: "Department"; }
-            .table td:nth-child(4)::before { content: "Section"; }
-            .table td:nth-child(5)::before { content: "Seat"; }
-            .table td:nth-child(6)::before { content: "Status"; }
-            .table td:nth-child(7)::before { content: "Apply Date"; }
-            .table td:nth-child(8)::before { content: "Actions"; }
-
-            .accordion-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .close-btn {
-                margin-top: 0.5rem;
-            }
+        .applications-container .table td {
+            text-align: right;
+            position: relative;
+            font-size: 0.9rem;
+            border: none;
         }
-    </style>
 
+        .applications-container .table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 40%;
+            padding-left: 0.5rem;
+            font-weight: 500;
+            color: #2C3E50;
+            text-align: left;
+        }
+
+        .applications-container .table td:nth-child(1)::before { content: "Admission ID"; }
+        .applications-container .table td:nth-child(2)::before { content: "Name"; }
+        .applications-container .table td:nth-child(3)::before { content: "Department"; }
+        .applications-container .table td:nth-child(4)::before { content: "Section"; }
+        .applications-container .table td:nth-child(5)::before { content: "Seat"; }
+        .applications-container .table td:nth-child(6)::before { content: "Status"; }
+        .applications-container .table td:nth-child(7)::before { content: "Apply Date"; }
+        .applications-container .table td:nth-child(8)::before { content: "Actions"; }
+
+        .applications-container .accordion-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .applications-container .accordion-title {
+            font-size: 1.1rem;
+        }
+
+        .applications-container .close-btn {
+            margin-top: 0.5rem;
+        }
+
+        .applications-container .btn-sm {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            margin-right: 0;
+        }
+
+        .applications-container .form-control {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
+<div class="applications-container">
     <div class="card">
         <div class="card-header">
             <h3 class="mb-0">Manage Applications - {{ college.college_name|default:"Unknown College" }}</h3>
@@ -324,93 +580,94 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function toggleAccordion(id) {
-            const content = document.getElementById(id);
-            content.classList.toggle('active');
-        }
+<script>
+    function toggleAccordion(id) {
+        const content = document.getElementById(id);
+        content.classList.toggle('active');
+    }
 
-        function closeAccordion(id, event) {
-            event.stopPropagation();
-            const content = document.getElementById(id);
-            content.classList.remove('active');
-        }
+    function closeAccordion(id, event) {
+        event.stopPropagation();
+        const content = document.getElementById(id);
+        content.classList.remove('active');
+    }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const forms = document.querySelectorAll('.action-form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const formData = new FormData(form);
-                    const actionButton = e.submitter;
-                    if (actionButton) {
-                        formData.append(actionButton.name, actionButton.value);
+    document.addEventListener('DOMContentLoaded', function () {
+        const forms = document.querySelectorAll('.action-form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const actionButton = e.submitter;
+                if (actionButton) {
+                    formData.append(actionButton.name, actionButton.value);
+                }
+                const row = form.closest('tr');
+                const cycleId = row.closest('.accordion-content').id.split('-')[1];
+                const pendingTable = document.querySelector(`#pending-table-${cycleId} tbody`);
+                fetch("{% url 'colleges:manage_applications' college_id=college.id %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken')
                     }
-                    const row = form.closest('tr');
-                    const cycleId = row.closest('.accordion-content').id.split('-')[1];
-                    const pendingTable = document.querySelector(`#pending-table-${cycleId} tbody`);
-                    fetch("{% url 'colleges:manage_applications' college_id=college.id %}", {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRFToken': getCookie('csrftoken')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const statusCell = row.querySelector('td:nth-child(6)');
-                            const seatCell = row.querySelector('td:nth-child(5)');
-                            statusCell.textContent = data.status;
-                            statusCell.className = `status-${data.status.toLowerCase()}`;
-                            seatCell.textContent = data.seat_number || 'Not Assigned';
-                            const newTableId = `${data.status.toLowerCase()}-table-${cycleId}`;
-                            const newTable = document.querySelector(`#${newTableId} tbody`);
-                            if (newTable) {
-                                pendingTable.removeChild(row); // Remove from pending table
-                                const newRow = row.cloneNode(true); // Clone the row
-                                // Update Admission ID in cloned row
-                                const admissionIdCell = newRow.querySelector('td:nth-child(1)');
-                                admissionIdCell.textContent = row.querySelector('td:nth-child(1)').textContent;
-                                // Remove the action form in the new row, keep view button
-                                const newActionsCell = newRow.querySelector('td:last-child');
-                                newActionsCell.innerHTML = `<a href="{% url 'colleges:view_application_details' college_id=college.id application_id=${row.dataset.applicationId}%" class="btn btn-view btn-sm">View Application</a>`;
-                                newTable.appendChild(newRow); // Add cloned row to new table
-                                // Show success alert without delay
-                                const alert = document.createElement('div');
-                                alert.className = 'alert alert-success';
-                                alert.textContent = `Application ${data.status.toLowerCase()}d successfully. Seat: ${data.seat_number || 'Not Assigned'}`;
-                                document.querySelector('.card-body').insertBefore(alert, document.querySelector('.accordion'));
-                                alert.remove(); // Remove immediately
-                            }
-                        } else {
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const statusCell = row.querySelector('td:nth-child(6)');
+                        const seatCell = row.querySelector('td:nth-child(5)');
+                        statusCell.textContent = data.status;
+                        statusCell.className = `status-${data.status.toLowerCase()}`;
+                        seatCell.textContent = data.seat_number || 'Not Assigned';
+                        const newTableId = `${data.status.toLowerCase()}-table-${cycleId}`;
+                        const newTable = document.querySelector(`#${newTableId} tbody`);
+                        if (newTable) {
+                            pendingTable.removeChild(row); // Remove from pending table
+                            const newRow = row.cloneNode(true); // Clone the row
+                            // Update Admission ID in cloned row
+                            const admissionIdCell = newRow.querySelector('td:nth-child(1)');
+                            admissionIdCell.textContent = row.querySelector('td:nth-child(1)').textContent;
+                            // Remove the action form in the new row, keep view button
+                            const newActionsCell = newRow.querySelector('td:last-child');
+                            newActionsCell.innerHTML = `<a href="{% url 'colleges:view_application_details' college_id=college.id application_id=${row.dataset.applicationId}%" class="btn btn-view btn-sm">View Application</a>`;
+                            newTable.appendChild(newRow); // Add cloned row to new table
+                            // Show success alert without delay
                             const alert = document.createElement('div');
-                            alert.className = 'alert alert-danger';
-                            alert.textContent = data.message;
+                            alert.className = 'alert alert-success';
+                            alert.textContent = `Application ${data.status.toLowerCase()}d successfully. Seat: ${data.seat_number || 'Not Assigned'}`;
                             document.querySelector('.card-body').insertBefore(alert, document.querySelector('.accordion'));
                             alert.remove(); // Remove immediately
                         }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
-                });
+                    } else {
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-danger';
+                        alert.textContent = data.message;
+                        document.querySelector('.card-body').insertBefore(alert, document.querySelector('.accordion'));
+                        alert.remove(); // Remove immediately
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
             });
+        });
 
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
                     }
                 }
-                return cookieValue;
             }
-        });
-    </script>
+            return cookieValue;
+        }
+    });
+</script>
 {% endblock %}

@@ -1,726 +1,274 @@
 {% extends 'schools/base.html' %}
+{% load static %}
 
-{% block title %}School Profile{% endblock %}
+{% block title %}School Profile - Academia Admit{% endblock %}
 
 {% block content %}
-    <style>
-        /* Form Styling */
-        .edit-form-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        .form-section h4 {
-            color: #1a2a6c;
-            margin-bottom: 20px;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        .form-group {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #1a2a6c;
-            margin-bottom: 8px;
-            display: block;
-            font-size: 1rem;
-        }
-        .form-control {
-            border: 2px solid #1a2a6c;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease;
-        }
-        .form-control:focus {
-            border-color: #b21f1f;
-            box-shadow: none;
-        }
-        /* Ensure all input types have the same width */
-        select.form-control,
-        textarea.form-control,
-        input[type="file"].form-control {
-            width: 100%;
-            box-sizing: border-box;
-        }
-        /* Style for textarea to match other inputs */
-        textarea.form-control {
-            resize: vertical;
-            min-height: 100px;
-        }
-        /* Style for file input */
-        input[type="file"].form-control {
-            padding: 5px;
-            height: auto;
-            line-height: normal;
-        }
-        /* Style for checkboxes */
-        .form-check {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-        .form-check-input {
-            border: 2px solid #1a2a6c;
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-        .form-check-input:checked {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-        }
-        .form-check-label {
-            font-size: 1rem;
-            color: #333;
-        }
-        .text-danger {
-            font-size: 0.875rem;
-            color: #b21f1f;
-        }
-        /* Profile Details Table Styling */
-        .profile-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            margin: 0 auto;
-        }
-        .profile-table th,
-        .profile-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            vertical-align: top;
-        }
-        .profile-table th {
-            background-color: #1a2a6c;
-            color: white;
-            font-weight: 600;
-        }
-        .profile-table td {
-            color: #333;
-        }
-        /* Two-column layout for larger screens */
-        @media (min-width: 768px) {
-            .profile-table th:nth-child(1),
-            .profile-table th:nth-child(3) {
-                width: 20%;
-            }
-            .profile-table td:nth-child(2),
-            .profile-table td:nth-child(4) {
-                width: 30%;
-            }
-            .profile-table th:nth-child(3),
-            .profile-table td:nth-child(4) {
-                border-left: 1px solid #ddd;
-            }
-        }
-        /* Stack vertically on smaller screens */
-        @media (max-width: 767px) {
-            .profile-table th,
-            .profile-table td {
-                display: block;
-                width: 100%;
-                text-align: left;
-            }
-            .profile-table th {
-                background-color: #1a2a6c;
-                color: white;
-            }
-            .profile-table td {
-                background-color: #f8f9fa;
-            }
-            .profile-table th:nth-child(3),
-            .profile-table td:nth-child(4) {
-                border-left: none;
-            }
-        }
-        /* Card Header */
-        .card-header {
-            background-color: #1a2a6c;
-            color: white;
-            padding: 15px 20px;
-        }
-        /* Buttons */
-        .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #5a6268;
-        }
-        /* Message Styling */
-        .messages {
-            margin: 20px 0;
-            padding: 0;
-            list-style: none;
-        }
-        .messages li {
-            padding: 10px 20px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .messages .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .messages .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        /* Responsive Adjustments for Form */
-        @media (min-width: 768px) {
-            .edit-form-container .row {
-                display: flex;
-                flex-wrap: wrap;
-                margin-left: -15px;
-                margin-right: -15px;
-            }
-            .edit-form-container .col-md-6 {
-                flex: 0 0 50%;
-                max-width: 50%;
-                padding-left: 15px;
-                padding-right: 15px;
-            }
-            .form-group {
-                max-width: 100%;
-            }
-            .form-control,
-            select.form-control,
-            textarea.form-control,
-            input[type="file"].form-control,
-            .form-check {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-        @media (max-width: 767px) {
-            .edit-form-container .col-md-6 {
-                flex: 0 0 100%;
-                max-width: 100%;
-                padding-left: 15px;
-                padding-right: 15px;
-            }
-            .form-group {
-                max-width: 100%;
-            }
-            .form-control,
-            select.form-control,
-            textarea.form-control,
-            input[type="file"].form-control,
-            .form-check {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-    </style>
-
-    <!-- <h1 class="mb-4">School Profile</h1> -->
-
-    <!-- Display messages -->
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <div class="card" style="margin-top: 50px;"> 
-        <div class="card-header">
-            <h3 class="mb-0">
-                {% if show_form %}
-                    {% if school_profile %}
-                        Edit Profile
-                    {% else %}
-                        Create Profile
-                    {% endif %}
+<div class="school-profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            {% if school_profile and school_profile.logo %}
+                <img src="{{ school_profile.logo.url }}" alt="{{ school_profile.school_name }} Logo">
                 {% else %}
-                    Profile Details
-                {% endif %}
-            </h3>
+                <img src="{% static 'images/default-logo.png' %}" alt="Default Logo">
+            {% endif %}
+            <h2>{% if school_profile %}{{ school_profile.school_name }}{% else %}School Profile{% endif %}</h2>
         </div>
-        <div class="card-body">
-            {% if show_form %}
-                <!-- Show the form if no profile exists or in edit mode -->
-                <div class="edit-form-container">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="hidden" name="form_type" value="profile">
-                        <!-- Basic Information -->
-                        <div class="form-section">
-                            <h4>Basic Information</h4>
-                            <div class="row">
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.school_name.id_for_label }}" class="form-label">{{ form.school_name.label }}</label>
-                                    {{ form.school_name }}
-                                    {% if form.school_name.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.school_name.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.principal_name.id_for_label }}" class="form-label">{{ form.principal_name.label }}</label>
-                                    {{ form.principal_name }}
-                                    {% if form.principal_name.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.principal_name.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.established_year.id_for_label }}" class="form-label">{{ form.established_year.label }}</label>
-                                    {{ form.established_year }}
-                                    {% if form.established_year.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.established_year.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.website.id_for_label }}" class="form-label">{{ form.website.label }}</label>
-                                    {{ form.website }}
-                                    {% if form.website.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.website.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+        <div class="profile-details">
+            {% if school_profile %}
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-school"></i> School Information</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Principal:</strong> {{ school_profile.principal_name|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Type:</strong> {{ school_profile.school_type|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Board:</strong> {{ school_profile.board_affiliation|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Medium:</strong> {{ school_profile.medium_of_instruction|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Established:</strong> {{ school_profile.established_year|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Students:</strong> {{ school_profile.total_students|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Teachers:</strong> {{ school_profile.total_teachers|default:"N/A" }}</div>
+                        <div class="info-item"><strong>School Code:</strong> {{ school_profile.school_code|default:"N/A" }}</div>
+                    </div>
+                </div>
 
-                        <!-- Address Information -->
-                        <div class="form-section">
-                            <h4>Address Information</h4>
-                            <div class="row">
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.street_address.id_for_label }}" class="form-label">{{ form.street_address.label }}</label>
-                                    {{ form.street_address }}
-                                    {% if form.street_address.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.street_address.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.landmark.id_for_label }}" class="form-label">{{ form.landmark.label }}</label>
-                                    {{ form.landmark }}
-                                    {% if form.landmark.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.landmark.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
-                                    {{ form.city }}
-                                    {% if form.city.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.city.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.district.id_for_label }}" class="form-label">{{ form.district.label }}</label>
-                                    {{ form.district }}
-                                    {% if form.district.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.district.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.state.id_for_label }}" class="form-label">{{ form.state.label }}</label>
-                                    {{ form.state }}
-                                    {% if form.state.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.state.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.pincode.id_for_label }}" class="form-label">{{ form.pincode.label }}</label>
-                                    {{ form.pincode }}
-                                    {% if form.pincode.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.pincode.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.country.id_for_label }}" class="form-label">{{ form.country.label }}</label>
-                                    {{ form.country }}
-                                    {% if form.country.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.country.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-phone"></i> Contact Details</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Phone:</strong> {{ school_profile.contact_phone|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Alternate Phone:</strong> {{ school_profile.alternate_phone_number|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Email:</strong> {{ school_profile.contact_email|default:"N/A" }}</div>
+                        {% if school_profile.website %}
+                            <div class="info-item"><strong>Website:</strong> <a href="{{ school_profile.website }}" class="text-accent">{{ school_profile.website }}</a></div>
+                        {% endif %}
+                    </div>
+                </div>
 
-                        <!-- Contact Information -->
-                        <div class="form-section">
-                            <h4>Contact Information</h4>
-                            <div class="row">
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.contact_email.id_for_label }}" class="form-label">{{ form.contact_email.label }}</label>
-                                    {{ form.contact_email }}
-                                    {% if form.contact_email.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.contact_email.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.contact_phone.id_for_label }}" class="form-label">{{ form.contact_phone.label }}</label>
-                                    {{ form.contact_phone }}
-                                    {% if form.contact_phone.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.contact_phone.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-map-marker-alt"></i> Address</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Address:</strong>
+                            {{ school_profile.street_address|default:"" }}
+                            {% if school_profile.city %}, {{ school_profile.city }}{% endif %}
+                            {% if school_profile.state %}, {{ school_profile.state }}{% endif %}
+                            {% if school_profile.pincode %}- {{ school_profile.pincode }}{% endif %}
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Academic Information -->
-                        <div class="form-section">
-                            <h4>Academic Information</h4>
-                            <div class="row">
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.total_students.id_for_label }}" class="form-label">{{ form.total_students.label }}</label>
-                                    {{ form.total_students }}
-                                    {% if form.total_students.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.total_students.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.total_teachers.id_for_label }}" class="form-label">{{ form.total_teachers.label }}</label>
-                                    {{ form.total_teachers }}
-                                    {% if form.total_teachers.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.total_teachers.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.start_grade.id_for_label }}" class="form-label">{{ form.start_grade.label }}</label>
-                                    {{ form.start_grade }}
-                                    {% if form.start_grade.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.start_grade.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.end_grade.id_for_label }}" class="form-label">{{ form.end_grade.label }}</label>
-                                    {{ form.end_grade }}
-                                    {% if form.end_grade.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.end_grade.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.school_type.id_for_label }}" class="form-label">{{ form.school_type.label }}</label>
-                                    {{ form.school_type }}
-                                    {% if form.school_type.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.school_type.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.medium_of_instruction.id_for_label }}" class="form-label">{{ form.medium_of_instruction.label }}</label>
-                                    {{ form.medium_of_instruction }}
-                                    {% if form.medium_of_instruction.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.medium_of_instruction.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.is_co_education.id_for_label }}" class="form-label">{{ form.is_co_education.label }}</label>
-                                    <div class="form-check">
-                                        {{ form.is_co_education }}
-                                        <label class="form-check-label" for="{{ form.is_co_education.id_for_label }}">Is Co-Education</label>
-                                    </div>
-                                    {% if form.is_co_education.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.is_co_education.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Additional Information -->
-                        <div class="form-section">
-                            <h4>Additional Information</h4>
-                            <div class="row">
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.accreditation.id_for_label }}" class="form-label">{{ form.accreditation.label }}</label>
-                                    {{ form.accreditation }}
-                                    {% if form.accreditation.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.accreditation.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.affiliation_number.id_for_label }}" class="form-label">{{ form.affiliation_number.label }}</label>
-                                    {{ form.affiliation_number }}
-                                    {% if form.affiliation_number.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.affiliation_number.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.facilities.id_for_label }}" class="form-label">{{ form.facilities.label }}</label>
-                                    {{ form.facilities }}
-                                    {% if form.facilities.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.facilities.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.has_transport.id_for_label }}" class="form-label">{{ form.has_transport.label }}</label>
-                                    <div class="form-check">
-                                        {{ form.has_transport }}
-                                        <label class="form-check-label" for="{{ form.has_transport.id_for_label }}">Has Transport</label>
-                                    </div>
-                                    {% if form.has_transport.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.has_transport.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.school_motto.id_for_label }}" class="form-label">{{ form.school_motto.label }}</label>
-                                    {{ form.school_motto }}
-                                    {% if form.school_motto.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.school_motto.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="{{ form.profile_pic.id_for_label }}" class="form-label">{{ form.profile_pic.label }}</label>
-                                    {{ form.profile_pic }}
-                                    {% if form.profile_pic.errors %}
-                                        <div class="text-danger">
-                                            {% for error in form.profile_pic.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    {% if school_profile.profile_pic %}
-                                        <div class="mt-2">
-                                            <p>Current Profile Picture:</p>
-                                            <img src="{{ school_profile.profile_pic.url }}" alt="Current Profile Picture" style="max-width: 150px; border-radius: 5px;">
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Form Buttons -->
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">Save Profile</button>
-                            <a href="{% url 'schools:school_profile' %}" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-file"></i> Documents</h5>
+                    <div class="info-grid">
+                        {% if school_profile.affiliation_certificate %}
+                            <div class="info-item"><strong>Affiliation Cert:</strong> <a href="{{ school_profile.affiliation_certificate.url }}" class="text-accent">View</a></div>
+                        {% else %}
+                            <div class="info-item"><strong>Affiliation Cert:</strong> N/A</div>
+                        {% endif %}
+                        {% if school_profile.brochure %}
+                            <div class="info-item"><strong>Brochure:</strong> <a href="{{ school_profile.brochure.url }}" class="text-accent">View</a></div>
+                        {% else %}
+                            <div class="info-item"><strong>Brochure:</strong> N/A</div>
+                        {% endif %}
+                    </div>
                 </div>
             {% else %}
-                <!-- Show profile details if a profile exists and not in edit mode -->
-                {% if school_profile %}
-                    <table class="profile-table">
-                        <!-- Row 1: School Name + Principal Name -->
-                        <tr>
-                            <th>School Name</th>
-                            <td>{{ school_profile.school_name|default:"Not specified" }}</td>
-                            <th>Principal Name</th>
-                            <td>{{ school_profile.principal_name|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 2: Established Year + Website -->
-                        <tr>
-                            <th>Established Year</th>
-                            <td>{{ school_profile.established_year|default:"Not specified" }}</td>
-                            <th>Website</th>
-                            <td>{{ school_profile.website|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 3: Address + Contact Email -->
-                        <tr>
-                            <th>Address</th>
-                            <td>
-                                {% with address_parts=school_profile.street_address|add:", "|add:school_profile.landmark|add:", "|add:school_profile.city|add:", "|add:school_profile.district|add:", "|add:school_profile.state|add:", "|add:school_profile.pincode|add:", "|add:school_profile.country %}
-                                    {{ address_parts|default:"Not specified" }}
-                                {% endwith %}
-                            </td>
-                            <th>Contact Email</th>
-                            <td>{{ school_profile.contact_email|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 4: Contact Phone + Total Students -->
-                        <tr>
-                            <th>Contact Phone</th>
-                            <td>{{ school_profile.contact_phone|default:"Not specified" }}</td>
-                            <th>Total Students</th>
-                            <td>{{ school_profile.total_students|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 5: Total Teachers + Grades Offered -->
-                        <tr>
-                            <th>Total Teachers</th>
-                            <td>{{ school_profile.total_teachers|default:"Not specified" }}</td>
-                            <th>Grades Offered</th>
-                            <td>
-                                {% if school_profile.start_grade and school_profile.end_grade %}
-                                    {{ school_profile.start_grade }} - {{ school_profile.end_grade }}
-                                {% else %}
-                                    Not specified
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <!-- Row 6: School Type + Medium of Instruction -->
-                        <tr>
-                            <th>School Type</th>
-                            <td>{{ school_profile.school_type|default:"Not specified" }}</td>
-                            <th>Medium of Instruction</th>
-                            <td>{{ school_profile.medium_of_instruction|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 7: Is Co-Education + Accreditation -->
-                        <tr>
-                            <th>Is Co-Education</th>
-                            <td>{{ school_profile.is_co_education|yesno:"Yes,No" }}</td>
-                            <th>Accreditation</th>
-                            <td>{{ school_profile.accreditation|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 8: Affiliation Number + Facilities -->
-                        <tr>
-                            <th>Affiliation Number</th>
-                            <td>{{ school_profile.affiliation_number|default:"Not specified" }}</td>
-                            <th>Facilities</th>
-                            <td>{{ school_profile.facilities|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 9: Transport Availability + School Motto -->
-                        <tr>
-                            <th>Transport Availability</th>
-                            <td>{{ school_profile.has_transport|yesno:"Yes,No" }}</td>
-                            <th>School Motto</th>
-                            <td>{{ school_profile.school_motto|default:"Not specified" }}</td>
-                        </tr>
-                        <!-- Row 10: Profile Picture (single field) -->
-                        <tr>
-                            <th>Profile Picture</th>
-                            <td>
-                                {% if school_profile.profile_pic %}
-                                    <img src="{{ school_profile.profile_pic.url }}" alt="Profile Picture" style="max-width: 150px; border-radius: 5px;">
-                                {% else %}
-                                    Not uploaded
-                                {% endif %}
-                            </td>
-                            <th></th>
-                            <td></td>
-                        </tr>
-                    </table>
-                    <a href="{% url 'schools:school_profile' %}?edit=true" class="btn btn-primary mt-3">Edit Profile</a>
-
-                    <!-- Include the rating section -->
-                    {% include 'schools/_rating.html' %}
-
-
-                    {% if school_profile %}
-        {% include 'schools/gallery.html' %}
-        {% include 'schools/testimonial.html' %}
-    {% endif %}
-                {% else %}
-                    <p>No profile found. Please create a profile.</p>
-                    <a href="{% url 'schools:school_profile' %}?edit=true" class="btn btn-primary mt-3">Create Profile</a>
-                {% endif %}
+                <div class="empty-message">No school profile data available.</div>
             {% endif %}
         </div>
+        <div class="action-buttons">
+            <a href="{% url 'schools:edit_school_profile' %}" class="btn btn-edit">Edit Profile</a>
+        </div>
     </div>
+</div>
+
+<style>
+    .school-profile-container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    .profile-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .profile-header img {
+        max-width: 100px;
+        border-radius: 8px;
+        border: 2px solid #ffffff;
+        margin-bottom: 1rem;
+    }
+
+    .profile-header h2 {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .profile-details {
+        padding: 1.5rem 2rem;
+    }
+
+    .section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        color: #2C3E50;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title i {
+        color: #E67E22;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem 1.5rem;
+    }
+
+    .info-item {
+        font-size: 0.95rem;
+        color: #333333;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .info-item strong {
+        color: #2C3E50;
+        font-weight: 600;
+        min-width: 120px;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: #666666;
+        font-style: italic;
+        padding: 2rem;
+        font-size: 1rem;
+    }
+
+    .action-buttons {
+        padding: 1.5rem;
+        background-color: #f9fafb;
+        text-align: center;
+    }
+
+    .btn-edit {
+        background-color: #3498DB;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-edit:hover {
+        background-color: #2980B9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .text-accent {
+        color: #E67E22;
+        transition: all 0.3s ease;
+    }
+
+    .text-accent:hover {
+        color: #F39C12;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .school-profile-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .profile-details {
+            padding: 1rem 1.5rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .info-item {
+            font-size: 0.9rem;
+        }
+
+        .profile-header img {
+            max-width: 80px;
+        }
+
+        .profile-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .profile-details {
+            padding: 0.8rem 1rem;
+        }
+
+        .info-item {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-item strong {
+            min-width: auto;
+        }
+
+        .profile-header h2 {
+            font-size: 1.3rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .btn-edit {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
 {% endblock %}

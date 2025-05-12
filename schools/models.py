@@ -1,46 +1,43 @@
 from django.db import models
-from core.models import User  # Using your custom User model
+from core.models import User
 
-# School Profile Model (Unchanged)
 class SchoolProfile(models.Model):
-    SCHOOL_TYPE_CHOICES = (
-        ('public', 'Public'),
-        ('private', 'Private'),
-        ('international', 'International'),
-    )
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school_profile')
     school_name = models.CharField(max_length=255)
-    street_address = models.CharField(max_length=255, blank=True, null=True)
-    landmark = models.CharField(max_length=100, blank=True, null=True)
-    city = models.CharField(max_length=100, blank=True, null=True)
+    principal_name = models.CharField(max_length=100)
+    contact_phone = models.CharField(max_length=15)
+    alternate_phone_number = models.CharField(max_length=15, blank=True, null=True)
+    contact_email = models.EmailField()
+    school_type = models.CharField(
+        max_length=50,
+        choices=[('Private', 'Private'), ('Public', 'Public'), ('Government Aided', 'Government Aided')]
+    )
+    board_affiliation = models.CharField(
+        max_length=50,
+        choices=[('CBSE', 'CBSE'), ('ICSE', 'ICSE'), ('State Board', 'State Board'), ('IB', 'IB'), ('Other', 'Other')]
+    )
+    medium_of_instruction = models.CharField(
+        max_length=50,
+        choices=[('English', 'English'), ('Telugu', 'Telugu'), ('Hindi', 'Hindi'), ('Other', 'Other')]
+    )
+    established_year = models.IntegerField()
+    total_students = models.IntegerField()
+    total_teachers = models.IntegerField()
+    school_code = models.CharField(max_length=50, blank=True, null=True)
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
     district = models.CharField(max_length=100, blank=True, null=True)
-    state = models.CharField(max_length=100, blank=True, null=True)
-    pincode = models.CharField(max_length=10, blank=True, null=True)
-    country = models.CharField(max_length=100, default="India", blank=True, null=True)
-    contact_email = models.EmailField(blank=True, null=True)
-    contact_phone = models.CharField(max_length=15, blank=True, null=True)
-    principal_name = models.CharField(max_length=100, blank=True, null=True)
-    accreditation = models.CharField(max_length=100, blank=True, null=True)
-    established_year = models.PositiveIntegerField(blank=True, null=True)
+    pincode = models.CharField(max_length=10)
     website = models.URLField(blank=True, null=True)
-    total_students = models.PositiveIntegerField(blank=True, null=True)
-    total_teachers = models.PositiveIntegerField(blank=True, null=True)
-    profile_pic = models.ImageField(upload_to='school_profiles/', blank=True, null=True)
-    school_type = models.CharField(max_length=20, choices=SCHOOL_TYPE_CHOICES, blank=True, null=True)
-    medium_of_instruction = models.CharField(max_length=50, blank=True, null=True)
-    start_grade = models.PositiveIntegerField(blank=True, null=True)
-    end_grade = models.PositiveIntegerField(blank=True, null=True)
-    is_co_education = models.BooleanField(default=True)
-    facilities = models.TextField(blank=True, null=True)
-    has_transport = models.BooleanField(default=False)
-    school_motto = models.CharField(max_length=255, blank=True, null=True)
-    affiliation_number = models.CharField(max_length=50, blank=True, null=True)
+    logo = models.ImageField(upload_to='school_logos/', blank=True, null=True)
+    affiliation_certificate = models.FileField(upload_to='school_certificates/', blank=True, null=True)
+    brochure = models.FileField(upload_to='school_brochures/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profile for {self.school_name}"
+        return self.school_name
 
 # Admission Cycle Model (Added)
 # schools/models.py
@@ -220,6 +217,8 @@ class Admission(models.Model):
     transfer_certificate = models.FileField(upload_to='documents/%Y/%m/%d/')
     passport_photo = models.FileField(upload_to='documents/%Y/%m/%d/')
     address_proof = models.FileField(upload_to='documents/%Y/%m/%d/')
+
+    
 
     def save(self, *args, **kwargs):
         if not self.pk:

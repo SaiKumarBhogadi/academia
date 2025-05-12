@@ -1,0 +1,103 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Update College Account Details{% endblock %}
+
+{% block content %}
+    <!-- Update College Details Form -->
+    <div class="d-flex align-items-center justify-content-center min-vh-100" style="background-color: #f9fafb; padding: 2rem 1rem;">
+        <div class="col-12 col-md-6 bg-white rounded-3 shadow" style="padding: 2rem;">
+            <h3 class="mb-4 border-bottom pb-3 d-flex align-items-center" style="color: #2C3E50;">
+                <svg class="me-2" style="width: 1.5rem; height: 1.5rem; color: #3498DB;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z"></path>
+                </svg>
+                Update College Account Details
+            </h3>
+
+            <!-- Form -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-container">
+                    {% for field in form %}
+                        <div class="field-container">
+                            <label for="{{ field.id_for_label }}" class="d-block" style="color: #333333;">{{ field.label }}</label>
+                            {% if field.name == "password" or field.name == "confirm_password" %}
+                                <div class="position-relative">
+                                    {{ field }}
+                                    <p class="mt-1" style="color: #666666;">Leave blank to keep the current password.</p>
+                                </div>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                            {% if field.errors %}
+                                <p class="mt-1" style="color: #e74c3c;">{{ field.errors }}</p>
+                            {% endif %}
+                            {% if field.help_text %}
+                                <p class="mt-1" style="color: #666666;">{{ field.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a href="{% url 'colleges:college_profile' %}" class="btn btn-light border" style="transition: all 0.15s ease;">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary d-flex align-items-center" style="background-color: #3498DB; border-color: #3498DB; transition: all 0.15s ease;">
+                        <svg class="me-2" style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Styles -->
+    <style>
+        .form-container > * {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-container .field-container > * {
+            margin-bottom: 0.25rem;
+        }
+
+        .form-control, select, textarea, input[type="text"], input[type="email"], input[type="number"], input[type="url"], input[type="date"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, select:focus, textarea:focus, input:focus {
+            border-color: #3498DB;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn-light:hover {
+            background-color: #f3f4f6;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980B9;
+            border-color: #2980B9;
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-1 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}

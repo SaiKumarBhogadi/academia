@@ -4,18 +4,28 @@
 
 {% block content %}
     <!-- Add User Form -->
-    <div class="mt-4">
+    <div class="container mt-4">
         <h3>Add New User</h3>
         <div class="card">
             <div class="card-body">
-                <form method="post" class="add-user-form">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="form-buttons">
-                        <button type="submit" class="btn btn-primary">Add User</button>
-                        <a href="{% url 'super_admin:dashboard' %}" class="btn btn-secondary">Cancel</a>
-                    </div>
+                <!-- User Type Selection Form -->
+                <form method="get" id="user-type-form" class="mb-4">
+                    {{ user_type_form.as_p }}
                 </form>
+
+                <!-- Registration Form (based on user type) -->
+                {% if selected_user_type and registration_form %}
+                    <form method="post" enctype="multipart/form-data" class="add-user-form">
+                        {% csrf_token %}
+                        <!-- Hidden input to preserve user_type in POST -->
+                        <input type="hidden" name="user_type" value="{{ selected_user_type }}">
+                        {{ registration_form.as_p }}
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary">Add User</button>
+                            <a href="{% url 'super_admin:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -24,16 +34,16 @@
     <style>
         /* Ensure the form container has proper spacing */
         .add-user-form {
-            max-width: 600px; /* Limit form width for better readability */
+            max-width: 800px; /* Increased width to accommodate more fields */
             margin: 0 auto; /* Center the form */
         }
 
         /* Style form fields */
-        .add-user-form p {
+        .add-user-form p, #user-type-form p {
             margin-bottom: 20px; /* Space between form fields */
         }
 
-        .add-user-form label {
+        .add-user-form label, #user-type-form label {
             display: block;
             font-weight: 600;
             color: #1a2a6c; /* Theme blue for labels */
@@ -41,7 +51,9 @@
         }
 
         .add-user-form input,
-        .add-user-form select {
+        .add-user-form select,
+        .add-user-form textarea,
+        #user-type-form select {
             width: 100%;
             padding: 10px 15px;
             border: 2px solid #1a2a6c; /* Theme blue border */
@@ -50,8 +62,14 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
+        .add-user-form textarea {
+            border-radius: 15px; /* Slightly less rounded for textareas */
+        }
+
         .add-user-form input:focus,
-        .add-user-form select:focus {
+        .add-user-form select:focus,
+        .add-user-form textarea:focus,
+        #user-type-form select:focus {
             border-color: #b21f1f; /* Theme red on focus */
             box-shadow: 0 0 5px rgba(178, 31, 31, 0.3); /* Subtle glow on focus */
             outline: none;
@@ -121,4 +139,51 @@
             }
         }
     </style>
+
+    <!-- JavaScript for dynamic user type selection and state-district dependency -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle user type selection
+            const userTypeSelect = document.getElementById('id_user_type');
+            userTypeSelect.addEventListener('change', function() {
+                if (this.value) {
+                    window.location.href = `?user_type=${this.value}`;
+                }
+            });
+
+            // Handle state-district dependency (if a registration form is present)
+            const stateSelect = document.getElementById('id_state');
+            const districtSelect = document.getElementById('id_district');
+            if (stateSelect && districtSelect) {
+                const statesDistricts = {{ states_districts|safe }};
+
+                stateSelect.addEventListener('change', function() {
+                    const state = this.value;
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
+                    if (state && statesDistricts[state]) {
+                        statesDistricts[state].forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district;
+                            option.textContent = district;
+                            districtSelect.appendChild(option);
+                        });
+                    }
+                });
+
+                // Trigger change event on page load to populate districts if a state is pre-selected
+                const initialState = stateSelect.value;
+                if (initialState) {
+                    const event = new Event('change');
+                    stateSelect.dispatchEvent(event);
+                }
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block extra_context %}
+    <!-- Pass STATES_DISTRICTS to JavaScript -->
+    <script type="text/javascript">
+        const statesDistricts = {{ states_districts|safe }};
+    </script>
 {% endblock %}

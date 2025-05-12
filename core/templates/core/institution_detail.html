@@ -1,0 +1,371 @@
+
+<!-- Hero Section -->
+<section class="hero-section py-5 text-white" style="background: linear-gradient(135deg, #1a3c34 0%, #2e5a52 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center">
+                {% if institution_type == 'College' and institution.profile_pic %}
+                    <img src="{{ institution.profile_pic.url }}" class="img-fluid rounded-circle shadow-lg" alt="{{ institution.college_name }} Logo" style="max-height: 150px;">
+                {% elif institution_type == 'School' and institution.logo %}
+                    <img src="{{ institution.logo.url }}" class="img-fluid rounded-circle shadow-lg" alt="{{ institution.school_name }} Logo" style="max-height: 150px;">
+                {% else %}
+                    <div class="placeholder-img rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; background-color: #e9ecef;">
+                        <i class="{% if institution_type == 'College' %}fas fa-university{% else %}fas fa-school{% endif %} fa-3x text-muted"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                <h1 class="fw-bold mb-2">
+                    {% if institution_type == 'College' %}
+                        {{ institution.college_name }}
+                    {% else %}
+                        {{ institution.school_name }}
+                    {% endif %}
+                </h1>
+                <p class="lead mb-3">
+                    {% if institution_type == 'College' %}
+                        {{ institution.college_type }} College | Affiliated to {{ institution.affiliation }}
+                    {% else %}
+                        {{ institution.school_type }} School | Affiliated to {{ institution.board_affiliation }}
+                    {% endif %}
+                </p>
+                <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ institution.street_address }}, {{ institution.city }}, {{ institution.state }} - {{ institution.pincode }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="content-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-3 sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-4 text-primary">Quick Info</h5>
+                        <p><i class="fas fa-phone-alt me-2 text-primary"></i><strong>Contact:</strong> {{ institution.contact_phone }}{% if institution.alternate_phone_number %}, {{ institution.alternate_phone_number }}{% endif %}</p>
+                        <p><i class="fas fa-envelope me-2 text-primary"></i><strong>Email:</strong> <a href="mailto:{{ institution.contact_email }}">{{ institution.contact_email }}</a></p>
+                        {% if institution.website %}
+                        <p><i class="fas fa-globe me-2 text-primary"></i><strong>Website:</strong> <a href="{{ institution.website }}" target="_blank">{{ institution.website }}</a></p>
+                        {% endif %}
+                        <p><i class="fas fa-calendar-alt me-2 text-primary"></i><strong>Established:</strong> {{ institution.established_year }}</p>
+                        {% if institution_type == 'College' and institution.accreditation %}
+                        <p><i class="fas fa-certificate me-2 text-primary"></i><strong>Accreditation:</strong> {{ institution.accreditation }}</p>
+                        {% endif %}
+                        <p><i class="fas fa-language me-2 text-primary"></i><strong>Medium:</strong> {{ institution.medium_of_instruction }}</p>
+                        <div class="mt-4">
+                            <a href="{% url 'core:view_all_schools' %}?institution_type={{ institution_type }}" class="btn btn-outline-primary w-100">Back to List</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Details -->
+            <div class="col-md-8">
+                <!-- Accordion for Sections -->
+                <div class="accordion" id="institutionAccordion">
+                    <!-- General Information -->
+                    <div class="accordion-item shadow-sm border-0 rounded-3 mb-3">
+                        <h2 class="accordion-header" id="headingGeneral">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral" aria-expanded="true" aria-controls="collapseGeneral">
+                                General Information
+                            </button>
+                        </h2>
+                        <div id="collapseGeneral" class="accordion-collapse collapse show" aria-labelledby="headingGeneral" data-bs-parent="#institutionAccordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Principal:</strong> {{ institution.principal_name }}</p>
+                                        {% if institution_type == 'College' %}
+                                        <p><strong>College Code:</strong> {{ institution.college_code|default:"N/A" }}</p>
+                                        {% else %}
+                                        <p><strong>School Code:</strong> {{ institution.school_code|default:"N/A" }}</p>
+                                        {% endif %}
+                                        <p><strong>Total Students:</strong> {{ institution.total_students }}</p>
+                                        {% if institution_type == 'College' %}
+                                        <p><strong>Total Faculty:</strong> {{ institution.total_faculty }}</p>
+                                        {% else %}
+                                        <p><strong>Total Teachers:</strong> {{ institution.total_teachers }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Address:</strong> {{ institution.street_address }}, {{ institution.city }}{% if institution.district %}, {{ institution.district }}{% endif %}, {{ institution.state }} - {{ institution.pincode }}</p>
+                                        {% if institution.brochure %}
+                                        <p><strong>Brochure:</strong> <a href="{{ institution.brochure.url }}" target="_blank" class="text-primary">Download</a></p>
+                                        {% endif %}
+                                        {% if institution_type == 'College' and institution.accreditation_certificate %}
+                                        <p><strong>Accreditation Certificate:</strong> <a href="{{ institution.accreditation_certificate.url }}" target="_blank" class="text-primary">Download</a></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academics -->
+                    <div class="accordion-item shadow-sm border-0 rounded-3 mb-3">
+                        <h2 class="accordion-header" id="headingAcademics">
+                            <button class="accordion-button fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAcademics" aria-expanded="false" aria-controls="collapseAcademics">
+                                Academics
+                            </button>
+                        </h2>
+                        <div id="collapseAcademics" class="accordion-collapse collapse" aria-labelledby="headingAcademics" data-bs-parent="#institutionAccordion">
+                            <div class="accordion-body">
+                                {% if institution_type == 'College' %}
+                                    {% if institution.courses_offered %}
+                                    <p><strong>Courses Offered:</strong> {{ institution.courses_offered }}</p>
+                                    {% endif %}
+                                    {% if institution.streams_available %}
+                                    <p><strong>Streams Available:</strong> {{ institution.streams_available }}</p>
+                                    {% endif %}
+                                    {% if admission_cycles %}
+                                    <h6 class="fw-bold mt-4">Admission Cycles</h6>
+                                    <ul>
+                                        {% for cycle in admission_cycles %}
+                                        <li>{{ cycle.year }} ({{ cycle.start_date }} to {{ cycle.end_date }}) - {% if cycle.is_active %}Active{% else %}Inactive{% endif %}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                    {% if degrees %}
+                                    <h6 class="fw-bold mt-4">Degrees Offered</h6>
+                                    <ul>
+                                        {% for degree in degrees %}
+                                        <li>{{ degree.name }} (Duration: {{ degree.duration }}) - Cycle: {{ degree.cycle.year }}</li>
+                                        {% if degree.eligibility_criteria %}
+                                        <p class="ms-4"><strong>Eligibility:</strong> {{ degree.eligibility_criteria }}</p>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                    {% if departments %}
+                                    <h6 class="fw-bold mt-4">Departments</h6>
+                                    <ul>
+                                        {% for dept in departments %}
+                                        <li>
+                                            {{ dept.name }} (Degree: {{ dept.degree.name }})
+                                            <ul>
+                                                <li><strong>HOD:</strong> {{ dept.hod_name|default:"N/A" }}</li>
+                                                <li><strong>Faculty Count:</strong> {{ dept.faculty_count }}</li>
+                                                {% if dept.labs %}
+                                                <li><strong>Labs:</strong> {{ dept.labs }}</li>
+                                                {% endif %}
+                                                <li><strong>Fees per Year:</strong> ₹{{ dept.fees_per_year }}</li>
+                                                <li><strong>Total Seats:</strong> {{ dept.total_seats }}</li>
+                                            </ul>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                {% else %}
+                                    {% if admission_cycles %}
+                                    <h6 class="fw-bold mt-4">Admission Cycles</h6>
+                                    <ul>
+                                        {% for cycle in admission_cycles %}
+                                        <li>{{ cycle.year }} ({{ cycle.start_date }} to {{ cycle.end_date }}) - {% if cycle.is_active %}Active{% else %}Inactive{% endif %}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                    {% if classes %}
+                                    <h6 class="fw-bold mt-4">Classes Offered</h6>
+                                    <ul>
+                                        {% for school_class in classes %}
+                                        <li>{{ school_class.grade }} (Sections: {{ school_class.total_sections }})</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facilities -->
+                    <div class="accordion-item shadow-sm border-0 rounded-3 mb-3">
+                        <h2 class="accordion-header" id="headingFacilities">
+                            <button class="accordion-button fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFacilities" aria-expanded="false" aria-controls="collapseFacilities">
+                                Facilities
+                            </button>
+                        </h2>
+                        <div id="collapseFacilities" class="accordion-collapse collapse" aria-labelledby="headingFacilities" data-bs-parent="#institutionAccordion">
+                            <div class="accordion-body">
+                                {% if institution_type == 'College' %}
+                                    <p><strong>Hostel Availability:</strong> {% if institution.hostel_availability %}Yes{% else %}No{% endif %}</p>
+                                    {% if institution.hostel_availability %}
+                                    <p><strong>Hostel Capacity (Boys):</strong> {{ institution.hostel_capacity_boys|default:"N/A" }}</p>
+                                    <p><strong>Hostel Capacity (Girls):</strong> {{ institution.hostel_capacity_girls|default:"N/A" }}</p>
+                                    {% endif %}
+                                    <p><strong>Library:</strong> {% if institution.library %}Yes{% else %}No{% endif %}</p>
+                                    {% if institution.library %}
+                                    <p><strong>Library Books Count:</strong> {{ institution.library_books_count|default:"N/A" }}</p>
+                                    {% endif %}
+                                    {% if institution.labs %}
+                                    <p><strong>Labs:</strong> {{ institution.labs }}</p>
+                                    {% endif %}
+                                    <p><strong>Placement Cell:</strong> {% if institution.placement_cell %}Yes{% else %}No{% endif %}</p>
+                                    {% if institution.placement_cell %}
+                                    <p><strong>Placement Percentage:</strong> {{ institution.placement_percentage|default:"N/A" }}%</p>
+                                    <p><strong>Top Recruiters:</strong> {{ institution.top_recruiters|default:"N/A" }}</p>
+                                    {% endif %}
+                                    {% if institution.other_facilities %}
+                                    <p><strong>Other Facilities:</strong> {{ institution.other_facilities }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p>Limited facility details available for schools. Please contact the school for more information.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery (School Only) -->
+                    {% if institution_type == 'School' and gallery %}
+                    <div class="accordion-item shadow-sm border-0 rounded-3 mb-3">
+                        <h2 class="accordion-header" id="headingGallery">
+                            <button class="accordion-button fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGallery" aria-expanded="false" aria-controls="collapseGallery">
+                                Gallery
+                            </button>
+                        </h2>
+                        <div id="collapseGallery" class="accordion-collapse collapse" aria-labelledby="headingGallery" data-bs-parent="#institutionAccordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    {% for image in gallery %}
+                                    <div class="col-md-4 mb-3">
+                                        <img src="{{ image.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ image.caption|default:'Gallery Image' }}">
+                                        {% if image.caption %}
+                                        <p class="text-center mt-2">{{ image.caption }}</p>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Testimonials (School Only) -->
+                    {% if institution_type == 'School' and testimonials %}
+                    <div class="accordion-item shadow-sm border-0 rounded-3 mb-3">
+                        <h2 class="accordion-header" id="headingTestimonials">
+                            <button class="accordion-button fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTestimonials" aria-expanded="false" aria-controls="collapseTestimonials">
+                                Testimonials
+                            </button>
+                        </h2>
+                        <div id="collapseTestimonials" class="accordion-collapse collapse" aria-labelledby="headingTestimonials" data-bs-parent="#institutionAccordion">
+                            <div class="accordion-body">
+                                {% for testimonial in testimonials %}
+                                <div class="mb-4">
+                                    <p class="fst-italic">"{{ testimonial.message }}"</p>
+                                    <p class="fw-bold text-primary">- {{ testimonial.author_name }} ({{ testimonial.author_role|title }})</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Hero Section */
+.hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #1a3c34 0%, #2e5a52 100%);
+    color: #fff;
+    padding: 5rem 0;
+}
+.hero-section h1 {
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.hero-section p {
+    font-size: 1.1rem;
+}
+
+/* Content Section */
+.content-section {
+    background-color: #f8f9fa;
+}
+.accordion-button {
+    background-color: #fff;
+    color: #1a3c34;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #1a3c34 0%, #2e5a52 100%);
+    color: #fff;
+}
+.accordion-button:focus {
+    box-shadow: none;
+}
+.accordion-item {
+    background-color: #fff;
+    border-radius: 10px;
+}
+.accordion-body {
+    padding: 1.5rem;
+}
+.accordion-body p {
+    font-size: 0.95rem;
+    color: #555;
+}
+
+/* Sidebar */
+.card {
+    border-radius: 10px;
+    background: linear-gradient(145deg, #ffffff 0%, #f9f9f9 100%);
+}
+.card-title {
+    color: #1a3c34;
+}
+.card-body p {
+    font-size: 0.9rem;
+    color: #555;
+}
+.btn-outline-primary {
+    border-color: #1a3c34;
+    color: #1a3c34;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background-color: #1a3c34;
+    color: #fff;
+}
+
+/* Gallery Images */
+.accordion-body img {
+    transition: transform 0.3s ease;
+}
+.accordion-body img:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 1.8rem;
+    }
+    .hero-section p {
+        font-size: 1rem;
+    }
+    .hero-section img, .hero-section .placeholder-img {
+        width: 120px;
+        height: 120px;
+    }
+}
+</style>
+
+
+
+<!-- Bootstrap JS and dependencies (Popper.js) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+

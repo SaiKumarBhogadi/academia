@@ -1,0 +1,213 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}Activity Logs - Super Admin{% endblock %}
+
+{% block content %}
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Activity Logs Section -->
+    <div class="min-h-screen bg-gray-100 py-8 px-4">
+        <div class="max-w-5xl mx-auto">
+            <!-- Recent Activity Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.5M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.856M7 20H2v-2a3 3 0 015.356-1.5M7 20v-2c0-.656.126-1.283.356-1.856m0 0a5.5 5.5 0 0110.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Recent Activity (Last 10 Users)
+                </h3>
+
+                {% if recent_users %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs uppercase bg-gray-50 text-gray-700">
+                                <tr>
+                                    <th scope="col" class="py-3 px-6">Username</th>
+                                    <th scope="col" class="py-3 px-6">Role</th>
+                                    <th scope="col" class="py-3 px-6">Last Login</th>
+                                    <th scope="col" class="py-3 px-6">Last Logout</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in recent_users %}
+                                    <tr class="border-b hover:bg-gray-50">
+                                        <td class="py-4 px-6">{{ user.username }}</td>
+                                        <td class="py-4 px-6">{{ user.get_user_type_display }}</td>
+                                        <td class="py-4 px-6">
+                                            {% if user.last_login %}
+                                                {{ user.last_login|date:"Y-m-d H:i:s" }}
+                                            {% else %}
+                                                Never
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            {% if user.last_logout %}
+                                                {{ user.last_logout|date:"Y-m-d H:i:s" }}
+                                            {% else %}
+                                                Never
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center py-4">No recent activity found.</p>
+                {% endif %}
+            </div>
+
+            <!-- Activity Logs by Role -->
+            <div class="space-y-8">
+                <!-- Schools Table -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Schools
+                    </h4>
+                    {% if schools %}
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs uppercase bg-gray-50 text-gray-700 sticky top-0">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6">School Name</th>
+                                        <th scope="col" class="py-3 px-6">Last Login</th>
+                                        <th scope="col" class="py-3 px-6">Last Logout</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for school in schools %}
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="py-4 px-6">{{ school.school_profile.school_name }}</td>
+                                            <td class="py-4 px-6">
+                                                {% if school.last_login %}
+                                                    {{ school.last_login|date:"Y-m-d H:i:s" }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                {% if school.last_logout %}
+                                                    {{ school.last_logout|date:"Y-m-d H:i:s" }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 text-center py-4">No schools found.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Colleges Table -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Colleges
+                    </h4>
+                    {% if colleges %}
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs uppercase bg-gray-50 text-gray-700 sticky top-0">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6">College Name</th>
+                                        <th scope="col" class="py-3 px-6">Last Login</th>
+                                        <th scope="col" class="py-3 px-6">Last Logout</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for college in colleges %}
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="py-4 px-6">{{ college.college_profile.college_name }}</td>
+                                            <td class="py-4 px-6">
+                                                {% if college.last_login %}
+                                                    {{ college.last_login|date:"Y-m-d H:i:s" }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                {% if college.last_logout %}
+                                                    {{ college.last_logout|date:"Y-m-d H:i:s" }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 text-center py-4">No colleges found.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Students Table -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Students
+                    </h4>
+                    {% if students %}
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs uppercase bg-gray-50 text-gray-700 sticky top-0">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6">Student Name</th>
+                                        <th scope="col" class="py-3 px-6">Last Login</th>
+                                        <th scope="col" class="py-3 px-6">Last Logout</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="py-4 px-6">{{ student.student_profile.first_name }} {{ student.student_profile.last_name }}</td>
+                                            <td class="py-4 px-6">
+                                                {% if student.last_login %}
+                                                    {{ student.last_login|date:"Y-m-d H:i:s" }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                {% if student.last_logout %}
+                                                    {{ student.last_logout|date:"Y-m-d H:i:s" }}
+                                                {% else %}
+                                                    Never
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 text-center py-4">No students found.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="mt-6 flex justify-end">
+                <a href="{% url 'super_admin:dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

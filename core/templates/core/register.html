@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Admission Portal</title>
+    <title>Register - Academia Vendors</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
@@ -12,7 +12,7 @@
     <!-- Custom CSS -->
     <style>
         body {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            background: #f5f7fa url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ddd" fill-opacity="0.3" d="M0,192L48,186.7C96,181,192,171,288,176C384,181,480,203,576,213.3C672,224,768,224,864,202.7C960,181,1056,139,1152,133.3C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E') no-repeat bottom;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -26,30 +26,31 @@
         }
         .register-card {
             background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
             overflow: hidden;
-            border: none;
         }
         .register-card .card-header {
-            background: #6e8efb;
-            color: #fff;
+            background: none;
             text-align: center;
-            padding: 1.5rem;
-            border-bottom: none;
+            padding: 2rem 1.5rem 1rem;
+            border-bottom: 2px solid #FFB300; /* Yellow from branding */
         }
         .register-card .card-header h2 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 600;
+            color: #333;
         }
         .register-card .card-body {
-            padding: 2rem;
+            padding: 2.5rem;
         }
         .row {
             display: flex;
             flex-wrap: wrap;
             margin-bottom: 1.5rem;
+            gap: 1rem;
         }
         .col {
             flex: 1;
@@ -62,7 +63,7 @@
         }
         .form-group label {
             font-size: 0.9rem;
-            color: #333;
+            color: #555;
             font-weight: 500;
             margin-bottom: 0.5rem;
             display: block;
@@ -70,53 +71,61 @@
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 0.75rem 1rem;
-            padding-left: 2.5rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 0.9rem;
-            transition: border-color 0.3s ease;
+            background: #fafafa;
+            transition: all 0.3s ease;
         }
         .form-group input:focus,
         .form-group select:focus {
-            border-color: #6e8efb;
+            border-color: #FFB300; /* Yellow from branding */
+            background: #fff;
+            box-shadow: 0 0 8px rgba(255, 179, 0, 0.2);
             outline: none;
-            box-shadow: 0 0 5px rgba(110, 142, 251, 0.3);
         }
         .form-group i {
             position: absolute;
             left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #6e8efb;
+            color: #EC407A; /* Pink from branding */
             font-size: 1rem;
         }
         .btn-register {
-            background: #6e8efb;
+            background: #FFB300; /* Yellow from branding */
             border: none;
-            padding: 0.75rem;
+            padding: 0.85rem;
             font-size: 1rem;
-            font-weight: 500;
-            border-radius: 8px;
+            font-weight: 600;
+            border-radius: 10px;
             width: 100%;
-            transition: background 0.3s ease;
+            color: #fff;
+            transition: all 0.3s ease;
         }
         .btn-register:hover {
-            background: #5a78e0;
+            background: #EC407A; /* Pink from branding */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236, 64, 122, 0.3);
         }
         .alert {
             margin-top: 1rem;
             padding: 0.75rem;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.9rem;
+            border: 1px solid;
+            text-align: center;
         }
         .alert-success {
-            background: #d4edda;
-            color: #155724;
+            background: #f0f9ff;
+            border-color: #bae6fd;
+            color: #0c4a6e;
         }
         .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
         }
         .login-link {
             text-align: center;
@@ -124,10 +133,12 @@
             font-size: 0.9rem;
         }
         .login-link a {
-            color: #6e8efb;
+            color: #EC407A; /* Pink from branding */
             text-decoration: none;
+            font-weight: 500;
         }
         .login-link a:hover {
+            color: #FFB300; /* Yellow from branding */
             text-decoration: underline;
         }
         @media (max-width: 576px) {
@@ -135,7 +146,7 @@
                 margin: 0 10px;
             }
             .register-card .card-header h2 {
-                font-size: 1.25rem;
+                font-size: 1.4rem;
             }
             .row {
                 flex-direction: column;
@@ -144,6 +155,9 @@
                 flex: 100%;
                 padding: 0;
             }
+            .btn-register {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -151,8 +165,8 @@
     <div class="register-container">
         <div class="card register-card">
             <div class="card-header">
-                <img src="{% static 'images/logo1.png' %}" alt="Admission Portal Logo" class="hero-logo" height="60px" width="150px">
-                <h2><i class="fas fa-user-plus me-2"></i>Register</h2>
+                <img src="{% static 'images/logo1.png' %}" alt="Academia Vendors Logo" class="hero-logo" height="60px" width="150px">
+                <h2>Register Your Account</h2>
             </div>
             <div class="card-body">
                 <form method="post">

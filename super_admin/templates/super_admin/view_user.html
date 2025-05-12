@@ -1,0 +1,612 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}View User - {{ user.username }}{% endblock %}
+
+{% block content %}
+<style>
+    .user-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f5f7fa;
+        padding: 20px 30px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.6rem;
+        color: #333;
+        font-weight: 600;
+    }
+    .section {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    .section h4 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        font-weight: 600;
+        border-left: 4px solid #FFB300;
+        padding-left: 12px;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .field {
+        display: flex;
+        flex-direction: column;
+    }
+    .field-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+    }
+    .field-value {
+        font-size: 1rem;
+        color: #555;
+    }
+    .file-link {
+        color: #FFB300;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .file-link:hover {
+        text-decoration: underline;
+        color: #EC407A;
+    }
+    .btn-primary {
+        background-color: #FFB300;
+        border-color: #FFB300;
+        padding: 10px 24px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 6px;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #EC407A;
+        border-color: #EC407A;
+    }
+    .btn-secondary {
+        background-color: #e0e0e0;
+        color: #333;
+        padding: 8px 18px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+        text-decoration: none;
+        border: none;
+        transition: 0.3s ease;
+    }
+    .btn-secondary:hover {
+        background-color: #ccc;
+        color: #111;
+    }
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .grid {
+            grid-template-columns: 1fr;
+        }
+        .user-container {
+            padding: 20px;
+            margin: 20px;
+        }
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3>User Details - {{ user.username }}</h3>
+        <a href="{% url 'super_admin:dashboard' %}#pending-approvals" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+    <div class="card-body">
+        <div class="user-container">
+            <!-- General Information -->
+            <div class="section">
+                <h4>General Information</h4>
+                <div class="grid">
+                    <div class="field">
+                        <div class="field-label">Username</div>
+                        <div class="field-value">{{ user.username }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Email</div>
+                        <div class="field-value">{{ user.email }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Role</div>
+                        <div class="field-value">{{ user.user_type|title }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Approval Status</div>
+                        <div class="field-value">{{ user.is_approved|yesno:"Approved,Pending" }}</div>
+                    </div>
+                    {% if user.first_name or user.last_name %}
+                        <div class="field">
+                            <div class="field-label">Name</div>
+                            <div class="field-value">{{ user.first_name }} {{ user.last_name }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- School Profile -->
+            {% if user.user_type == 'school' and user.school_profile %}
+                <div class="section">
+                    <h4>School Profile</h4>
+                    <div class="grid">
+                        <div class="field">
+                            <div class="field-label">School Name</div>
+                            <div class="field-value">{{ user.school_profile.school_name }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Principal Name</div>
+                            <div class="field-value">{{ user.school_profile.principal_name }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Contact Phone</div>
+                            <div class="field-value">{{ user.school_profile.contact_phone }}</div>
+                        </div>
+                        {% if user.school_profile.alternate_phone_number %}
+                            <div class="field">
+                                <div class="field-label">Alternate Phone</div>
+                                <div class="field-value">{{ user.school_profile.alternate_phone_number }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Contact Email</div>
+                            <div class="field-value">{{ user.school_profile.contact_email }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">School Type</div>
+                            <div class="field-value">{{ user.school_profile.school_type }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Board Affiliation</div>
+                            <div class="field-value">{{ user.school_profile.board_affiliation }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Medium of Instruction</div>
+                            <div class="field-value">{{ user.school_profile.medium_of_instruction }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Established Year</div>
+                            <div class="field-value">{{ user.school_profile.established_year }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Total Students</div>
+                            <div class="field-value">{{ user.school_profile.total_students }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Total Teachers</div>
+                            <div class="field-value">{{ user.school_profile.total_teachers }}</div>
+                        </div>
+                        {% if user.school_profile.school_code %}
+                            <div class="field">
+                                <div class="field-label">School Code</div>
+                                <div class="field-value">{{ user.school_profile.school_code }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Address</div>
+                            <div class="field-value">{{ user.school_profile.street_address }}, {{ user.school_profile.city }}, {{ user.school_profile.state }} - {{ user.school_profile.pincode }}</div>
+                        </div>
+                        {% if user.school_profile.website %}
+                            <div class="field">
+                                <div class="field-label">Website</div>
+                                <div class="field-value"><a href="{{ user.school_profile.website }}" class="file-link" target="_blank">{{ user.school_profile.website }}</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.school_profile.logo %}
+                            <div class="field">
+                                <div class="field-label">Logo</div>
+                                <div class="field-value"><a href="{{ user.school_profile.logo.url }}" class="file-link" target="_blank">View Logo</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.school_profile.affiliation_certificate %}
+                            <div class="field">
+                                <div class="field-label">Affiliation Certificate</div>
+                                <div class="field-value"><a href="{{ user.school_profile.affiliation_certificate.url }}" class="file-link" target="_blank">View Certificate</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.school_profile.brochure %}
+                            <div class="field">
+                                <div class="field-label">Brochure</div>
+                                <div class="field-value"><a href="{{ user.school_profile.brochure.url }}" class="file-link" target="_blank">View Brochure</a></div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Created At</div>
+                            <div class="field-value">{{ user.school_profile.created_at|date:"F d, Y H:i" }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Updated At</div>
+                            <div class="field-value">{{ user.school_profile.updated_at|date:"F d, Y H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- College Profile -->
+            {% if user.user_type == 'college' and user.college_profile %}
+                <div class="section">
+                    <h4>College Profile</h4>
+                    <div class="grid">
+                        <div class="field">
+                            <div class="field-label">College Name</div>
+                            <div class="field-value">{{ user.college_profile.college_name }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Principal Name</div>
+                            <div class="field-value">{{ user.college_profile.principal_name }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Contact Phone</div>
+                            <div class="field-value">{{ user.college_profile.contact_phone }}</div>
+                        </div>
+                        {% if user.college_profile.alternate_phone_number %}
+                            <div class="field">
+                                <div class="field-label">Alternate Phone</div>
+                                <div class="field-value">{{ user.college_profile.alternate_phone_number }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Contact Email</div>
+                            <div class="field-value">{{ user.college_profile.contact_email }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">College Type</div>
+                            <div class="field-value">{{ user.college_profile.college_type }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Affiliation</div>
+                            <div class="field-value">{{ user.college_profile.affiliation }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Accreditation</div>
+                            <div class="field-value">{{ user.college_profile.accreditation }}</div>
+                        </div>
+                        {% if user.college_profile.courses_offered %}
+                            <div class="field">
+                                <div class="field-label">Courses Offered</div>
+                                <div class="field-value">{{ user.college_profile.courses_offered }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.streams_available %}
+                            <div class="field">
+                                <div class="field-label">Streams Available</div>
+                                <div class="field-value">{{ user.college_profile.streams_available }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.medium_of_instruction %}
+                            <div class="field">
+                                <div class="field-label">Medium of Instruction</div>
+                                <div class="field-value">{{ user.college_profile.medium_of_instruction }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Established Year</div>
+                            <div class="field-value">{{ user.college_profile.established_year }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Total Students</div>
+                            <div class="field-value">{{ user.college_profile.total_students }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Total Faculty</div>
+                            <div class="field-value">{{ user.college_profile.total_faculty }}</div>
+                        </div>
+                        {% if user.college_profile.college_code %}
+                            <div class="field">
+                                <div class="field-label">College Code</div>
+                                <div class="field-value">{{ user.college_profile.college_code }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.website %}
+                            <div class="field">
+                                <div class="field-label">Website</div>
+                                <div class="field-value"><a href="{{ user.college_profile.website }}" class="file-link" target="_blank">{{ user.college_profile.website }}</a></div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Hostel Availability</div>
+                            <div class="field-value">{{ user.college_profile.hostel_availability|yesno:"Yes,No" }}</div>
+                        </div>
+                        {% if user.college_profile.hostel_capacity_boys %}
+                            <div class="field">
+                                <div class="field-label">Hostel Capacity (Boys)</div>
+                                <div class="field-value">{{ user.college_profile.hostel_capacity_boys }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.hostel_capacity_girls %}
+                            <div class="field">
+                                <div class="field-label">Hostel Capacity (Girls)</div>
+                                <div class="field-value">{{ user.college_profile.hostel_capacity_girls }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Library</div>
+                            <div class="field-value">{{ user.college_profile.library|yesno:"Yes,No" }}</div>
+                        </div>
+                        {% if user.college_profile.library_books_count %}
+                            <div class="field">
+                                <div class="field-label">Library Books Count</div>
+                                <div class="field-value">{{ user.college_profile.library_books_count }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.labs %}
+                            <div class="field">
+                                <div class="field-label">Labs</div>
+                                <div class="field-value">{{ user.college_profile.labs }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Placement Cell</div>
+                            <div class="field-value">{{ user.college_profile.placement_cell|yesno:"Yes,No" }}</div>
+                        </div>
+                        {% if user.college_profile.placement_percentage %}
+                            <div class="field">
+                                <div class="field-label">Placement Percentage</div>
+                                <div class="field-value">{{ user.college_profile.placement_percentage }}%</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.top_recruiters %}
+                            <div class="field">
+                                <div class="field-label">Top Recruiters</div>
+                                <div class="field-value">{{ user.college_profile.top_recruiters }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.other_facilities %}
+                            <div class="field">
+                                <div class="field-label">Other Facilities</div>
+                                <div class="field-value">{{ user.college_profile.other_facilities }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Address</div>
+                            <div class="field-value">{{ user.college_profile.street_address }}, {{ user.college_profile.city }}, {{ user.college_profile.state }} - {{ user.college_profile.pincode }}</div>
+                        </div>
+                        {% if user.college_profile.profile_pic %}
+                            <div class="field">
+                                <div class="field-label">Profile Picture</div>
+                                <div class="field-value"><a href="{{ user.college_profile.profile_pic.url }}" class="file-link" target="_blank">View Logo</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.accreditation_certificate %}
+                            <div class="field">
+                                <div class="field-label">Accreditation Certificate</div>
+                                <div class="field-value"><a href="{{ user.college_profile.accreditation_certificate.url }}" class="file-link" target="_blank">View Certificate</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.college_profile.brochure %}
+                            <div class="field">
+                                <div class="field-label">Brochure</div>
+                                <div class="field-value"><a href="{{ user.college_profile.brochure.url }}" class="file-link" target="_blank">View Brochure</a></div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Created At</div>
+                            <div class="field-value">{{ user.college_profile.created_at|date:"F d, Y H:i" }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Updated At</div>
+                            <div class="field-value">{{ user.college_profile.updated_at|date:"F d, Y H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Student Profile -->
+            {% if user.user_type == 'student' and user.student_profile %}
+                <div class="section">
+                    <h4>Student Profile</h4>
+                    <div class="grid">
+                        <div class="field">
+                            <div class="field-label">Full Name</div>
+                            <div class="field-value">{{ user.student_profile.first_name }} {{ user.student_profile.last_name }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Date of Birth</div>
+                            <div class="field-value">{{ user.student_profile.date_of_birth|date:"F d, Y" }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Gender</div>
+                            <div class="field-value">{{ user.student_profile.gender }}</div>
+                        </div>
+                        {% if user.student_profile.nationality %}
+                            <div class="field">
+                                <div class="field-label">Nationality</div>
+                                <div class="field-value">{{ user.student_profile.nationality }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.category %}
+                            <div class="field">
+                                <div class="field-label">Category</div>
+                                <div class="field-value">{{ user.student_profile.category }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.aadhar_number %}
+                            <div class="field">
+                                <div class="field-label">Aadhar Number</div>
+                                <div class="field-value">{{ user.student_profile.aadhar_number }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Email</div>
+                            <div class="field-value">{{ user.student_profile.email }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Contact Number</div>
+                            <div class="field-value">{{ user.student_profile.contact_number }}</div>
+                        </div>
+                        {% if user.student_profile.alternate_phone_number %}
+                            <div class="field">
+                                <div class="field-label">Alternate Phone</div>
+                                <div class="field-value">{{ user.student_profile.alternate_phone_number }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Address</div>
+                            <div class="field-value">{{ user.student_profile.street_address }}, {{ user.student_profile.city }}, {{ user.student_profile.state }} - {{ user.student_profile.pincode }}</div>
+                        </div>
+                        {% if user.student_profile.father_name %}
+                            <div class="field">
+                                <div class="field-label">Father's Name</div>
+                                <div class="field-value">{{ user.student_profile.father_name }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.father_mobile %}
+                            <div class="field">
+                                <div class="field-label">Father's Mobile</div>
+                                <div class="field-value">{{ user.student_profile.father_mobile }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.father_email %}
+                            <div class="field">
+                                <div class="field-label">Father's Email</div>
+                                <div class="field-value">{{ user.student_profile.father_email }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.mother_name %}
+                            <div class="field">
+                                <div class="field-label">Mother's Name</div>
+                                <div class="field-value">{{ user.student_profile.mother_name }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.mother_mobile %}
+                            <div class="field">
+                                <div class="field-label">Mother's Mobile</div>
+                                <div class="field-value">{{ user.student_profile.mother_mobile }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.mother_email %}
+                            <div class="field">
+                                <div class="field-label">Mother's Email</div>
+                                <div class="field-value">{{ user.student_profile.mother_email }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.parent_income %}
+                            <div class="field">
+                                <div class="field-label">Parent Income</div>
+                                <div class="field-value">₹{{ user.student_profile.parent_income }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Admission Preference</div>
+                            <div class="field-value">{{ user.student_profile.admission_preference }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Desired Course</div>
+                            <div class="field-value">{{ user.student_profile.desired_course }}</div>
+                        </div>
+                        {% if user.student_profile.last_institution %}
+                            <div class="field">
+                                <div class="field-label">Last Institution</div>
+                                <div class="field-value">{{ user.student_profile.last_institution }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.previous_qualification %}
+                            <div class="field">
+                                <div class="field-label">Previous Qualification</div>
+                                <div class="field-value">{{ user.student_profile.previous_qualification }}</div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.entrance_score %}
+                            <div class="field">
+                                <div class="field-label">Entrance Score</div>
+                                <div class="field-value">{{ user.student_profile.entrance_score }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Academic Year</div>
+                            <div class="field-value">{{ user.student_profile.academic_year }}</div>
+                        </div>
+                        {% if user.student_profile.profile_photo %}
+                            <div class="field">
+                                <div class="field-label">Profile Photo</div>
+                                <div class="field-value"><a href="{{ user.student_profile.profile_photo.url }}" class="file-link" target="_blank">View Photo</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.marksheet %}
+                            <div class="field">
+                                <div class="field-label">Marksheet</div>
+                                <div class="field-value"><a href="{{ user.student_profile.marksheet.url }}" class="file-link" target="_blank">View Marksheet</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.transfer_certificate %}
+                            <div class="field">
+                                <div class="field-label">Transfer Certificate</div>
+                                <div class="field-value"><a href="{{ user.student_profile.transfer_certificate.url }}" class="file-link" target="_blank">View Certificate</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.id_proof %}
+                            <div class="field">
+                                <div class="field-label">ID Proof</div>
+                                <div class="field-value"><a href="{{ user.student_profile.id_proof.url }}" class="file-link" target="_blank">View ID Proof</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.caste_certificate %}
+                            <div class="field">
+                                <div class="field-label">Caste Certificate</div>
+                                <div class="field-value"><a href="{{ user.student_profile.caste_certificate.url }}" class="file-link" target="_blank">View Certificate</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.income_certificate %}
+                            <div class="field">
+                                <div class="field-label">Income Certificate</div>
+                                <div class="field-value"><a href="{{ user.student_profile.income_certificate.url }}" class="file-link" target="_blank">View Certificate</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.passport_photo %}
+                            <div class="field">
+                                <div class="field-label">Passport Photo</div>
+                                <div class="field-value"><a href="{{ user.student_profile.passport_photo.url }}" class="file-link" target="_blank">View Photo</a></div>
+                            </div>
+                        {% endif %}
+                        {% if user.student_profile.signature %}
+                            <div class="field">
+                                <div class="field-label">Signature</div>
+                                <div class="field-value"><a href="{{ user.student_profile.signature.url }}" class="file-link" target="_blank">View Signature</a></div>
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <div class="field-label">Created At</div>
+                            <div class="field-value">{{ user.student_profile.created_at|date:"F d, Y H:i" }}</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Updated At</div>
+                            <div class="field-value">{{ user.student_profile.updated_at|date:"F d, Y H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="section">
+                {% if not user.is_approved %}
+                    <a href="{% url 'super_admin:approve_user' user.id %}" class="btn btn-primary">Approve User</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

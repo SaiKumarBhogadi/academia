@@ -1,251 +1,312 @@
 {% extends 'students/base.html' %}
-{% load static %}
 
 {% block title %}{{ college.college_name }}{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="card shadow-sm">
-            <!-- College Header with Image -->
-            <div class="card-header text-white p-4" style="background: linear-gradient(to bottom, #1a2a6c, #b21f1f); display: flex; align-items: center;">
-                <div class="college-image me-3">
-                    <img src="{% if college.profile_pic %}{{ college.profile_pic.url }}{% else %}{% static 'images/no-images.avif' %}{% endif %}" alt="{{ college.college_name }} Logo" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #ffffff;">
-                </div>
-                <div>
-                    <h2 class="mb-0">{{ college.college_name }}</h2>
-                    <p class="text-white small">Established: {{ college.established_year|default:"N/A" }}</p>
-                </div>
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 2rem;
+        border-left: 4px solid #3498DB;
+        padding-left: 0.75rem;
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .alert-success {
+        background: #e6ffe6;
+        border: 1px solid #b3ffb3;
+        color: #2C3E50;
+    }
+
+    .alert-info {
+        background: #e6f0fa;
+        border: 1px solid #d1e7ff;
+        color: #2C3E50;
+    }
+
+    .alert-warning {
+        background: #fef9e7;
+        border: 1px solid #f9e4a0;
+        color: #7A4B00;
+    }
+
+    .btn-close {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        color: #666666;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+
+    .btn-close:hover {
+        opacity: 1;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 2rem;
+        background: #ffffff;
+    }
+
+    .college-details p {
+        font-size: 0.9rem;
+        color: #333333;
+        margin-bottom: 0.75rem;
+    }
+
+    .college-details strong {
+        color: #2C3E50;
+        font-weight: 600;
+        display: inline-block;
+        width: 180px;
+    }
+
+    .college-details a {
+        color: #E67E22;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .college-details a:hover {
+        color: #F39C12;
+        text-decoration: underline;
+    }
+
+    .form-inline {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-inline label {
+        font-size: 0.9rem;
+        color: #e6f0fa;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: auto;
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .form-control:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 1rem;
+        border-left: 4px solid #3498DB;
+        padding-left: 0.75rem;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    ul li {
+        font-size: 0.9rem;
+        color: #333333;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    ul li:last-child {
+        border-bottom: none;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: #666666;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .college-details p {
+            font-size: 0.85rem;
+        }
+
+        .college-details strong {
+            width: 150px;
+        }
+
+        .form-control {
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        h4 {
+            font-size: 1rem;
+        }
+
+        ul li {
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .college-details strong {
+            width: 100%;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-inline {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-control {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    <h1>{{ college.college_name }}</h1>
+    
+    <!-- Display messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+        {% endfor %}
+    {% endif %}
 
-            <div class="card-body p-4" style="background-color: rgba(255, 255, 255, 0.9);">
-                <!-- College Details -->
-                <h3 class="mt-4" style="color: #1a2a6c;">College Details</h3>
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">Principal</h6>
-                            <p>{{ college.principal_name|default:"Not specified" }}</p>
-                        </div>
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">Address</h6>
-                            <p>
-                                {% with address_parts=college.street_address|add:", "|add:college.city|add:", "|add:college.state|add:", "|add:college.pincode|add:", "|add:college.country %}
-                                    {{ address_parts|default:"Not specified" }}
-                                {% endwith %}
-                            </p>
-                        </div>
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">Contact</h6>
-                            <p>Email: {{ college.contact_email|default:"Not specified" }}</p>
-                            <p>Phone: {{ college.contact_phone|default:"Not specified" }}</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">College Info</h6>
-                            <p>Type: {{ college.get_college_type_display|default:"Not specified" }}</p>
-                            <p>Affiliation: {{ college.affiliation|default:"Not specified" }}</p>
-                            <p>Accreditation: {{ college.accreditation|default:"Not specified" }}</p>
-                        </div>
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">Placement & Recruiters</h6>
-                            <p>Placement: {{ college.placement_percentage|default:"Not specified" }}%</p>
-                            <p>Top Recruiters: {{ college.top_recruiters|default:"Not specified" }}</p>
-                        </div>
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">Website</h6>
-                            <p>
-                                {% if college.website %}
-                                    <a href="{{ college.website }}" target="_blank" style="color: #1a2a6c;">{{ college.website }}</a>
-                                {% else %}
-                                    Not specified
-                                {% endif %}
-                            </p>
-                        </div>
-                        <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                            <h6 class="mb-2" style="color: #1a2a6c;">Facilities</h6>
-                            <p>{{ college.other_facilities|default:"Not specified" }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Admission Cycle -->
-                <div class="detail-card p-3 mb-3 bg-light rounded shadow-sm" style="border-left: 4px solid #1a2a6c;">
-                    <h6 class="mb-2" style="color: #1a2a6c;">Admission Cycle</h6>
-                    <form method="get" class="mb-2">
-                        <select name="cycle_id" class="form-select" style="border-color: #1a2a6c; width: auto; display: inline-block;" onchange="this.form.submit()">
-                            {% for cycle in active_cycles %}
-                                <option value="{{ cycle.id }}" {% if active_cycle and cycle.id == active_cycle.id %}selected{% endif %}>
-                                    {{ cycle.year }} ({{ cycle.start_date|date:"d M Y" }} - {{ cycle.end_date|date:"d M Y" }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                    {% if active_cycle %}
-                        <p>Selected Cycle: {{ active_cycle.year }} ({{ active_cycle.start_date|date:"d M Y" }} - {{ active_cycle.end_date|date:"d M Y" }})</p>
-                    {% else %}
-                        <p class="text-muted">No active admission cycle available.</p>
-                    {% endif %}
-                </div>
-
-                <!-- Degrees -->
-                <h3 class="mt-5" style="color: #1a2a6c;">Degrees Offered</h3>
-                {% if degrees %}
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead>
-                                <tr style="background: linear-gradient(to right, #1a2a6c, #b21f1f); color: white;">
-                                    <th>Name</th>
-                                    <th>Duration</th>
-                                    <th>Eligibility Criteria</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for degree in degrees %}
-                                    <tr class="degree-row">
-                                        <td>{{ degree.name }}</td>
-                                        <td>{{ degree.duration }}</td>
-                                        <td>{{ degree.eligibility_criteria|default:"Not specified" }}</td>
-                                        <!-- Inside the degrees table -->
-<td>
-    <a href="{% url 'colleges:student_department_list' college.id degree.id active_cycle.id %}" class="btn btn-sm btn-primary">View Departments</a>
-</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <p class="text-muted">No degrees available for the selected cycle.</p>
-                {% endif %}
-            </div>
+    <!-- College Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>College Information</h3>
+        </div>
+        <div class="card-body college-details">
+            <p><strong>Principal:</strong> {{ college.principal_name }}</p>
+            <p><strong>Contact Phone:</strong> {{ college.contact_phone }}</p>
+            {% if college.alternate_phone_number %}
+                <p><strong>Alternate Phone:</strong> {{ college.alternate_phone_number }}</p>
+            {% endif %}
+            <p><strong>Email:</strong> {{ college.contact_email }}</p>
+            <p><strong>Type:</strong> {{ college.college_type }}</p>
+            <p><strong>Affiliation:</strong> {{ college.affiliation }}</p>
+            <p><strong>Accreditation:</strong> {{ college.accreditation }}</p>
+            <p><strong>Established Year:</strong> {{ college.established_year }}</p>
+            <p><strong>Total Students:</strong> {{ college.total_students }}</p>
+            <p><strong>Total Faculty:</strong> {{ college.total_faculty }}</p>
+            <p><strong>College Code:</strong> {{ college.college_code|default:"N/A" }}</p>
+            {% if college.website %}
+                <p><strong>Website:</strong> <a href="{{ college.website }}" target="_blank">{{ college.website }}</a></p>
+            {% endif %}
+            <p><strong>Address:</strong> {{ college.street_address }}, {{ college.city }}, {{ college.district|default:"" }} {{ college.state|default:"" }} - {{ college.pincode }}</p>
         </div>
     </div>
-{% endblock %}
 
-{% block extra_css %}
-    <style>
-        .card-header {
-            background: linear-gradient(to bottom, #1a2a6c, #b21f1f);
-            color: white;
-            padding: 20px;
-        }
-        .college-image img {
-            transition: transform 0.3s ease;
-        }
-        .college-image img:hover {
-            transform: scale(1.1);
-        }
-        .detail-card {
-            border-left: 4px solid #1a2a6c;
-            transition: box-shadow 0.3s ease;
-        }
-        .detail-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .card-body {
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-        .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-            padding: 6px 12px;
-            font-size: 0.875rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .table-striped tbody tr:nth-child(odd) {
-            background-color: #f8f9fa;
-        }
-        .degree-row:hover {
-            background-color: #e9ecef;
-            transition: background-color 0.2s ease;
-        }
-        a.text-primary {
-            color: #1a2a6c !important;
-        }
-        a.text-primary:hover {
-            color: #b21f1f !important;
-        }
-        .text-muted {
-            color: #6c757d;
-        }
-        .form-select {
-            border-color: #1a2a6c;
-            padding: 5px;
-            font-size: 0.9rem;
-            border-radius: 5px;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 767px) {
-            .card-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .college-image {
-                margin-bottom: 10px;
-            }
-            .college-image img {
-                width: 80px;
-                height: 80px;
-            }
-            .row.g-4 {
-                flex-direction: column;
-            }
-            .detail-card {
-                margin-bottom: 15px;
-            }
-            .table thead {
-                display: none;
-            }
-            .table tbody tr {
-                display: block;
-                margin-bottom: 10px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-            .table td {
-                display: block;
-                text-align: right;
-                padding: 10px;
-                border-bottom: 1px solid #ddd;
-                position: relative;
-            }
-            .table td::before {
-                content: attr(data-label);
-                font-weight: bold;
-                position: absolute;
-                left: 10px;
-                color: #1a2a6c;
-            }
-            .table td:last-child {
-                border-bottom: none;
-            }
-            .table td[data-label="Actions"] {
-                text-align: center;
-            }
-            .form-select {
-                width: 100%;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .detail-card p {
-                margin-bottom: 0;
-            }
-            .form-select {
-                width: auto;
-            }
-        }
-    </style>
-{% endblock %}
-
-{% block extra_js %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admission Cycles -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Admission Cycles</h3>
+            {% if active_cycles %}
+                <form method="get" class="form-inline">
+                    <label for="cycle_id">Select Cycle:</label>
+                    <select name="cycle_id" id="cycle_id" class="form-control" onchange="this.form.submit()">
+                        {% for cycle in active_cycles %}
+                            <option value="{{ cycle.id }}" {% if cycle == active_cycle %}selected{% endif %}>{{ cycle.year }}-{{ cycle.year|add:1 }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            {% else %}
+                <p class="text-muted">No active admission cycles available.</p>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if active_cycle %}
+                <h4>Degrees for Cycle {{ active_cycle.year }}-{{ active_cycle.year|add:1 }}</h4>
+                {% if degrees %}
+                    <ul>
+                        {% for degree in degrees %}
+                            <li>{{ degree.name }} ({{ degree.duration }} years)   -  <a href="{% url 'colleges:student_department_list' college.id degree.id active_cycle.id %}" class="btn btn-sm btn-primary">View Departments</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No degrees available for this cycle.</p>
+                {% endif %}
+            {% else %}
+                <p>No active cycle selected.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

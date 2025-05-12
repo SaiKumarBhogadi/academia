@@ -1,33 +1,90 @@
 {% extends 'super_admin/base.html' %}
 
-{% block title %}Edit User - Super Admin{% endblock %}
+{% block title %}Edit {{ user.username }}'s Account Details{% endblock %}
 
 {% block content %}
-    <!-- Edit User Form -->
-    <div class="mt-4">
-        <h3>Edit User: {{ user.username }}</h3>
-        <div class="card">
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        {% for field in form %}
-                            <div class="col-12 col-md-6 mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Edit User Account Details Form -->
+    <div class="min-h-screen bg-gray-100 flex items-center justify-center py-8 px-4">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z"></path>
+                </svg>
+                Edit {{ user.username }}'s Account Details
+            </h3>
+
+            <!-- Form -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    {% for field in user_form %}
+                        <div class="space-y-1">
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                            {% if field.name == "password" or field.name == "confirm_password" %}
+                                <div class="relative">
+                                    {{ field }}
+                                    <p class="text-xs text-gray-500 mt-1">Leave blank to keep the current password.</p>
+                                </div>
+                            {% else %}
                                 {{ field }}
-                                {% if field.errors %}
-                                    <div class="text-danger">{{ field.errors }}</div>
-                                {% endif %}
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <a href="{% url 'super_admin:manage_users' %}" class="btn btn-secondary">Cancel</a>
-                </form>
-            </div>
+                            {% endif %}
+                            {% if field.errors %}
+                                <p class="text-xs text-red-600 mt-1">{{ field.errors }}</p>
+                            {% endif %}
+                            {% if field.help_text %}
+                                <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex justify-end space-x-3 mt-8">
+                    <a href="{% url 'super_admin:manage_users' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Custom Styles -->
+    <style>
+        .form-control, select, textarea, input[type="text"], input[type="email"], input[type="number"], input[type="url"], input[type="date"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, select:focus, textarea:focus, input:focus {
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-1 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 {% endblock %}

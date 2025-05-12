@@ -1,316 +1,287 @@
 {% extends 'students/base.html' %}
-
-{% block title %}Student Profile{% endblock %}
-
+{% load static %}
+{% block title %} Student Profile {% endblock %}
 {% block content %}
 <style>
-    body {
-        background-color: #F5F6FA;
-        font-family: 'Arial', sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-    .container {
+    .profile-container {
         max-width: 900px;
-        margin: 40px auto;
-        padding: 0 15px;
+        margin: 3rem auto;
+        padding: 0 1rem;
     }
-    .card {
-        background-color: #FFFFFF;
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+
+    .profile-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .card:hover {
+
+    .profile-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
     }
-    .card-header {
-        background: linear-gradient(90deg, #2C3E50, #C0392B);
-        color: #FFFFFF;
-        padding: 20px;
-        border-bottom: none;
-        border-radius: 12px 12px 0 0;
+
+    .profile-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        padding: 2rem;
         text-align: center;
+        border-radius: 16px 16px 0 0;
     }
-    .card-header h3 {
-        margin: 0;
+
+    .profile-header img {
+        max-width: 120px;
+        border-radius: 8px;
+        border: 3px solid #ffffff;
+        transition: transform 0.3s ease;
+    }
+
+    .profile-header img:hover {
+        transform: scale(1.05);
+    }
+
+    .profile-header h2 {
+        color: #ffffff;
+        font-weight: 600;
         font-size: 1.75rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
     }
-    .card-body {
-        padding: 30px;
-    }
-    /* Profile Details Styling */
+
     .profile-details {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
+        padding: 2rem;
     }
-    .profile-details p {
-        margin: 0;
-        font-size: 1rem;
-        color: #2C3E50;
-        line-height: 1.6;
-    }
-    .profile-details p strong {
-        color: #C0392B;
+
+    .profile-details h5 {
+        font-size: 1.25rem;
         font-weight: 600;
-        display: inline-block;
-        width: 120px;
-    }
-    /* Form Styling */
-    .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    .form-label {
         color: #2C3E50;
-        font-weight: 500;
-        font-size: 0.95rem;
-        margin-bottom: 6px;
-        display: block;
+        margin-bottom: 1rem;
+        border-left: 4px solid #3498DB;
+        padding-left: 0.75rem;
     }
-    .form-control {
-        border: 1px solid #2C3E50;
-        border-radius: 6px;
-        padding: 10px;
+
+    .info-item {
+        margin-bottom: 0.75rem;
         font-size: 0.95rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .info-item strong {
         color: #2C3E50;
-        width: 100%;
-        box-sizing: border-box;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        font-weight: 600;
+        width: 200px;
     }
-    .form-control:focus {
-        border-color: #C0392B;
-        box-shadow: 0 0 6px rgba(192, 57, 43, 0.3);
-        outline: none;
+
+    .text-accent {
+        color: #E67E22;
+        transition: color 0.3s ease;
+        text-decoration: none;
     }
-    .form-control::placeholder {
-        color: #A9A9A9;
-        font-style: italic;
+
+    .text-accent:hover {
+        color: #F39C12;
+        text-decoration: underline;
     }
-    /* Full-width fields */
-    .form-group.full-width {
-        grid-column: 1 / -1;
-    }
-    /* Button Styling */
-    .btn {
-        padding: 10px 20px;
-        font-size: 0.95rem;
-        border-radius: 6px;
+
+    .btn-edit {
+        background-color: #3498DB;
         border: none;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        color: #ffffff;
+        transition: all 0.3s ease;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    .btn-primary {
-        background-color: #2C3E50;
-        color: #FFFFFF;
-    }
-    .btn-primary:hover {
-        background-color: #C0392B;
+
+    .btn-edit:hover {
+        background-color: #2980B9;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
     }
-    .btn-secondary {
-        background-color: #6c757d;
-        color: #FFFFFF;
-        margin-left: 10px;
-    }
-    .btn-secondary:hover {
-        background-color: #5a6268;
-        transform: translateY(-2px);
-    }
-    .btn-container {
-        margin-top: 20px;
-        text-align: center;
-    }
-    /* Error Messages */
-    .error-message {
-        color: #dc3545;
-        font-size: 0.85rem;
-        margin-top: 5px;
-        display: block;
-    }
-    /* Responsive Design */
+
     @media (max-width: 768px) {
-        .container {
-            margin: 20px auto;
-            padding: 0 10px;
+        .profile-container {
+            padding: 1rem 0.5rem;
         }
-        .card {
-            border-radius: 8px;
+
+        .profile-card {
+            padding: 0;
         }
-        .card-header {
-            padding: 15px;
+
+        .profile-header {
+            padding: 1.5rem;
         }
-        .card-header h3 {
+
+        .profile-header img {
+            max-width: 100px;
+        }
+
+        .profile-header h2 {
             font-size: 1.5rem;
         }
-        .card-body {
-            padding: 20px;
-        }
+
         .profile-details {
-            grid-template-columns: 1fr;
-            gap: 15px;
+            padding: 1.5rem;
         }
-        .profile-details p {
+
+        .profile-details h5 {
+            font-size: 1.1rem;
+        }
+
+        .info-item {
             font-size: 0.9rem;
         }
-        .profile-details p strong {
-            width: 100px;
+
+        .info-item strong {
+            width: 150px;
         }
-        .form-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-label {
+
+        .btn-edit {
             font-size: 0.9rem;
+            padding: 0.5rem 1rem;
         }
-        .form-control {
-            font-size: 0.9rem;
-            padding: 8px;
+    }
+
+    @media (max-width: 576px) {
+        .profile-header {
+            padding: 1rem;
         }
-        .btn {
-            font-size: 0.9rem;
-            padding: 8px 16px;
+
+        .profile-header h2 {
+            font-size: 1.3rem;
         }
-        .btn-secondary {
-            margin-left: 8px;
+
+        .profile-details h5 {
+            font-size: 1rem;
+        }
+
+        .info-item {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-item strong {
+            width: 100%;
+        }
+
+        .btn-edit {
+            width: 100%;
+            text-align: center;
         }
     }
 </style>
 
-<div class="container">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            {% if student_profile.profile_photo %}
+                <img src="{{ student_profile.profile_photo.url }}" alt="{{ student_profile.first_name }} {{ student_profile.last_name }} Photo">
+            {% endif %}
+            <h2>{{ student_profile.first_name }} {{ student_profile.last_name }}</h2>
+            <a href="{% url 'students:edit_student_profile' %}" class="btn btn-edit">Edit Profile</a>
+        </div>
+        <div class="profile-details">
+            <h5>Personal Information</h5>
+            <div class="info-item"><strong>Date of Birth:</strong> {{ student_profile.date_of_birth|default:"N/A" }}</div>
+            <div class="info-item"><strong>Gender:</strong> {{ student_profile.get_gender_display|default:"N/A" }}</div>
+            <div class="info-item"><strong>Nationality:</strong> {{ student_profile.nationality|default:"N/A" }}</div>
+            <div class="info-item"><strong>Category:</strong> {{ student_profile.get_category_display|default:"N/A" }}</div>
+            <div class="info-item"><strong>Aadhar Number:</strong> {{ student_profile.aadhar_number|default:"N/A" }}</div>
 
-    {% if student_profile and not edit %}
-        <!-- Display Profile Details -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Profile Details</h3>
+            <h5>Contact Details</h5>
+            <div class="info-item"><strong>Email:</strong> {{ student_profile.email|default:"N/A" }}</div>
+            <div class="info-item"><strong>Mobile Number:</strong> {{ student_profile.contact_number|default:"N/A" }}</div>
+            <div class="info-item"><strong>Alternate Phone Number:</strong> {{ student_profile.alternate_phone_number|default:"N/A" }}</div>
+            <div class="info-item"><strong>Address:</strong>
+                {{ student_profile.street_address|default:"" }}
+                {% if student_profile.city %}, {{ student_profile.city }}{% endif %}
+                {% if student_profile.district %}, {{ student_profile.district }}{% endif %}
+                {% if student_profile.state %}, {{ student_profile.state }}{% endif %}
+                {% if student_profile.pincode %}- {{ student_profile.pincode }}{% endif %}
             </div>
-            <div class="card-body">
-                <div class="profile-details">
-                    <p><strong>First Name:</strong> {{ student_profile.first_name|default:"N/A" }}</p>
-                    <p><strong>Last Name:</strong> {{ student_profile.last_name|default:"N/A" }}</p>
-                    <p><strong>Date of Birth:</strong> {{ student_profile.date_of_birth|date:"Y-m-d"|default:"N/A" }}</p>
-                    <p><strong>Gender:</strong> {{ student_profile.gender|default:"N/A" }}</p>
-                    <p><strong>Address:</strong> {{ student_profile.address|default:"N/A" }}</p>
-                    <p><strong>Contact Number:</strong> {{ student_profile.contact_number|default:"N/A" }}</p>
-                    <p><strong>Email:</strong> {{ student_profile.email|default:"N/A" }}</p>
-                    <p><strong>Parent Name:</strong> {{ student_profile.parent_name|default:"N/A" }}</p>
-                    <p><strong>Parent Contact:</strong> {{ student_profile.parent_contact|default:"N/A" }}</p>
-                    <p><strong>Created At:</strong> {{ student_profile.created_at|date:"Y-m-d H:i"|default:"N/A" }}</p>
-                    <p><strong>Updated At:</strong> {{ student_profile.updated_at|date:"Y-m-d H:i"|default:"N/A" }}</p>
-                </div>
-                <div class="btn-container">
-                    <a href="{% url 'students:student_profile' %}?edit=true" class="btn btn-primary">Edit Profile</a>
-                </div>
+
+            <h5>Parent/Guardian Details</h5>
+            <div class="info-item"><strong>Father’s Name:</strong> {{ student_profile.father_name|default:"N/A" }}</div>
+            <div class="info-item"><strong>Father’s Mobile:</strong> {{ student_profile.father_mobile|default:"N/A" }}</div>
+            <div class="info-item"><strong>Father’s Email:</strong> {{ student_profile.father_email|default:"N/A" }}</div>
+            <div class="info-item"><strong>Mother’s Name:</strong> {{ student_profile.mother_name|default:"N/A" }}</div>
+            <div class="info-item"><strong>Mother’s Mobile:</strong> {{ student_profile.mother_mobile|default:"N/A" }}</div>
+            <div class="info-item"><strong>Mother’s Email:</strong> {{ student_profile.mother_email|default:"N/A" }}</div>
+            <div class="info-item"><strong>Parent/Guardian Annual Income:</strong> {{ student_profile.parent_income|default:"N/A" }}</div>
+
+            <h5>Academic Details</h5>
+            <div class="info-item"><strong>Applying For:</strong> {{ student_profile.get_admission_preference_display|default:"N/A" }}</div>
+            <div class="info-item"><strong>Desired Class/Course:</strong> {{ student_profile.desired_course|default:"N/A" }}</div>
+            <div class="info-item"><strong>Last School/College Attended:</strong> {{ student_profile.last_institution|default:"N/A" }}</div>
+            <div class="info-item"><strong>Previous Class/Qualification:</strong> {{ student_profile.previous_qualification|default:"N/A" }}</div>
+            <div class="info-item"><strong>Entrance Exam Score:</strong> {{ student_profile.entrance_score|default:"N/A" }}</div>
+            <div class="info-item"><strong>Academic Year:</strong> {{ student_profile.academic_year|default:"N/A" }}</div>
+
+            <h5>Documents</h5>
+            <div class="info-item">
+                <strong>Previous Marksheet:</strong> 
+                {% if student_profile.marksheet %}
+                    <a href="{{ student_profile.marksheet.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
             </div>
-        </div>
-    {% else %}
-        <!-- Create/Edit Profile Form -->
-        <div class="card">
-            <div class="card-header">
-                <h3>{{ student_profile|yesno:"Edit Your Profile,Create Your Profile" }}</h3>
+            <div class="info-item">
+                <strong>Transfer Certificate:</strong> 
+                {% if student_profile.transfer_certificate %}
+                    <a href="{{ student_profile.transfer_certificate.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
             </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                                <span class="error-message">{{ form.first_name.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                                <span class="error-message">{{ form.last_name.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
-                            {{ form.date_of_birth }}
-                            {% if form.date_of_birth.errors %}
-                                <span class="error-message">{{ form.date_of_birth.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
-                            {{ form.gender }}
-                            {% if form.gender.errors %}
-                                <span class="error-message">{{ form.gender.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
-                            {{ form.address }}
-                            {% if form.address.errors %}
-                                <span class="error-message">{{ form.address.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.contact_number.id_for_label }}" class="form-label">Contact Number</label>
-                            {{ form.contact_number }}
-                            {% if form.contact_number.errors %}
-                                <span class="error-message">{{ form.contact_number.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <span class="error-message">{{ form.email.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.parent_name.id_for_label }}" class="form-label">Parent Name</label>
-                            {{ form.parent_name }}
-                            {% if form.parent_name.errors %}
-                                <span class="error-message">{{ form.parent_name.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="{{ form.parent_contact.id_for_label }}" class="form-label">Parent Contact</label>
-                            {{ form.parent_contact }}
-                            {% if form.parent_contact.errors %}
-                                <span class="error-message">{{ form.parent_contact.errors.as_text }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="btn-container">
-                        <button type="submit" class="btn btn-primary">{{ student_profile|yesno:"Update Profile,Save Profile" }}</button>
-                        {% if student_profile %}
-                            <a href="{% url 'students:student_profile' %}" class="btn btn-secondary">Cancel</a>
-                        {% endif %}
-                    </div>
-                </form>
+            <div class="info-item">
+                <strong>ID Proof:</strong> 
+                {% if student_profile.id_proof %}
+                    <a href="{{ student_profile.id_proof.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <strong>Caste Certificate:</strong> 
+                {% if student_profile.caste_certificate %}
+                    <a href="{{ student_profile.caste_certificate.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <strong>Income Certificate:</strong> 
+                {% if student_profile.income_certificate %}
+                    <a href="{{ student_profile.income_certificate.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <strong>Passport Photo:</strong> 
+                {% if student_profile.passport_photo %}
+                    <a href="{{ student_profile.passport_photo.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <strong>Signature:</strong> 
+                {% if student_profile.signature %}
+                    <a href="{{ student_profile.signature.url }}" class="text-accent">View</a>
+                {% else %}
+                    N/A
+                {% endif %}
             </div>
         </div>
-    {% endif %}
+    </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

@@ -27,8 +27,11 @@ class User(AbstractUser):
     )
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='student')
     is_approved = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True, blank=True)
+    last_logout = models.DateTimeField(null=True, blank=True)
+    password_reset_requested_at = models.DateTimeField(null=True, blank=True)
+    password_reset_created_at = models.DateTimeField(null=True, blank=True)
 
-    # Override the email field to make it unique
     email = models.EmailField(unique=True, error_messages={
         'unique': "A user with that email already exists.",
     })
@@ -38,7 +41,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-    # Custom method to check if user is super admin
     def is_super_admin(self):
         return self.user_type == 'super_admin'
 

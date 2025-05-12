@@ -4,47 +4,157 @@
 
 {% block content %}
 <style>
-    .gradient-theme {
-        background: linear-gradient(to bottom, #1a2a6c, #b21f1f);
-        color: white;
-        border-radius: 8px 8px 0 0;
-        padding: 1rem;
+    .cycle-list-container {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 1rem;
     }
 
     .card-custom {
         border: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }
 
-    .btn-theme {
-        background-color: #b21f1f;
-        border: none;
-        color: white;
-        transition: background-color 0.3s ease;
+    .gradient-theme {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
     }
 
-    .btn-theme:hover {
-        background-color: #1a2a6c;
+    .gradient-theme h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        margin-bottom: 0;
     }
 
     .table th {
-        background-color: #1a2a6c;
-        color: white;
+        background-color: #2C3E50;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+    }
+
+    .table td {
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        color: #333333;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9fafb;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .btn-theme {
+        background-color: #3498DB;
+        border: none;
+        color: #ffffff;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-theme:hover {
+        background-color: #2980B9;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-delete {
+        background-color: #E57373;
+        border: none;
+        color: #ffffff;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-delete:hover {
+        background-color: #D32F2F;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(229, 115, 115, 0.3);
+    }
+
+    .alert-warning {
+        background-color: #fef9e7;
+        border: 1px solid #f9e4a0;
+        color: #7A4B00;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .alert-link {
+        color: #E67E22;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .alert-link:hover {
+        color: #F39C12;
+        text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-        .table-responsive {
-            overflow-x: auto;
+        .cycle-list-container {
+            padding: 1rem 0.5rem;
         }
 
         .gradient-theme h3 {
             font-size: 1.25rem;
         }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .table th,
+        .table td {
+            font-size: 0.9rem;
+            padding: 0.5rem;
+        }
+
+        .btn-theme,
+        .btn-delete {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .action-buttons {
+            gap: 0.3rem;
+        }
     }
 </style>
 
-<div class="container py-4">
+<div class="cycle-list-container">
     <div class="card card-custom">
         <div class="gradient-theme">
             <h3 class="mb-0">Admission Cycles for {{ school.school_name }}</h3>
@@ -82,7 +192,10 @@
                                     <td>{{ cycle.is_active|yesno:"Yes,No" }}</td>
                                     <td>{{ cycle.is_archived|yesno:"Yes,No" }}</td>
                                     <td>
-                                        <a href="{% url 'schools:edit_cycle' cycle.id %}" class="btn btn-sm btn-theme">Edit</a>
+                                        <div class="action-buttons">
+                                            <a href="{% url 'schools:edit_cycle' cycle.id %}" class="btn btn-sm btn-theme">Edit</a>
+                                            <a href="{% url 'schools:delete_cycle' cycle.id %}" class="btn btn-sm btn-delete">Delete</a>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -1,55 +1,147 @@
-# colleges/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import CollegeProfile, Department, Degree, Course
-from .forms import CollegeProfileForm, DepartmentForm, DegreeForm, CourseForm
+from .forms import CollegeRegistrationForm, CollegeProfileForm, DepartmentForm, DegreeForm, CourseForm
+from core.signals import user_registered
+import logging
+import json
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import CollegeProfile
-from .forms import CollegeProfileForm
-from core.signals import profile_updated
+from django.contrib import messages
+from .models import CollegeProfile, Department, Degree, Course
+from .forms import CollegeRegistrationForm, CollegeProfileForm, DepartmentForm, DegreeForm, CourseForm
+from core.signals import user_registered
 import logging
+from .utils import STATES_DISTRICTS
+
+logger = logging.getLogger(__name__)
+
+def college_register(request):
+    if request.method == 'POST':
+        form = CollegeRegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            user_registered.send(sender=None, user=user)
+            messages.success(request, 'Registration successful! Please wait for admin approval.')
+            logger.info("College %s registered, awaiting approval", form.cleaned_data['college_name'])
+            return redirect('core:login')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            logger.warning("College registration failed due to form errors: %s", form.errors)
+    else:
+        form = CollegeRegistrationForm()
+    return render(request, 'colleges/register.html', {
+        'form': form,
+        'states_districts': STATES_DISTRICTS  # Pass the dictionary directly
+    })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import CollegeProfile, Department, Degree, Course
+from .forms import CollegeRegistrationForm, CollegeProfileForm, DepartmentForm, DegreeForm, CourseForm
+from core.signals import user_registered
+import logging
+from .utils import STATES_DISTRICTS
 
 logger = logging.getLogger(__name__)
 
 @login_required
 def college_profile(request):
+    if request.user.user_type != 'college':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    
+    if not request.user.is_approved:
+        messages.error(request, "Your account is not yet approved by the super admin.")
+        return redirect('core:pending_approval')
+
     try:
-        college_profile = request.user.college_profile
-        show_form = False
+        college_profile = CollegeProfile.objects.select_related('user').get(user=request.user)
     except CollegeProfile.DoesNotExist:
-        college_profile = None
-        show_form = True
+        messages.error(request, "Profile not found. Contact support.")
+        return redirect('core:pending_approval')
+
+    return render(request, 'colleges/college_profile.html', {
+        'college_profile': college_profile,
+    })
+
+@login_required
+def edit_college_profile(request):
+    if request.user.user_type != 'college':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    
+    if not request.user.is_approved:
+        messages.error(request, "Your account is not yet approved by the super admin.")
+        return redirect('core:pending_approval')
+
+    try:
+        college_profile = CollegeProfile.objects.select_related('user').get(user=request.user)
+    except CollegeProfile.DoesNotExist:
+        messages.error(request, "Profile not found. Contact support.")
+        return redirect('core:pending_approval')
 
     if request.method == 'POST':
         form = CollegeProfileForm(request.POST, request.FILES, instance=college_profile)
         if form.is_valid():
-            college_profile = form.save(commit=False)
-            college_profile.user = request.user
-            college_profile.save()
-            messages.success(request, "College profile saved successfully!")
-            profile_updated.send(sender=CollegeProfile, user=request.user)
+            form.save()
+            messages.success(request, "Profile updated successfully.")
             return redirect('colleges:college_profile')
         else:
             messages.error(request, "Please correct the errors below.")
+            logger.warning("College profile update failed due to form errors: %s", form.errors)
     else:
-        if college_profile and 'edit' in request.GET:
-            show_form = True
         form = CollegeProfileForm(instance=college_profile)
 
-    return render(request, 'colleges/college_profile.html', {
+    return render(request, 'colleges/edit_college_profile.html', {
         'form': form,
         'college_profile': college_profile,
-        'show_form': show_form,
+        'states_districts': STATES_DISTRICTS  # Pass dictionary directly
     })
 
 
+from core.forms import UserUpdateForm
+
+@login_required
+def update_college_details(request):
+    if request.user.user_type != 'college':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    
+    if not request.user.is_approved:
+        messages.error(request, "Your account is not yet approved by the super admin.")
+        return redirect('core:pending_approval')
+
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your account details have been updated successfully.")
+            return redirect('colleges:college_details_updated')
+        else:
+            messages.error(request, "Please correct the errors below.")
+            logger.warning("College details update failed due to form errors: %s", form.errors)
+    else:
+        form = UserUpdateForm(instance=request.user)
+
+    return render(request, 'colleges/update_college_details.html', {'form': form})
+
+@login_required
+def college_details_updated(request):
+    if request.user.user_type != 'college':
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('core:login')
+    return render(request, 'colleges/college_details_updated.html')
+
 # colleges/views.py
 import logging
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import AdmissionCycle, Application, Department, Section
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +156,13 @@ def dashboard(request):
         return redirect('core:login')
 
     college_profile = request.user.college_profile
-    active_cycle = AdmissionCycle.objects.filter(college=college_profile, is_active=True, is_archived=False).first()
+
+    # Fetch all active admission cycles for the dropdown
+    cycles = AdmissionCycle.objects.filter(college=college_profile, is_active=True, is_archived=False)
+    logger.info(f"Found {cycles.count()} active cycles for college {college_profile.id}: {list(cycles.values('id', 'year', 'is_active', 'is_archived'))}")
+
+    # Use the first active cycle for dashboard metrics, or None if no active cycles
+    active_cycle = cycles.first()
     if not active_cycle:
         messages.warning(request, "No active admission cycle available.")
         total_admitted, pending_applications, total_departments, total_seats, filled_seats, available_seats, chart_data, recent_applications = 0, 0, 0, 0, 0, 0, {'labels': [], 'filled_seats': [], 'available_seats': []}, []
@@ -88,6 +186,24 @@ def dashboard(request):
         recent_applications = Application.objects.filter(department__college=college_profile, cycle=active_cycle).order_by('-apply_date')[:5]
 
     logger.info(f"Chart Data: {chart_data}")
+
+    # Prepare chart data for all cycles (for the dropdown)
+    all_chart_data = {}
+    for cycle in cycles:
+        cycle_departments = Department.objects.filter(college=college_profile, cycle=cycle).prefetch_related('sections__seats')
+        cycle_chart_data = {'labels': [], 'filled_seats': [], 'available_seats': []}
+        for department in cycle_departments:
+            dept_filled_seats = sum(section.seats.filter(is_filled=True).count() for section in department.sections.all())
+            dept_total_seats = sum(section.total_seats for section in department.sections.all())
+            dept_available_seats = dept_total_seats - dept_filled_seats
+            cycle_chart_data['labels'].append(department.name)
+            cycle_chart_data['filled_seats'].append(dept_filled_seats)
+            cycle_chart_data['available_seats'].append(dept_available_seats)
+        all_chart_data[str(cycle.year)] = cycle_chart_data
+    # Add a default entry in case no cycles are available
+    if not all_chart_data:
+        all_chart_data['default'] = {'labels': [], 'filled_seats': [], 'available_seats': []}
+
     context = {
         'college_profile': college_profile,
         'total_admitted': total_admitted,
@@ -99,6 +215,8 @@ def dashboard(request):
         'chart_data': chart_data,
         'recent_applications': recent_applications,
         'active_cycle': active_cycle,
+        'cycles': cycles,  # Pass all active cycles for the dropdown
+        'all_chart_data': all_chart_data,  # Pass chart data for all cycles
     }
     return render(request, 'colleges/dashboard.html', context)
 
@@ -495,7 +613,8 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import AdmissionCycle, CollegeProfile, Application, Section, Seat
+from .models import AdmissionCycle
+from colleges.models import CollegeProfile, Application, Section, Seat
 from core.signals import application_status_updated, application_submitted
 import logging
 
@@ -546,7 +665,7 @@ def manage_applications(request, college_id):
             old_status = application.status
             if action == 'approve':
                 if application.status == 'Approved':
-                    response = {'success': False, 'message': f"Application {application.admission_id} is already approved."}
+                    response = {'success': False, 'message': f"Application from {application.student.username if application.student else 'Unknown'} is already approved."}
                 else:
                     section = application.section
                     if not section:
@@ -568,7 +687,7 @@ def manage_applications(request, college_id):
                                 application.save()
                                 response = {
                                     'success': True,
-                                    'message': f"Application {application.admission_id} approved and seat {seat.seat_number} assigned.",
+                                    'message': f"Application from {application.student.username if application.student else 'Unknown'} approved and seat {seat.seat_number} assigned.",
                                     'status': 'Approved',
                                     'seat_number': seat.seat_number
                                 }
@@ -580,7 +699,7 @@ def manage_applications(request, college_id):
                             response = {'success': False, 'message': "No available seats in the selected section."}
             elif action == 'reject':
                 if application.status == 'Rejected':
-                    response = {'success': False, 'message': f"Application {application.admission_id} is already rejected."}
+                    response = {'success': False, 'message': f"Application from {application.student.username if application.student else 'Unknown'} is already rejected."}
                 else:
                     if application.seat:
                         application.seat.is_filled = False
@@ -589,7 +708,7 @@ def manage_applications(request, college_id):
                     application.save()
                     response = {
                         'success': True,
-                        'message': f"Application {application.admission_id} rejected.",
+                        'message': f"Application from {application.student.username if application.student else 'Unknown'} rejected.",
                         'status': 'Rejected',
                         'seat_number': None
                     }
@@ -622,23 +741,6 @@ def manage_applications(request, college_id):
         'active_cycles': active_cycles,
     }
     return render(request, 'colleges/manage_applications.html', context)
-
-@login_required
-def view_application_details(request, college_id, application_id):
-    if not hasattr(request.user, 'college_profile') or request.user.user_type != 'college' or not request.user.is_approved:
-        return HttpResponseForbidden("You are not authorized to access this page.")
-
-    college = get_object_or_404(CollegeProfile, id=college_id, user=request.user)
-    application = get_object_or_404(Application, id=application_id, department__college=college)
-    
-    context = {
-        'college': college,
-        'application': application,
-    }
-    return render(request, 'colleges/view_application_details.html', context)
-
-
-
 
 
 from django.shortcuts import render, get_object_or_404
@@ -674,7 +776,19 @@ def college_student_details(request, college_id, student_id):
     }
     return render(request, 'colleges/college_student_details.html', context)
 
+@login_required
+def view_application_details(request, college_id, application_id):
+    if not hasattr(request.user, 'college_profile') or request.user.user_type != 'college' or not request.user.is_approved:
+        return HttpResponseForbidden("You are not authorized to access this page.")
 
+    college = get_object_or_404(CollegeProfile, id=college_id, user=request.user)
+    application = get_object_or_404(Application, id=application_id, department__college=college)
+    
+    context = {
+        'college': college,
+        'application': application,
+    }
+    return render(request, 'colleges/view_application_details.html', context)
 
 # colleges/views.py
 from django.contrib.auth.decorators import login_required
@@ -1588,66 +1702,77 @@ def apply_direct(request, college_id):
     return render(request, 'colleges/apply_direct.html', context)
 
 
+
 @login_required
 def application_success(request):
     return render(request, 'colleges/application_success.html', context={})
 
 
-# colleges/views.py (assumed)
+
 from django.shortcuts import render
 
+
 def packages(request):
+    # Get institution type if available (for now, assume school; extend for colleges later)
+    institution_type = 'school'  # Default
+    if request.user.is_authenticated and hasattr(request.user, 'school_profile'):
+        try:
+            school_profile = CollegeProfile.objects.get(user=request.user)
+            institution_type = school_profile.school_type.lower() if school_profile.school_type else 'school'
+        except CollegeProfile.DoesNotExist:
+            pass
+
     context = {
-        'institution_type': 'college',
+        'institution_type': institution_type,
         'digital_marketing_packages': [
             {
                 'name': 'Basic Package',
-                'price': '₹14,999/month',
+                'price': '₹9,999/month',
                 'features': [
                     '5 Social Media Posts (Facebook, Instagram)',
-                    '1 Promotional Video for College Events',
-                    'Basic SEO for College Website',
+                    '1 Promotional Video',
+                    'Basic SEO for School Website',
                     'Google My Business Optimization',
-                    'Lead Generation Form for Admissions',
+                    'Lead Generation Form Setup',
                 ],
             },
             {
                 'name': 'Standard Package',
-                'price': '₹24,999/month',
+                'price': '₹19,999/month',
                 'features': [
                     '10 Social Media Posts (FB, Insta, LinkedIn)',
                     '2 Promotional Videos + Reels',
                     'Advanced SEO & Website Optimization',
-                    'Facebook & Instagram Ads (₹4,000 Ad Budget Included)',
+                    'Facebook & Instagram Ads (₹3,000 Ad Budget Included)',
                     'Google My Business & Reviews Management',
-                    'Lead Generation Campaigns for College Admissions',
+                    'Lead Generation Campaigns',
                 ],
             },
             {
                 'name': 'Premium Package',
-                'price': '₹39,999/month',
+                'price': '₹29,999/month',
                 'features': [
                     '15 Social Media Posts (FB, Insta, LinkedIn, Twitter)',
                     '3 Promotional Videos + Reels',
-                    'Full SEO + Blog Writing (3 Blogs/Month)',
-                    'Paid Ad Campaigns on FB, Insta (₹7,000 Ad Budget Included)',
-                    'College Admission Landing Page',
+                    'Full SEO + Blog Writing (2 Blogs/Month)',
+                    'Paid Ad Campaigns on FB, Insta (₹5,000 Ad Budget Included)',
+                    'School Admission Landing Page',
                     'Google My Business & Reviews Management',
                 ],
             },
         ],
         'academia_package': {
             'name': 'Academia Admission Package',
-            'price': '₹TBD/month',
+            'price': '₹9999/6 months',  # Placeholder, update later
             'features': [
                 'Online Application Form',
                 'Student Data Management',
-                'College Listing & Filtering',
-                '3000 Applications/Month',
+                'Institution Listing & Filtering',
+                '2000 Applications/Month',
                 'Email Notifications',
-                'College Data Analytics',
+                'Institution Data Analytics',
                 'Admin Seat Visualization',
-                'College Landing Page',
+                'Institution Landing Page',
                 'Payment Gateway Integration',
             ],
         },

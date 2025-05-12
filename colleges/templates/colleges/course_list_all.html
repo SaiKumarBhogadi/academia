@@ -4,198 +4,329 @@
 
 {% block content %}
 <style>
-    /* Custom styles for the Course List page */
     .course-list-container {
         max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px 15px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
     }
-    .card {
+
+    .course-list-container .card {
         border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
     }
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
-        border-radius: 10px 10px 0 0;
-        padding: 15px 20px;
+
+    .course-list-container .card:hover {
+        transform: translateY(-5px);
     }
-    .card-header h3 {
+
+    .course-list-container .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem 2rem;
+    }
+
+    .course-list-container .card-header h3 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: 600;
-        color: #333;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    .card-body {
-        padding: 20px;
+
+    .course-list-container .card-body {
+        padding: 2rem;
     }
-    .form-label {
+
+    .course-list-container .form-label {
         font-weight: 500;
-        color: #444;
-        margin-bottom: 5px;
+        color: #333333;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
     }
-    .form-select {
-        width: 200px;
-        padding: 8px 12px;
-        border: 1px solid #ced4da;
-        border-radius: 5px;
+
+    .course-list-container .form-select {
+        width: 250px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
         font-size: 0.95rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
     }
-    .dropdown-toggle {
-        padding: 8px 16px;
+
+    .course-list-container .form-select:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .course-list-container .dropdown-toggle {
+        padding: 0.5rem 1rem;
         font-size: 0.95rem;
-        border-radius: 5px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    .dropdown-menu {
-        border-radius: 5px;
+
+    .course-list-container .dropdown-menu {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: none;
     }
-    .dropdown-item {
+
+    .course-list-container .dropdown-item {
         font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        transition: background-color 0.2s ease;
     }
-    h5 {
-        font-size: 1.2rem;
+
+    .course-list-container .dropdown-item:hover {
+        background-color: #e6f0fa;
+        color: #2C3E50;
+    }
+
+    .course-list-container h5 {
+        font-size: 1.4rem;
         font-weight: 600;
-        margin-bottom: 15px;
+        margin-bottom: 1.5rem;
+        color: #2C3E50;
     }
-    h6 {
-        font-size: 1.1rem;
+
+    .course-list-container h6 {
+        font-size: 1.2rem;
         font-weight: 500;
-        margin-bottom: 10px;
+        margin-bottom: 1rem;
+        color: #333333;
     }
-    .table {
+
+    .course-list-container .table {
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         margin-bottom: 0;
     }
-    .table th {
-        font-weight: 600;
-        color: #444;
-        border-bottom: 2px solid #dee2e6;
+
+    .course-list-container .table thead {
+        background: #f9fafb;
     }
-    .table td {
+
+    .course-list-container .table th {
+        font-weight: 600;
+        color: white;
+        border-bottom: 2px solid #e0e0e0;
+        padding: 1rem;
+    }
+
+    .course-list-container .table td {
         vertical-align: middle;
         font-size: 0.95rem;
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333333;
     }
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 0.85rem;
-        border-radius: 5px;
-        margin-right: 5px;
+
+    .course-list-container .table tbody tr:hover {
+        background: #e6f0fa;
     }
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-    }
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-    .btn-warning {
-        background-color: #ffc107;
-        border: none;
-        color: #212529;
-    }
-    .btn-warning:hover {
-        background-color: #e0a800;
-    }
-    .btn-danger {
-        background-color: #dc3545;
-        border: none;
-    }
-    .btn-danger:hover {
-        background-color: #b02a37;
-    }
-    .text-muted,
-    .text-danger {
+
+    .course-list-container .btn-sm {
+        padding: 0.5rem 1rem;
         font-size: 0.9rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-right: 0.5rem;
     }
-    .alert {
-        margin-bottom: 20px;
-        border-radius: 5px;
+
+    .course-list-container .btn-primary {
+        background-color: #2C3E50;
+        border: none;
+        color: #ffffff;
     }
-    /* Desktop and larger screens */
+
+    .course-list-container .btn-primary:hover {
+        background-color: #3498DB;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .course-list-container .btn-warning {
+        background-color: #F1C40F;
+        border: none;
+        color: #ffffff;
+    }
+
+    .course-list-container .btn-warning:hover {
+        background-color: #E67E22;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-list-container .btn-danger {
+        background-color: #E74C3C;
+        border: none;
+        color: #ffffff;
+    }
+
+    .course-list-container .btn-danger:hover {
+        background-color: #C0392B;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .course-list-container .text-muted {
+        color: #666666 !important;
+        font-style: italic;
+        font-size: 0.95rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .course-list-container .text-danger {
+        color: #E74C3C !important;
+        font-size: 0.95rem;
+        padding: 1rem;
+    }
+
+    .course-list-container .text-danger a {
+        color: #E74C3C;
+        text-decoration: underline;
+    }
+
+    .course-list-container .text-danger a:hover {
+        color: #C0392B;
+    }
+
+    .course-list-container .alert {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        border: none;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-list-container .alert-success {
+        background: #e6f4ea;
+        color: #2c6b40;
+    }
+
+    .course-list-container .alert-danger {
+        background: #fee2e2;
+        color: #E74C3C;
+    }
+
     @media (min-width: 768px) {
-        .table-responsive {
+        .course-list-container .table-responsive {
             overflow-x: auto;
         }
-        .table td:last-child {
+
+        .course-list-container .table td:last-child {
             white-space: nowrap;
         }
     }
-    /* Mobile screens */
+
     @media (max-width: 767px) {
         .course-list-container {
-            padding: 15px 10px;
+            padding: 1rem 0.5rem;
         }
-        .card-header h3 {
-            font-size: 1.3rem;
+
+        .course-list-container .card-header h3 {
+            font-size: 1.5rem;
         }
-        .card-body {
-            padding: 15px;
+
+        .course-list-container .card-body {
+            padding: 1.5rem;
         }
-        .form-select {
+
+        .course-list-container .form-select {
             width: 100%;
             font-size: 0.9rem;
         }
-        .dropdown-toggle {
+
+        .course-list-container .dropdown-toggle {
             width: 100%;
-            padding: 8px;
+            padding: 0.5rem;
             font-size: 0.9rem;
         }
-        h5 {
+
+        .course-list-container h5 {
+            font-size: 1.2rem;
+        }
+
+        .course-list-container h6 {
             font-size: 1.1rem;
         }
-        h6 {
-            font-size: 1rem;
-        }
-        .table {
+
+        .course-list-container .table {
             display: block;
         }
-        .table thead {
+
+        .course-list-container .table thead {
             display: none;
         }
-        .table tbody,
-        .table tr {
+
+        .course-list-container .table tbody,
+        .course-list-container .table tr {
             display: block;
         }
-        .table tr {
-            border: 1px solid #dee2e6;
+
+        .course-list-container .table tr {
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
             background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        .table td {
+
+        .course-list-container .table td {
             display: block;
             text-align: left;
             font-size: 0.9rem;
-            padding: 5px 0;
+            padding: 0.5rem 0;
             border: none;
+            color: #333333;
         }
-        .table td:before {
+
+        .course-list-container .table td:before {
             content: attr(data-label) ": ";
             font-weight: 500;
-            color: #444;
+            color: #2C3E50;
             display: inline-block;
             width: 120px;
         }
-        .table td:last-child {
-            padding-top: 10px;
+
+        .course-list-container .table td:last-child {
+            padding-top: 0.8rem;
         }
-        .btn-sm {
+
+        .course-list-container .btn-sm {
             display: block;
             width: 100%;
-            padding: 8px;
-            font-size: 0.9rem;
-            margin-right: 0;
-            margin-bottom: 5px;
-        }
-        .text-muted,
-        .text-danger {
+            padding: 0.5rem;
             font-size: 0.85rem;
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-list-container .text-muted,
+        .course-list-container .text-danger {
+            font-size: 0.9rem;
         }
     }
 </style>
 
-<div class="course-list-container mt-5">
+<div class="course-list-container">
     <div class="card">
         <div class="card-header">
             <h3>Manage Courses - {{ college_profile.college_name }}</h3>
@@ -249,11 +380,11 @@
                                         <table class="table">
                                             <thead>
                                                 <tr>
-                                                    <th style="color: white;">Course Code</th>
-                                                    <th style="color: white;">Name</th>
-                                                    <th style="color: white;">Semester</th>
-                                                    <th style="color: white;">Credits</th>
-                                                    <th style="color: white;">Actions</th>
+                                                    <th>Course Code</th>
+                                                    <th>Name</th>
+                                                    <th>Semester</th>
+                                                    <th>Credits</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

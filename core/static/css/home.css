@@ -1,0 +1,985 @@
+/* Topbar Styling */
+.topbar {
+  font-size: 0.85rem;
+  background-color: #d81b60 !important;
+  z-index: 1040;
+  position: relative;
+}
+
+.topbar .nav-link {
+  color: #333;
+  transition: color 0.2s;
+}
+
+/* .topbar .nav-link:hover {
+  color: #f7f4f5;
+} */
+
+#top-link:hover{
+  color: #f4f0f1 !important;
+}
+
+ 
+ 
+ /* Sticky Navbar with Glassmorphism */
+ .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  /* Fallback for browsers that don't support backdrop-filter */
+  @supports not (backdrop-filter: blur(10px)) {
+    .navbar {
+      background: #ffffff;
+    }
+  }
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Navbar Links */
+  .navbar-nav .nav-link {
+    color: #FFB300 !important;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  .navbar-nav .nav-link:hover {
+    color: #EC407A !important;
+  }
+  /* Login Button */
+  .btn-login {
+    background-color: #EC407A;
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  .btn-login:hover {
+    background-color: #d81b60;
+  }
+  /* Logo Styling */
+  .navbar-brand img {
+    max-height: 50px;
+  }
+  /* Padding for Spacing */
+  .navbar .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  /* Mobile Menu Links */
+  .navbar-collapse .nav-link {
+    text-align: center;
+  }
+  /* Body background */
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+
+
+
+  /* Carousel Styling */
+  .carousel-item {
+    height: 90vh;
+    
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay for contrast */
+    opacity: 0.5; /* Reduced opacity for image */
+  }
+  .banner-content {
+    position: relative;
+    z-index: 1;
+    padding: 3rem;
+    color: #ffffff;
+    text-align: center;
+  }
+  .banner-content h5 {
+    color: #FF5722; /* Orange from reference */
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8); /* Stronger shadow */
+  }
+  .banner-content h1 {
+    color: #ffffff;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+  }
+  .banner-content p {
+    color: #ffffff;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+  }
+  .banner-content .highlight {
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  .btn-register {
+    background-color: #FF5722; /* Orange */
+    color: #ffffff;
+    border: none;
+    margin-right: 1rem;
+  }
+  .btn-register:hover {
+    background-color: #E64A19;
+  }
+  .btn-know-more {
+    background-color: #2196F3; /* Blue */
+    color: #ffffff;
+    border: none;
+  }
+  .btn-know-more:hover {
+    background-color: #1976D2;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .banner-content h1 {
+      font-size: 1.8rem;
+    }
+    .banner-content p {
+      font-size: 0.9rem;
+    }
+  }
+
+
+
+
+
+   /* About Us Section */
+   .about-us {
+    padding: 4rem 0;
+    background-color: #f8f9fa; /* Light background */
+  }
+  .about-content h2 {
+    color: #FFB300; /* Yellow from logo */
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  .about-content p {
+    color: #333; /* Dark text for readability */
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .about-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .about-content h2 {
+      font-size: 2rem;
+    }
+    .about-content p {
+      font-size: 1rem;
+    }
+  }
+
+
+
+
+  /* Services Section */
+  .services {
+    padding: 1rem 0;
+    background-color: #ffffff; /* White background */
+  }
+  .services h2 {
+    color: #FFB300; /* Yellow from branding */
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .service-card {
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+  }
+  .service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
+  .service-card i {
+    font-size: 2.5rem;
+    color: #EC407A; /* Pink from branding */
+    margin-bottom: 1rem;
+  }
+  .service-card h3 {
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  .service-card p {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .services h2 {
+      font-size: 2rem;
+    }
+    .service-card h3 {
+      font-size: 1.3rem;
+    }
+    .service-card p {
+      font-size: 0.9rem;
+    }
+  }
+
+
+
+ /* Impact Section */
+ .impact {
+    position: relative;
+    color: #ffffff;
+  }
+  .impact-top {
+    position: relative;
+    height: 30vh;
+    background-image: url('https://via.placeholder.com/1920x1080?text=Educational+Institution');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .impact-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay for readability */
+  }
+  .impact-top-content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+  }
+  .impact-top-content h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  .impact-top-content h2 span {
+    color: #FFB300; /* Yellow for stats */
+  }
+  .impact-top-content p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+    text-transform: uppercase;
+  }
+  .impact-bottom {
+    background-color: #EC407A; /* Pink from branding */
+    padding: 3rem 0;
+    text-align: center;
+  }
+  .impact-bottom p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 800px;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .impact-top {
+      height: 40vh;
+    }
+    .impact-top-content h2 {
+      font-size: 1.8rem;
+    }
+    .impact-top-content p {
+      font-size: 1.2rem;
+    }
+    .impact-bottom p {
+      font-size: 1rem;
+    }
+  }
+
+
+
+
+/* Achievements Section */
+.achievements {
+    background-color: #EC407A; /* Pink from branding */
+    padding: 4rem 0;
+    color: #ffffff;
+  }
+  .achievements h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .achievements h2 span {
+    color: #FFB300; /* Yellow for stats */
+  }
+  .achievement-card {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    height: 100%;
+    color: #333;
+    transition: transform 0.3s ease;
+  }
+  .achievement-card:hover {
+    transform: translateY(-5px);
+  }
+  .achievement-card i {
+    font-size: 2.5rem;
+    color: #EC407A;
+    margin-bottom: 1rem;
+  }
+  .achievement-card .number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #FFB300;
+    margin-bottom: 0.5rem;
+  }
+  .achievement-card h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .achievements h2 {
+      font-size: 2rem;
+    }
+    .achievement-card .number {
+      font-size: 1.5rem;
+    }
+    .achievement-card h3 {
+      font-size: 1rem;
+    }
+  }
+
+
+
+  /* Why Choose Us Section */
+  .why-choose-us {
+    padding: 4rem 0;
+    background-color: #f8f9fa; /* Light background */
+  }
+  .why-choose-us h2 {
+    color: #FFB300; /* Yellow from branding */
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .why-choose-us .intro {
+    color: #666;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .category-title {
+    color: #EC407A; /* Pink from branding */
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .benefit-card {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+  }
+  .benefit-card:hover {
+    transform: translateY(-5px);
+  }
+  .benefit-card i {
+    font-size: 2rem;
+    color: #EC407A;
+    margin-right: 1rem;
+  }
+  .benefit-card p {
+    color: #333;
+    font-size: 1rem;
+    margin: 0;
+    flex: 1;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .why-choose-us h2 {
+      font-size: 2rem;
+    }
+    .why-choose-us .intro {
+      font-size: 1rem;
+    }
+    .category-title {
+      font-size: 1.5rem;
+    }
+    .benefit-card p {
+      font-size: 0.9rem;
+    }
+  }
+
+
+
+
+  .is-testimonials-section {
+    background: url('world-map-bg.png') center/cover no-repeat; /* Replace with your world map background image */
+    padding: 60px 0;
+    position: relative;
+}
+
+.is-testimonials-container {
+    max-width: 80%; /* 10% space on left and right (100% - 10% - 10%) */
+    margin: 0 auto; /* Center the container with 10% space on both sides */
+    text-align: center;
+}
+
+.is-testimonials-subtitle {
+    color: #EC407A; /* Red theme color */
+    font-size: 1.2rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #EC407A; /* Red underline */
+    display: inline-block;
+}
+
+.is-testimonials-title {
+    color: #333;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.is-testimonials-slider {
+    overflow: hidden; /* Hide overflow to create the slider effect */
+    position: relative;
+}
+
+.is-testimonials-wrapper {
+    display: flex;
+    transition: transform 0.5s ease; /* Smooth transition for sliding */
+}
+
+.is-testimonial-card {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    padding: 30px;
+    flex-shrink: 0; /* Prevent cards from shrinking */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    margin-right: 30px; /* Gap between cards */
+    width: calc(50% - 15px); /* Two cards per row with gap on larger screens */
+}
+
+@media screen and (max-width: 768px) {
+    .is-testimonial-card {
+        width: 100%; /* One card per row on smaller screens */
+        margin-right: 0; /* Remove margin for single card view */
+    }
+}
+
+.is-testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: #EC407A; /* Red theme color for the left border */
+}
+
+.is-testimonial-card blockquote {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.is-testimonial-card cite {
+    font-size: 1rem;
+    color: #EC407A; /* Red theme color for the name */
+    font-style: normal;
+    font-weight: bold;
+}
+
+.is-testimonials-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.is-testimonial-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.is-testimonial-dot.active {
+    background-color: #EC407A; /* Red theme color for active dot */
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .is-testimonials-container {
+        max-width: 90%; /* Slightly less space on smaller screens */
+    }
+
+    .is-testimonials-title {
+        font-size: 2rem;
+    }
+
+    .is-testimonials-subtitle {
+        font-size: 1rem;
+    }
+
+    .is-testimonial-card blockquote {
+        font-size: 1.1rem;
+    }
+
+    .is-testimonial-card cite {
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .is-testimonials-title {
+        font-size: 1.5rem;
+    }
+
+    .is-testimonials-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .is-testimonial-card blockquote {
+        font-size: 1rem;
+    }
+
+    .is-testimonial-card cite {
+        font-size: 0.8rem;
+    }
+}
+
+
+
+
+ /* Contact Us Section */
+ .contact-us {
+    padding: 4rem 0;
+    background-color: #f8f9fa; /* Light background */
+  }
+  .contact-us h3 {
+    color: #FFB300; /* Yellow from branding */
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+ 
+  .contact-left {
+    color: #333;
+  }
+  .contact-left ul {
+    list-style: none;
+    padding: 0;
+  }
+  .contact-left ul li {
+    margin-bottom: 1rem;
+  }
+  .contact-left ul li::before {
+    content: "•";
+    color: #EC407A; /* Pink from branding */
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+  .contact-form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .contact-form label {
+    font-weight: bold;
+    color: #333;
+  }
+  .contact-form .form-control {
+    border-radius: 5px;
+  }
+  .contact-form .btn {
+    background-color: #EC407A;
+    color: #ffffff;
+    border: none;
+  }
+  .contact-form .btn:hover {
+    background-color: #d81b60;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .contact-us h2 {
+      font-size: 2rem;
+    }
+    .contact-form {
+      padding: 1.5rem;
+    }
+  }
+
+
+
+
+ /* Footer Section */
+ .footer {
+    background-color: #333; /* Dark background */
+    color: #ffffff;
+    padding: 2rem 0;
+    margin-top: 2rem;
+  }
+  .footer h4 {
+    color: #FFB300; /* Yellow from branding */
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .footer p, .footer a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+  .footer a:hover {
+    color: #EC407A; /* Pink from branding */
+  }
+  .footer .social-icons a {
+    margin-right: 1rem;
+    font-size: 1.5rem;
+  }
+  .footer .social-icons a i {
+    color: #EC407A;
+    transition: color 0.3s ease;
+  }
+  .footer .social-icons a i:hover {
+    color: #FFB300;
+  }
+  .footer .copyright {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #555;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .footer h4 {
+      font-size: 1.2rem;
+    }
+    .footer .social-icons a {
+      margin-right: 0.5rem;
+    }
+  }
+
+
+
+
+
+ /* Plans Section */
+ .plans {
+  padding: 4rem 0;
+  background-color: #f8f9fa; /* Light background */
+}
+.plans h2 {
+  color: #FFB300; /* Yellow from branding */
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.plans .subtitle {
+  color: #666;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.plan-card {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  text-align: center;
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack elements vertically */
+  justify-content: space-between; /* Push button to bottom */
+}
+.plan-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+.plan-card h3 {
+  color: #EC407A; /* Pink from branding */
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.plan-card .price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+.plan-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+  flex-grow: 1; /* Take up remaining space */
+}
+.plan-card ul li {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.75rem;
+}
+.plan-card ul li i {
+  color: #EC407A;
+  margin-right: 0.5rem;
+}
+.plan-card .btn {
+  background-color: #FFB300;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  align-self: center; /* Center the button */
+}
+.plan-card .btn:hover {
+  background-color: #EC407A;
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .plans h2 {
+    font-size: 2rem;
+  }
+  .plans .subtitle {
+    font-size: 1rem;
+  }
+  .plan-card h3 {
+    font-size: 1.5rem;
+  }
+  .plan-card .price {
+    font-size: 1.2rem;
+  }
+  .plan-card ul li {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
+
+/* Header Section */
+.clients-header {
+  background: linear-gradient(135deg, #FFB300, #EC407A); /* Gradient of yellow to pink */
+  color: #ffffff;
+  padding: 4rem 0;
+  position: relative;
+}
+.clients-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.clients-header p {
+  font-size: 1.2rem;
+}
+.clients-header .image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 40%;
+  background: url('../images/clients.jpg') no-repeat center;
+  background-size: cover;
+}
+.clients-breadcrumb {
+  background-color: #ffffff;
+  padding: 1rem 0;
+  color: #666;
+}
+.clients-breadcrumb a {
+  color: #FFB300; /* Yellow from branding */
+  text-decoration: none;
+}
+.clients-breadcrumb a:hover {
+  color: #EC407A; /* Pink from branding */
+}
+/* Clients Section */
+.clients-section {
+  padding: 4rem 0;
+  background-color: #f8f9fa;
+}
+.client-card {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  height: 100%;
+}
+.client-card:hover {
+  transform: translateY(-5px);
+}
+.client-card img {
+  max-width: 100%;
+  height: 200px;
+  margin-bottom: 1rem;
+}
+.client-card h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.client-card p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .clients-header h1 {
+    font-size: 2rem;
+  }
+  .clients-header p {
+    font-size: 1rem;
+  }
+  .clients-header .image {
+    display: none; /* Hide image on mobile */
+  }
+  .client-card h4 {
+    font-size: 1rem;
+  }
+  .client-card p {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
+
+ /* Header Section */
+ .testimonials-header {
+  background: linear-gradient(135deg, #FFB300, #EC407A); /* Gradient of yellow to pink */
+  color: #ffffff;
+  padding: 4rem 0;
+  text-align: center;
+}
+.testimonials-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.testimonials-breadcrumb {
+  background-color: #ffffff;
+  padding: 1rem 0;
+  color: #666;
+  text-align: center;
+}
+.testimonials-breadcrumb a {
+  color: #FFB300; /* Yellow from branding */
+  text-decoration: none;
+}
+.testimonials-breadcrumb a:hover {
+  color: #EC407A; /* Pink from branding */
+}
+/* Testimonials Section */
+.testimonials-section {
+  padding: 4rem 0;
+  background-color: #f8f9fa;
+}
+.testimonial-card {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  height: 100%;
+  text-align: center;
+}
+.testimonial-card:hover {
+  transform: translateY(-5px);
+}
+.testimonial-card i {
+  font-size: 2rem;
+  color: #EC407A; /* Pink from branding */
+  margin-bottom: 1rem;
+}
+.testimonial-card p.quote {
+  font-size: 1.1rem;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+.testimonial-card h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.testimonial-card p.designation {
+  font-size: 1rem;
+  color: #999;
+  margin: 0;
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .testimonials-header h1 {
+    font-size: 2rem;
+  }
+  .testimonial-card p.quote {
+    font-size: 1rem;
+  }
+  .testimonial-card h4 {
+    font-size: 1rem;
+  }
+  .testimonial-card p.designation {
+    font-size: 0.9rem;
+  }
+}

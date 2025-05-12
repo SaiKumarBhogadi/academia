@@ -1,53 +1,135 @@
 from django import forms
-from .models import CollegeProfile, Department, Degree, Course, Section, AdmissionCycle
-from .models import Application
-from django.utils import timezone
+from django.db import transaction
+from core.models import User
+from .models import CollegeProfile, Department, Degree, Course
+import json
+import os
+
+from django import forms
+from django.db import transaction
+from core.models import User
+from .models import CollegeProfile, Department, Degree, Course
+from .utils import STATES_DISTRICTS
+
+# Generate state choices dynamically
+INDIAN_STATES = [(state, state) for state in STATES_DISTRICTS.keys()]
+INDIAN_STATES.insert(0, ('', 'Select State'))
 
 class CollegeProfileForm(forms.ModelForm):
+    state = forms.ChoiceField(
+        choices=INDIAN_STATES,
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_state', 'class': 'form-control'})
+    )
+    district = forms.ChoiceField(
+        choices=[('', 'Select District')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_district', 'class': 'form-control'})
+    )
+
     class Meta:
         model = CollegeProfile
         fields = [
-            'college_name', 'principal_name', 'established_year', 'street_address', 'city',
-            'state', 'pincode', 'country', 'contact_email', 'contact_phone', 'website',
-            'college_type', 'affiliation', 'accreditation', 'hostel_availability',
-            'hostel_capacity_boys', 'hostel_capacity_girls', 'library', 'library_books_count',
-            'labs', 'placement_cell', 'placement_percentage', 'top_recruiters',
-            'other_facilities', 'profile_pic'
+            'college_name', 'principal_name', 'contact_phone', 'alternate_phone_number',
+            'contact_email', 'college_type', 'affiliation', 'accreditation',
+            'medium_of_instruction', 'established_year', 'total_students', 'total_faculty',
+            'college_code', 'courses_offered', 'streams_available', 'street_address',
+            'city', 'state', 'district', 'pincode', 'website', 'profile_pic',
+            'accreditation_certificate', 'brochure', 'hostel_availability',
+            'hostel_capacity_boys', 'hostel_capacity_girls', 'library',
+            'library_books_count', 'placement_cell', 'placement_percentage',
+            'top_recruiters', 'labs', 'other_facilities'
         ]
         widgets = {
             'college_name': forms.TextInput(attrs={'class': 'form-control'}),
             'principal_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'established_year': forms.NumberInput(attrs={'class': 'form-control'}),
-            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
-            'city': forms.TextInput(attrs={'class': 'form-control'}),
-            'state': forms.TextInput(attrs={'class': 'form-control'}),
-            'pincode': forms.TextInput(attrs={'class': 'form-control'}),
-            'country': forms.TextInput(attrs={'class': 'form-control'}),
-            'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
             'contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'website': forms.URLInput(attrs={'class': 'form-control'}),
+            'alternate_phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
             'college_type': forms.Select(attrs={'class': 'form-control'}),
             'affiliation': forms.TextInput(attrs={'class': 'form-control'}),
-            'accreditation': forms.TextInput(attrs={'class': 'form-control'}),
+            'accreditation': forms.Select(attrs={'class': 'form-control'}),
+            'medium_of_instruction': forms.Select(attrs={'class': 'form-control'}),
+            'established_year': forms.NumberInput(attrs={'class':'form-control'}),
+            'total_students': forms.NumberInput(attrs={'class': 'form-control'}),
+            'total_faculty': forms.NumberInput(attrs={'class': 'form-control'}),
+            'college_code': forms.TextInput(attrs={'class': 'form-control'}),
+            'courses_offered': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'streams_available': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'pincode': forms.TextInput(attrs={'class': 'form-control'}),
+            'website': forms.URLInput(attrs={'class': 'form-control'}),
+            'profile_pic': forms.FileInput(attrs={'class': 'form-control'}),
+            'accreditation_certificate': forms.FileInput(attrs={'class': 'form-control'}),
+            'brochure': forms.FileInput(attrs={'class': 'form-control'}),
             'hostel_availability': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'hostel_capacity_boys': forms.NumberInput(attrs={'class': 'form-control'}),
             'hostel_capacity_girls': forms.NumberInput(attrs={'class': 'form-control'}),
             'library': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'library_books_count': forms.NumberInput(attrs={'class': 'form-control'}),
-            'labs': forms.Textarea(attrs={'class': 'form-control'}),
             'placement_cell': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'placement_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
-            'top_recruiters': forms.Textarea(attrs={'class': 'form-control'}),
-            'other_facilities': forms.Textarea(attrs={'class': 'form-control'}),
-            'profile_pic': forms.FileInput(attrs={'class': 'form-control'}),
-        }
+            'top_recruiters': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'labs': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'other_facilities': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Update district choices based on the selected state
+        if 'state' in self.data:  # Check if state is in the submitted data
+            state = self.data.get('state')
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+            else:
+                self.fields['district'].choices = [('', 'Select District')]
+        elif self.instance and self.instance.state:  # Handle existing state from instance
+            state = self.instance.state
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+        else:
+            self.fields['district'].choices = [('', 'Select District')]
+
+    def clean_contact_phone(self):
+        phone = self.cleaned_data.get('contact_phone')
+        if not phone.isdigit() or len(phone) != 10:
+            raise forms.ValidationError("Contact phone must be a 10-digit number.")
+        return phone
+
+    def clean_alternate_phone_number(self):
+        phone = self.cleaned_data.get('alternate_phone_number')
+        if phone and (not phone.isdigit() or len(phone) != 10):
+            raise forms.ValidationError("Alternate phone must be a 10-digit number.")
+        return phone
+
+    def clean_placement_percentage(self):
+        percentage = self.cleaned_data.get('placement_percentage')
+        if percentage and (percentage < 0 or percentage > 100):
+            raise forms.ValidationError("Placement percentage must be between 0 and 100.")
+        return percentage
+
+    def clean(self):
+        cleaned_data = super().clean()
+        state = cleaned_data.get('state')
+        district = cleaned_data.get('district')
+
+        # Validate district based on state
+        if state and district:
+            if district not in STATES_DISTRICTS.get(state, []):
+                raise forms.ValidationError("Invalid district for the selected state.")
+        elif state and not district:
+            raise forms.ValidationError("Please select a district.")
+        elif district and not state:
+            raise forms.ValidationError("Please select a state before selecting a district.")
+
+        return cleaned_data
 
 # colleges/forms.py
 from django import forms
 from .models import AdmissionCycle, Degree, Department, Section, Course, CollegeProfile
 
-from django import forms
-from .models import AdmissionCycle
+
 
 from django import forms
 from .models import AdmissionCycle
@@ -56,6 +138,14 @@ class AdmissionCycleForm(forms.ModelForm):
     class Meta:
         model = AdmissionCycle
         fields = ['year', 'start_date', 'end_date', 'is_active', 'is_archived']
+        
+        widgets = {
+            'year': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 2025-2026'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_archived': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
     def __init__(self, college, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -291,3 +381,169 @@ class ApplicationForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+
+from django import forms
+from django.db import transaction
+from core.models import User
+from .models import CollegeProfile
+
+from django import forms
+from django.db import transaction
+from core.models import User
+from .models import CollegeProfile, Department, Degree, Course
+from .utils import STATES_DISTRICTS
+
+# Generate state choices dynamically
+INDIAN_STATES = [(state, state) for state in STATES_DISTRICTS.keys()]
+INDIAN_STATES.insert(0, ('', 'Select State'))
+
+class CollegeRegistrationForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, label="Username")
+    email = forms.EmailField(label="Email")
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+
+    # Define state as a ChoiceField
+    state = forms.ChoiceField(
+        choices=INDIAN_STATES,
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_state', 'class': 'form-control'})
+    )
+    # Define district as a ChoiceField with dynamic choices
+    district = forms.ChoiceField(
+        choices=[('', 'Select District')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'id_district', 'class': 'form-control'})
+    )
+
+    class Meta:
+        model = CollegeProfile
+        fields = [
+            'college_name', 'principal_name', 'contact_phone', 'alternate_phone_number', 'contact_email',
+            'college_type', 'affiliation', 'accreditation', 'courses_offered', 'streams_available',
+            'medium_of_instruction', 'established_year', 'total_students', 'total_faculty', 'college_code',
+            'website', 'hostel_availability', 'hostel_capacity_boys', 'hostel_capacity_girls',
+            'library', 'library_books_count', 'labs', 'placement_cell', 'placement_percentage',
+            'top_recruiters', 'other_facilities', 'street_address', 'city', 'state', 'district', 'pincode',
+            'profile_pic', 'accreditation_certificate', 'brochure'
+        ]
+        widgets = {
+            'college_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'principal_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'alternate_phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'college_type': forms.Select(attrs={'class': 'form-control'}),
+            'affiliation': forms.TextInput(attrs={'class': 'form-control'}),
+            'accreditation': forms.Select(attrs={'class': 'form-control'}),
+            'courses_offered': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'streams_available': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'medium_of_instruction': forms.Select(attrs={'class': 'form-control'}),
+            'established_year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'total_students': forms.NumberInput(attrs={'class': 'form-control'}),
+            'total_faculty': forms.NumberInput(attrs={'class': 'form-control'}),
+            'college_code': forms.TextInput(attrs={'class': 'form-control'}),
+            'website': forms.URLInput(attrs={'class': 'form-control'}),
+            'hostel_availability': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'hostel_capacity_boys': forms.NumberInput(attrs={'class': 'form-control'}),
+            'hostel_capacity_girls': forms.NumberInput(attrs={'class': 'form-control'}),
+            'library': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'library_books_count': forms.NumberInput(attrs={'class': 'form-control'}),
+            'labs': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'placement_cell': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'placement_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'top_recruiters': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'other_facilities': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'pincode': forms.TextInput(attrs={'class': 'form-control'}),
+            'profile_pic': forms.FileInput(attrs={'class': 'form-control'}),
+            'accreditation_certificate': forms.FileInput(attrs={'class': 'form-control'}),
+            'brochure': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Update district choices based on the selected state
+        if 'state' in self.data:  # Check if state is in the submitted data
+            state = self.data.get('state')
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+            else:
+                self.fields['district'].choices = [('', 'Select District')]
+        elif self.initial.get('state'):  # Handle initial state (e.g., from instance)
+            state = self.initial.get('state')
+            if state in STATES_DISTRICTS:
+                self.fields['district'].choices = [('', 'Select District')] + [(district, district) for district in STATES_DISTRICTS[state]]
+        else:
+            self.fields['district'].choices = [('', 'Select District')]
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("A user with that username already exists.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with that email already exists.")
+        return email
+
+    def clean_contact_phone(self):
+        phone = self.cleaned_data.get('contact_phone')
+        if not phone.isdigit() or len(phone) != 10:
+            raise forms.ValidationError("Contact phone must be a 10-digit number.")
+        return phone
+
+    def clean_alternate_phone_number(self):
+        phone = self.cleaned_data.get('alternate_phone_number')
+        if phone and (not phone.isdigit() or len(phone) != 10):
+            raise forms.ValidationError("Alternate phone must be a 10-digit number.")
+        return phone
+
+    def clean_placement_percentage(self):
+        percentage = self.cleaned_data.get('placement_percentage')
+        if percentage and (percentage < 0 or percentage > 100):
+            raise forms.ValidationError("Placement percentage must be between 0 and 100.")
+        return percentage
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+        state = cleaned_data.get('state')
+        district = cleaned_data.get('district')
+
+        # Validate password match
+        if password and confirm_password and password != confirm_password:
+            raise forms.ValidationError("Passwords do not match.")
+
+        # Validate district based on state
+        if state and district:
+            if district not in STATES_DISTRICTS.get(state, []):
+                raise forms.ValidationError("Invalid district for the selected state.")
+        elif state and not district:
+            raise forms.ValidationError("Please select a district.")
+        elif district and not state:
+            raise forms.ValidationError("Please select a state before selecting a district.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        with transaction.atomic():
+            user = User(
+                username=self.cleaned_data['username'],
+                email=self.cleaned_data['email'],
+                user_type='college',
+                is_approved=False
+            )
+            user.set_password(self.cleaned_data['password'])
+            if commit:
+                user.save()
+                profile = super().save(commit=False)
+                profile.user = user
+                profile.save()
+            return user

@@ -2,150 +2,908 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Admission Portal</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            min-height: 100vh;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-        }
-        .hero-logo {
-            max-width: 150px; /* Adjust the size */
-            margin-bottom: 20px; /* Spacing below the logo */
-        }
-        .hero-section {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #fff;
-            padding: 2rem;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://source.unsplash.com/1600x900/?education,school');
-            background-size: cover;
-            background-position: center;
-        }
-        .hero-content {
-            max-width: 800px;
-            padding: 0 15px;
-        }
-        .hero-content h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-            animation: fadeInDown 1s ease-in-out;
-        }
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1.2s ease-in-out;
-        }
-        .btn-hero {
-            padding: 0.75rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: transform 0.3s ease, background 0.3s ease;
-            margin: 0 0.5rem;
-            animation: fadeInUp 1.4s ease-in-out;
-        }
-        .btn-hero:hover {
-            transform: translateY(-3px);
-        }
-        .btn-register {
-            background: #6e8efb;
-            border: none;
-        }
-        .btn-register:hover {
-            background: #5a78e0;
-        }
-        .btn-login {
-            background: #a777e3;
-            border: none;
-        }
-        .btn-login:hover {
-            background: #9566d3;
-        }
-        @keyframes fadeInDown {
-            0% {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        @media (max-width: 768px) {
-            .hero-content h1 {
-                font-size: 2rem;
-            }
-            .hero-content p {
-                font-size: 1rem;
-            }
-            .btn-hero {
-                padding: 0.5rem 1.5rem;
-                font-size: 1rem;
-                margin: 0.5rem 0;
-                display: inline-block;
-            }
-        }
-        @media (max-width: 576px) {
-            .hero-content h1 {
-                font-size: 1.5rem;
-            }
-            .hero-content p {
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Admit</title>
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
-    <div class="hero-section">
-        <div class="hero-content">
 
-            <img src="{% static 'images/logo1.png' %}" alt="Admission Portal Logo" class="hero-logo">
-            <h1>Welcome to the Admission Portal</h1>
-            <p>Streamline your school admissions process with ease. Register to apply or login to manage your applications.</p>
-            <div class="hero-buttons">
-                <a href="{% url 'core:register' %}" class="btn btn-hero btn-register">Register</a>
-                <a href="{% url 'core:login' %}" class="btn btn-hero btn-login">Login</a>
-            </div>
-        </div>
+
+<!-- Top Bar -->
+<nav class="topbar navbar navbar-expand-md bg-light py-1 border-bottom">
+  <div class="container d-flex justify-content-between align-items-center">
+    <!-- Left Side: Contact Info -->
+    <div class="d-flex align-items-center">
+      <span class="me-3 small" style="color: #FFB300 !important;font-weight:600;font-size:16px;"><i class="bi bi-telephone"></i> +91-0000000000</span>
+      <span class="small" style="color: #FFB300 !important;font-weight:600;font-size:16px;"><i class="bi bi-envelope"></i>info@academiaadmit.in</span>
     </div>
 
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Toggle Button for Small Screens -->
+    <!-- Toggle Button with 3 Vertical Dots -->
+<button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topbarLinks" aria-controls="topbarLinks" aria-expanded="false" aria-label="Toggle topbar">
+  <span style="font-size: 1.5rem; line-height: 1;">&#8942;</span> <!-- Unicode for vertical dots (⋮) -->
+</button>
+
+
+    <!-- Right Side Links (Collapsible on small screens) -->
+    <div class="collapse navbar-collapse justify-content-end" id="topbarLinks">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link small px-2" href="#" id="top-link" style="font-size: 16px;">Fee Payment</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link small px-2" href="{% url 'core:online_admission' %}" id="top-link" style="font-size: 16px;">Online Admission</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link small px-2" href="{% url 'core:login' %}" id="top-link" style="font-size: 16px;" >Login</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md shadow-sm">
+    <div class="container">
+      <!-- Logo (Left Side) -->
+      <a class="navbar-brand" href="/">
+        <img src="{% static 'images/logo.png' %}" alt="Academia Admit Logo" class="logo-img">
+      </a>
+
+      <!-- Toggler for Mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Menu Links (Right Side) -->
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#home">Home</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="#about">About Us</a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:clients' %}">Our Clients</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:testimonials' %}">Testimonials</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:contact' %}">Contact</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link btn btn-login px-3 py-1" href="/login" style="color: black !important; margin-top:5px;">Login</a>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Banner Section (Carousel) -->
+<!-- Banner Section (Carousel) -->
+<div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <!-- Slide 1: General Consultancy for Schools and Colleges -->
+      <div class="carousel-item active" style="background-image: url('{% static "images/banner1.jpg" %}');">
+        <div class="container h-100">
+          <div class="row h-100 align-items-center justify-content-center">
+            <!-- Centered Content -->
+            <div class="banner-content">
+              <h5>Education Consultancy Services</h5>
+              <h1>Empowering Schools and Colleges for Success</h1>
+              <p>School Setup | College Accreditation | Admissions Growth. We provide end-to-end solutions for educational institutions.</p>
+              <p class="highlight">Comprehensive Support Academia Schools and Higher Education.</p>
+              <a href="{% url 'core:register_options' %}" class="btn btn-register">Register</a>
+              <a href="#" class="btn btn-know-more">Know More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Slide 2: School-Specific Services -->
+      <div class="carousel-item" style="background-image: url('{% static "images/banner3.jpg" %}');">
+        <div class="container h-100">
+          <div class="row h-100 align-items-center justify-content-center">
+            <!-- Centered Content -->
+            <div class="banner-content">
+              <h5>School Growth Solutions</h5>
+              <h1>Boost Your School Admissions</h1>
+              <p>CBSE/IB Affiliations | Admissions Strategies | Staff Training. We ensure 100% growth for your school.</p>
+              <p class="highlight">Proven Strategies for School Success.</p>
+              <a href="#" class="btn btn-register">Register</a>
+              <a href="#" class="btn btn-know-more">Know More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Slide 3: College-Specific Services -->
+      <div class="carousel-item" style="background-image: url('{% static "images/banner4.jpg" %}');">
+        <div class="container h-100">
+          <div class="row h-100 align-items-center justify-content-center">
+            <!-- Centered Content -->
+            <div class="banner-content">
+              <h5>College Development Services</h5>
+              <h1>Elevate Your College with Expert Guidance</h1>
+              <p>NAAC Accreditation | Campus Setup | International Partnerships. Build a world-class institution with us.</p>
+              <p class="highlight">Tailored Solutions for Higher Education Excellence.</p>
+              <a href="#" class="btn btn-register">Register</a>
+              <a href="#" class="btn btn-know-more">Know More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+
+
+
+
+   <!-- About Us Section -->
+   <section class="about-us" id="about">
+    <div class="container">
+      <div class="row align-items-center">
+        <!-- Left: Content -->
+        <div class="col-md-6 about-content">
+          <h2>About Academia Admit</h2>
+          <p>Academia Admit is a premier consultancy dedicated to transforming education across India and beyond. With expertise in school improvement, college development, and admissions strategies, we empower institutions to achieve excellence. Our team of seasoned educators and advisors offers tailored solutions, including CBSE/IB affiliations, NAAC accreditation, staff training, and campus setup.</p>
+          <p>Founded with a vision to inspire educational success, we provide end-to-end support for K-12 schools and higher education institutions, ensuring growth, innovation, and lasting impact.</p>
+        </div>
+        <!-- Right: Image -->
+        <div class="col-md-6 about-image">
+          <img src="{% static 'images/about-us.jpg' %}" alt="Academia Admit Team">
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+
+  <!-- Section for displaying cities -->
+  <section class="cities-section py-4 bg-light">
+      <div class="container">
+          <h5 class="text-center mb-3">Popular Cities to Explore Schools and Colleges</h5>
+          <div class="d-flex justify-content-center flex-wrap" id="cityTabs" role="tablist">
+              {% for city in selected_cities %}
+              <a href="#city-{{ city|lower }}" class="btn btn-outline-secondary m-2 city-btn" data-toggle="tab" role="tab" aria-controls="city-{{ city|lower }}" aria-selected="{% if city|lower == selected_city|lower %}true{% else %}false{% endif %}">{{ city }}</a>
+              {% endfor %}
+              <a href="#" class="btn btn-outline-primary m-2">Explore More</a>
+          </div>
+      </div>
+  </section>
+  
+  <!-- Section for displaying schools and colleges -->
+  <section class="top-picks-section py-5">
+      <div class="container">
+          <div class="tab-content" id="cityTabContent">
+              {% for city_name, school_data in all_school_profiles.items %}
+              {% for city_name_colleges, college_data in all_college_profiles.items %}
+              {% if city_name == city_name_colleges %}
+              <div class="tab-pane fade {% if city_name|lower == selected_city|lower %}show active{% endif %}" id="city-{{ city_name|lower }}" role="tabpanel">
+                  <!-- Section Heading -->
+                  <h2 class="text-center mb-4">Top Picks for Your Perfect School or College in {{ city_name }}</h2>
+  
+                  <!-- Tabs for Schools and Colleges -->
+                  <ul class="nav nav-tabs justify-content-center mb-4" id="institutionTabs-{{ city_name|lower }}" role="tablist">
+                      <li class="nav-item">
+                          <a class="nav-link active" id="schools-tab-{{ city_name|lower }}" data-toggle="tab" href="#schools-{{ city_name|lower }}" role="tab" aria-controls="schools-{{ city_name|lower }}" aria-selected="true">SCHOOLS ({{ school_data.total_count }})</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link" id="colleges-tab-{{ city_name|lower }}" data-toggle="tab" href="#colleges-{{ city_name|lower }}" role="tab" aria-controls="colleges-{{ city_name|lower }}" aria-selected="false">COLLEGES ({{ college_data.total_count }})</a>
+                      </li>
+                  </ul>
+  
+                  <!-- Tab Content -->
+                  <div class="tab-content" id="institutionTabContent-{{ city_name|lower }}">
+                      <!-- Schools Tab -->
+                      <div class="tab-pane fade show active" id="schools-{{ city_name|lower }}" role="tabpanel" aria-labelledby="schools-tab-{{ city_name|lower }}">
+                          <div class="row">
+                              {% for school in school_data.schools %}
+                              <div class="col-md-3 mb-4">
+                                  <div class="card h-100">
+                                      {% if school.logo %}
+                                      <img src="{{ school.logo.url }}" class="card-img-top" alt="{{ school.school_name }} Logo">
+                                      {% else %}
+                                      <div class="card-img-top placeholder-img" style="height: 150px; background-color: #f0f0f0;"></div>
+                                      {% endif %}
+                                      <div class="card-body">
+                                          <h5 class="card-title">{{ school.school_name }}</h5>
+                                          <p class="card-text">{{ school.city }}, {{ school.state }}</p>
+                                          <p class="card-text">{{ school.board_affiliation }} | {{ school.medium_of_instruction }}</p>
+                                          <!-- Placeholder for rating -->
+                                          <div class="rating">
+                                              {% for i in "12345" %}
+                                              <span class="fa fa-star {% if forloop.counter <= 4 %}checked{% endif %}"></span>
+                                              {% endfor %}
+                                          </div>
+                                      </div>
+                                      <div class="card-footer">
+                                       
+                                          <a href=" " class="btn btn-primary btn-sm">Explore More</a>
+                                      </div>
+                                  </div>
+                              </div>
+                              {% empty %}
+                              <div class="col-12 text-center">
+                                  <p>No schools found in {{ city_name }}.</p>
+                              </div>
+                              {% endfor %}
+                          </div>
+                          <!-- View All Button -->
+                          <div class="text-center mt-4">
+                              <a href="{% url 'core:view_all_schools' %}" class="btn btn-primary">View All Schools</a>
+                          </div>
+                      </div>
+  
+                      <!-- Colleges Tab -->
+                      <div class="tab-pane fade" id="colleges-{{ city_name|lower }}" role="tabpanel" aria-labelledby="colleges-tab-{{ city_name|lower }}">
+                          <div class="row">
+                              {% for college in college_data.colleges %}
+                              <div class="col-md-3 mb-4">
+                                  <div class="card h-100">
+                                      {% if college.profile_pic %}
+                                      <img src="{{ college.profile_pic.url }}" class="card-img-top" alt="{{ college.college_name }} Logo">
+                                      {% else %}
+                                      <div class="card-img-top placeholder-img" style="height: 150px; background-color: #f0f0f0;"></div>
+                                      {% endif %}
+                                      <div class="card-body">
+                                          <h5 class="card-title">{{ college.college_name }}</h5>
+                                          <p class="card-text">{{ college.city }}, {{ college.state }}</p>
+                                          <p class="card-text">{{ college.affiliation }} | {{ college.medium_of_instruction }}</p>
+                                          <!-- Placeholder for rating -->
+                                          <div class="rating">
+                                              {% for i in "12345" %}
+                                              <span class="fa fa-star {% if forloop.counter <= 4 %}checked{% endif %}"></span>
+                                              {% endfor %}
+                                          </div>
+                                      </div>
+                                      <div class="card-footer">
+                                          <a href="" class="btn btn-primary btn-sm">Explore More</a>
+                                      </div>
+                                  </div>
+                              </div>
+                              {% empty %}
+                              <div class="col-12 text-center">
+                                  <p>No colleges found in {{ city_name }}.</p>
+                              </div>
+                              {% endfor %}
+                          </div>
+                          <!-- View All Button -->
+                          <div class="text-center mt-4">
+                              <a href="{% url 'core:view_all_schools' %}" class="btn btn-primary">View All Colleges</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              {% endif %}
+              {% endfor %}
+              {% endfor %}
+          </div>
+      </div>
+  </section>
+  
+  <style>
+  /* Tabs */
+  .nav-tabs .nav-link {
+      color: #555;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      border-bottom: 2px solid transparent;
+  }
+  .nav-tabs .nav-link:hover {
+      color: #008080;
+      border-bottom: 2px solid #008080;
+  }
+  .nav-tabs .nav-link.active {
+      color: #008080;
+      border-bottom: 2px solid #008080;
+      background-color: transparent;
+  }
+  
+  /* Rating Stars */
+  .rating .fa-star {
+      color: #ddd;
+      transition: color 0.3s ease;
+  }
+  .rating .fa-star.checked {
+      color: #f39c12;
+  }
+  
+  /* City Buttons */
+  .city-btn {
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      padding: 6px 16px;
+  }
+  .city-btn.active,
+  .city-btn:focus,
+  .city-btn:hover {
+      background-color: #ffc107 !important;
+      color: white !important;
+      border-color: #ffc107 !important;
+  }
+  
+  /* Cards */
+  .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+  }
+  .card:hover {
+      transform: translateY(-4px);
+  }
+  .card-img-top {
+      height: 160px;
+      object-fit: contain;
+      background: #fff;
+      padding: 1rem;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+  }
+  .card-body {
+      padding: 1rem;
+  }
+  .card-footer {
+      background-color: transparent;
+      border-top: none;
+      padding: 0.75rem 1rem;
+  }
+  
+  /* Buttons */
+  .btn-primary,
+  .btn-outline-primary {
+      background-color: #008080;
+      border-color: #008080;
+      color: white;
+      font-weight: 500;
+      border-radius: 30px;
+      padding: 6px 16px;
+      transition: all 0.3s ease;
+  }
+  .btn-primary:hover,
+  .btn-outline-primary:hover {
+      background-color: #006666;
+      border-color: #006666;
+      color: white;
+  }
+  .btn-outline-secondary {
+      color: #444;
+      border-color: #bbb;
+      border-radius: 30px;
+      padding: 6px 16px;
+  }
+  .btn-outline-secondary:hover {
+      background-color: #eaeaea;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+      .card-img-top {
+          height: 140px;
+      }
+      .nav-tabs .nav-link {
+          font-size: 14px;
+          padding: 0.5rem 0.75rem;
+      }
+  }
+  </style>
+  
+  
+  <!-- Bootstrap JS and dependencies (Popper.js) for tab functionality -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <script>
+  $(document).ready(function() {
+      $('.city-btn').on('click', function(e) {
+          e.preventDefault(); // Prevent default anchor behavior
+  
+          // Remove 'active' class from all city buttons
+          $('.city-btn').removeClass('active');
+          // Add 'active' class to the clicked button
+          $(this).addClass('active');
+  
+          // Get the target tab ID from the href attribute (e.g., #city-hyderabad)
+          var targetTab = $(this).attr('href');
+  
+          // Remove 'active' and 'show' classes from all tab panes
+          $('.tab-pane').removeClass('active show');
+  
+          // Add 'active' and 'show' classes to the target tab pane
+          $(targetTab).addClass('active show');
+      });
+  });
+  </script>
+ 
+
+  <!-- Our Services Section -->
+  <section class="services" id="services">
+    <div class="container">
+      <h2>Our Services</h2>
+      <div class="row g-4">
+        <!-- Service 1: School Admission Strategies -->
+        <div class="col-md-4">
+          <div class="service-card">
+            <i class="fas fa-school"></i>
+            <h3>School Admission Strategies</h3>
+            <p>We provide expert guidance to boost school admissions through targeted marketing, CBSE/IB affiliation support, and streamlined admission processes.</p>
+          </div>
+        </div>
+        <!-- Service 2: College Admission Support -->
+        <div class="col-md-4">
+          <div class="service-card">
+            <i class="fas fa-university"></i>
+            <h3>College Admission Support</h3>
+            <p>Enhance college admissions with our tailored strategies, including NAAC accreditation assistance, digital marketing campaigns, and partnerships to attract top students.</p>
+          </div>
+        </div>
+        <!-- Service 3: Admission Analytics and Reporting -->
+        <div class="col-md-4">
+          <div class="service-card">
+            <i class="fas fa-chart-line"></i>
+            <h3>Admission Analytics and Reporting</h3>
+            <p>Utilize data-driven insights to optimize admissions with detailed analytics, performance tracking, and customized reports for schools and colleges.</p>
+          </div>
+        </div>
+        <!-- Service 4: Admission Marketing -->
+        <div class="col-md-4">
+          <div class="service-card">
+            <i class="fas fa-bullhorn"></i>
+            <h3>Admission Marketing</h3>
+            <p>We create effective marketing campaigns for schools and colleges to increase visibility, attract more applicants, and build a strong institutional brand.</p>
+          </div>
+        </div>
+        <!-- Service 5: Admission Process Optimization -->
+        <div class="col-md-4">
+          <div class="service-card">
+            <i class="fas fa-cogs"></i>
+            <h3>Admission Process Optimization</h3>
+            <p>Streamline your admission processes with our expertise in automation, data management, and parent engagement, ensuring a seamless experience for schools and colleges.</p>
+          </div>
+        </div>
+        <!-- Service 6: International Admissions -->
+        <div class="col-md-4">
+          <div class="service-card">
+            <i class="fas fa-globe"></i>
+            <h3>International Admissions</h3>
+            <p>We assist schools and colleges in attracting international students through global partnerships, visa guidance, and cultural integration programs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+<!-- Our Impact Section -->
+<section class="impact" id="impact">
+    <!-- Top: Stats with Background Image -->
+    <div class="impact-top">
+      <div class="impact-top-content">
+        <h2>Trusted by <span>500+ Institutions</span> | <span>20+ Regions</span></h2>
+        <p>10,000+ Admissions Facilitated for Schools and Colleges</p>
+      </div>
+    </div>
+    <!-- Bottom: Description -->
+    <!-- <div class="impact-bottom">
+      <p>Academia Admit is a leading admission portal, empowering schools and colleges with innovative solutions. From K-12 admissions to higher education placements, we’ve helped over 500 institutions across 20+ regions achieve their goals. Our data-driven approach ensures success, having facilitated over 10,000 admissions with tailored strategies and seamless processes.</p>
+    </div> -->
+  </section>
+
+
+<!-- Plans Section -->
+<section class="plans" id="plans">
+  <div class="container">
+    <h2>Our Plans</h2>
+    <p class="subtitle">Choose the perfect plan for your institution’s admission and marketing needs.</p>
+    
+    <!-- Academia Admission Package -->
+    <div class="row mb-5 justify-content-center">
+      <div class="col-md-6">
+        <div class="plan-card">
+          <div>
+            <h3>Academia Admission Package</h3>
+            <div class="price">₹9999/6 months</div>
+            <ul>
+              <li><i class="fas fa-check"></i> Online Application Form</li>
+              <li><i class="fas fa-check"></i> Student Data Management</li>
+              <li><i class="fas fa-check"></i> Institution Listing & Filtering</li>
+              <li><i class="fas fa-check"></i> 2000 Applications/Month</li>
+              <li><i class="fas fa-check"></i> Email Notifications</li>
+              <li><i class="fas fa-check"></i> Institution Data Analytics</li>
+              <li><i class="fas fa-check"></i> Admin Seat Visualization</li>
+              <li><i class="fas fa-check"></i> Institution Landing Page</li>
+              <!-- <li><i class="fas fa-check"></i> Payment Gateway Integration</li> -->
+            </ul>
+          </div>
+          <a href="" class="btn">Get Started</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Digital Marketing Packages -->
+    <h2 class="mt-5">Digital Marketing Packages</h2>
+    <p class="subtitle">Boost your institution's online presence and admissions!</p>
+    <div class="row g-4">
+      <!-- Basic Package -->
+      <div class="col-md-4">
+        <div class="plan-card">
+          <div>
+            <h3>Basic Package</h3>
+            <div class="price">₹9,999/month</div>
+            <ul>
+              <li><i class="fas fa-check"></i> 5 Social Media Posts (Facebook, Instagram)</li>
+              <li><i class="fas fa-check"></i> 1 Promotional Video</li>
+              <li><i class="fas fa-check"></i> Basic SEO for School Website</li>
+              <li><i class="fas fa-check"></i> Google My Business Optimization</li>
+              <li><i class="fas fa-check"></i> Lead Generation Form Setup</li>
+            </ul>
+          </div>
+          <a href="" class="btn">Get Started</a>
+        </div>
+      </div>
+      <!-- Standard Package -->
+      <div class="col-md-4">
+        <div class="plan-card">
+          <div>
+            <h3>Standard Package</h3>
+            <div class="price">₹19,999/month</div>
+            <ul>
+              <li><i class="fas fa-check"></i> 10 Social Media Posts (FB, Insta, LinkedIn)</li>
+              <li><i class="fas fa-check"></i> 2 Promotional Videos + Reels</li>
+              <li><i class="fas fa-check"></i> Advanced SEO & Website Optimization</li>
+              <li><i class="fas fa-check"></i> Facebook & Instagram Ads (₹3,000 Ad Budget Included)</li>
+              <li><i class="fas fa-check"></i> Google My Business & Reviews Management</li>
+              <li><i class="fas fa-check"></i> Lead Generation Campaigns</li>
+            </ul>
+          </div>
+          <a href="" class="btn">Get Started</a>
+        </div>
+      </div>
+      <!-- Premium Package -->
+      <div class="col-md-4">
+        <div class="plan-card">
+          <div>
+            <h3>Premium Package</h3>
+            <div class="price">₹29,999/month</div>
+            <ul>
+              <li><i class="fas fa-check"></i> 15 Social Media Posts (FB, Insta, LinkedIn, Twitter)</li>
+              <li><i class="fas fa-check"></i> 3 Promotional Videos + Reels</li>
+              <li><i class="fas fa-check"></i> Full SEO + Blog Writing (2 Blogs/Month)</li>
+              <li><i class="fas fa-check"></i> Paid Ad Campaigns on FB, Insta (₹5,000 Ad Budget Included)</li>
+              <li><i class="fas fa-check"></i> School Admission Landing Page</li>
+              <li><i class="fas fa-check"></i> Google My Business & Reviews Management</li>
+            </ul>
+          </div>
+          <a href="" class="btn">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Our Achievements Section -->
+  <section class="achievements" id="achievements">
+    <div class="container">
+      <h2>Trusted by <span>500+ Institutions</span> | <span>20+ Regions</span></h2>
+      <p>Academia Admit is a leading admission portal, empowering schools and colleges with innovative solutions. From K-12 admissions to higher education placements, we’ve helped over 500 institutions across 20+ regions achieve their goals. Our data-driven approach ensures success, having facilitated over 10,000 admissions with tailored strategies and seamless processes.</p>
+      <div class="row g-4">
+        <!-- Achievement 1: New Institution Setups -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-building"></i>
+            <div class="number">50+</div>
+            <h3>New Institution Setups</h3>
+          </div>
+        </div>
+        <!-- Achievement 2: Admission Campaigns -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-bullhorn"></i>
+            <div class="number">300+</div>
+            <h3>Admission Campaigns</h3>
+          </div>
+        </div>
+        <!-- Achievement 3: Admission Drives -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-users"></i>
+            <div class="number">400+</div>
+            <h3>Admission Drives</h3>
+          </div>
+        </div>
+        <!-- Achievement 4: Process Optimizations -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-cogs"></i>
+            <div class="number">200+</div>
+            <h3>Process Optimizations</h3>
+          </div>
+        </div>
+        <!-- Achievement 5: International Admissions -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-globe"></i>
+            <div class="number">150+</div>
+            <h3>International Admissions</h3>
+          </div>
+        </div>
+        <!-- Achievement 6: Analytics Projects -->
+        <div class="col-md-4">
+          <div class="achievement-card">
+            <i class="fas fa-chart-line"></i>
+            <div class="number">180+</div>
+            <h3>Analytics Admissions</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+   <!-- Why Choose Us Section -->
+   <section class="why-choose-us" id="why-choose-us">
+    <div class="container">
+      <!-- Top: Tagline and Description -->
+      <h2>Why Choose Academia Admit?</h2>
+      <p class="intro">As a leading admission portal, we specialize in helping schools and colleges achieve their admission goals with tailored strategies, data-driven insights, and seamless processes.</p>
+      <!-- Bottom: Benefits for Schools and Colleges -->
+      <div class="row g-4">
+        <!-- Schools -->
+        <div class="col-md-6">
+          <h3 class="category-title">For Schools</h3>
+          <div class="benefit-card">
+            <i class="fas fa-users"></i>
+            <p>Boost admissions with targeted marketing and CBSE/IB affiliation support.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-cogs"></i>
+            <p>Streamline admission processes with automation and parent engagement tools.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-chart-line"></i>
+            <p>Access analytics to track admission trends and optimize strategies.</p>
+          </div>
+        </div>
+        <!-- Colleges -->
+        <div class="col-md-6">
+          <h3 class="category-title">For Colleges</h3>
+          <div class="benefit-card">
+            <i class="fas fa-globe"></i>
+            <p>Attract international students with global partnerships and visa guidance.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-bullhorn"></i>
+            <p>Increase visibility through digital marketing and NAAC accreditation support.</p>
+          </div>
+          <div class="benefit-card">
+            <i class="fas fa-chart-bar"></i>
+            <p>Leverage data insights to improve enrollment and student diversity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="is-testimonials-section">
+    <div class="is-testimonials-container">
+        <h2 class="is-testimonials-subtitle">Learner Success Stories</h2>
+        <h1 class="is-testimonials-title">Happy With Expertise</h1>
+        <div class="is-testimonials-slider">
+            <div class="is-testimonials-wrapper">
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“We have been working with for several years and have always been satisfied with their services. They have a great team and are very responsive.”</p>
+                        <cite>Jane Smith</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“Has been a valuable partner for our company. They have helped us to develop several software solutions that have improved our business.”</p>
+                        <cite>Bob Johnson</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“Their expertise in software development has been instrumental in scaling our operations efficiently.”</p>
+                        <cite>Alice Brown</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“The team delivered a fantastic solution that exceeded our expectations. Highly recommended!”</p>
+                        <cite>Tom Wilson</cite>
+                    </blockquote>
+                </div>
+                <div class="is-testimonial-card">
+                    <blockquote>
+                        <p>“Their support and maintenance services have been exceptional, ensuring our systems run smoothly.”</p>
+                        <cite>Emily Davis</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        <div class="is-testimonials-dots">
+            <!-- Dots will be dynamically generated by JavaScript -->
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- Contact Us Section -->
+<section class="contact-us" id="contact">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- Left side -->
+      <div class="col-md-5 contact-left">
+        <h3>Talk to Our Consultancy Expert</h3>
+        <p>Start to Work</p>
+        <ul>
+          <li>Fill out the Contact form.</li>
+          <li>Arrange a one-on-one consultation to discuss your admission needs.</li>
+          <li>Get a FREE Demo (We’re here to answer all your questions!)</li>
+          <li>BOOK A BUSINESS MEETING WITH US</li>
+        </ul>
+        <p>Contact us for services like Admissions, Affiliation, Marketing, or Process Optimization for Schools and Colleges.</p>
+      </div>
+
+      <!-- Right side -->
+      <div class="col-md-7 contact-form">
+        <h3>Contact Us</h3>
+
+        <!-- Show success or error messages -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="firstName">First Name(*)</label>
+              <input type="text" class="form-control" id="firstName" name="first_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="lastName">Last Name(*)</label>
+              <input type="text" class="form-control" id="lastName" name="last_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="email">Email(*)</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="col-md-6">
+              <label for="mobile">Mobile Number(*)</label>
+              <input type="tel" class="form-control" id="mobile" name="mobile" required>
+            </div>
+            <div class="col-12">
+              <label for="organization">Organization / School / College Name(*)</label>
+              <input type="text" class="form-control" id="organization" name="organization" required>
+            </div>
+            <div class="col-md-6">
+              <label for="type">Type of Institution(*)</label>
+              <select class="form-control" id="type" name="type" required>
+                <option value="">Select Institution</option>
+                <option value="school">School</option>
+                <option value="college">College</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="location">Location(*)</label>
+              <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <div class="col-12">
+              <label for="inquiry">Nature of Inquiry(*)</label>
+              <select class="form-control" id="inquiry" name="inquiry" required>
+                <option value="">Select Inquiry</option>
+                <option value="admissions">Admissions Support</option>
+                <option value="affiliation">Affiliation Assistance</option>
+                <option value="marketing">Admission Marketing</option>
+                <option value="optimization">Process Optimization</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="services">Admission Services Needed(*)</label>
+              <input type="text" class="form-control" id="services" name="services">
+            </div>
+            <div class="col-md-6">
+              <label for="role">Role of Contact(*)</label>
+              <select class="form-control" id="role" name="role" required>
+                <option value="">Select Role</option>
+                <option value="owner">School Owner</option>
+                <option value="admin">College Admin</option>
+                <option value="principal">Principal</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="details">Briefly About Your Institution & Requirements(*)</label>
+              <textarea class="form-control" id="details" name="details" rows="3" required></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <!-- Contact Info -->
+        <div class="col-md-4">
+          <h4>Contact Us</h4>
+          <p><i class="fas fa-map-marker-alt"></i> Near N Convention Lane , Hyderabad, India</p>
+          <p><i class="fas fa-phone"></i>+91 9177120736</p>
+          <p><i class="fas fa-envelope"></i> info@academiaadmit.com</p>
+        </div>
+        <!-- Quick Links -->
+        <div class="col-md-4">
+          <h4>Quick Links</h4>
+          <p><a href="#home">Home</a></p>
+          <p><a href="#about">About Us</a></p>
+          <p><a href="#services">Our Services</a></p>
+          <p><a href="#contact">Contact Us</a></p>
+        </div>
+        <!-- Social Media -->
+        <div class="col-md-4">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 Academia Admit. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Bootstrap 5 JS and Popper.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

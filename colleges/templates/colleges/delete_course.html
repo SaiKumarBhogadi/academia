@@ -1,0 +1,178 @@
+{% extends 'colleges/base.html' %}
+
+{% block title %}Delete Course - {{ course.name }} - {{ college_profile.college_name }}{% endblock %}
+
+{% block content %}
+<style>
+    .delete-course-container {
+        max-width: 800px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .delete-course-container .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
+    }
+
+    .delete-course-container .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .delete-course-container .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .delete-course-container .card-header h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .delete-course-container .card-body {
+        padding: 2rem;
+    }
+
+    .delete-course-container .card-body p {
+        color: #333333;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .delete-course-container .card-body p strong {
+        color: #2C3E50;
+    }
+
+    .delete-course-container .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .delete-course-container .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .delete-course-container .btn-danger {
+        background-color: #E74C3C;
+        border: none;
+        color: #ffffff;
+    }
+
+    .delete-course-container .btn-danger:hover {
+        background-color: #C0392B;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .delete-course-container .btn-secondary {
+        background-color: #95A5A6;
+        border: none;
+        color: #ffffff;
+    }
+
+    .delete-course-container .btn-secondary:hover {
+        background-color: #7F8C8D;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .delete-course-container .messages {
+        margin: 1.5rem 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .delete-course-container .messages li {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .delete-course-container .messages .success {
+        background: #e6f4ea;
+        color: #2c6b40;
+    }
+
+    .delete-course-container .messages .error {
+        background: #fee2e2;
+        color: #E74C3C;
+    }
+
+    @media (max-width: 576px) {
+        .delete-course-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .delete-course-container .card-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .delete-course-container .card-body {
+            padding: 1rem;
+        }
+
+        .delete-course-container .card-body p {
+            font-size: 0.9rem;
+        }
+
+        .delete-course-container .btn-group {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .delete-course-container .btn {
+            width: 100%;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="delete-course-container">
+    <div class="card">
+        <div class="card-header">
+            <h3>Delete Course - {{ course.name }} ({{ college_profile.college_name }})</h3>
+        </div>
+        <div class="card-body">
+            <!-- Display messages -->
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <p>Are you sure you want to delete the course <strong>{{ course.name }}</strong>? This action cannot be undone.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <a href="{% url 'colleges:course_list_all' %}?cycle_id={{ selected_cycle.id }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

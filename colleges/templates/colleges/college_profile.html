@@ -1,373 +1,383 @@
 {% extends 'colleges/base.html' %}
+{% load static %}
 
-{% block title %}{{ college_profile.college_name|default:"College Profile" }}{% endblock %}
+{% block title %}{{ college_profile.college_name }} Profile - Academia Admit{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="card shadow-lg">
-            <div class="card-header">
-                <h3 class="mb-0">College Profile</h3>
-            </div>
-            <div class="card-body">
-                <!-- Display messages -->
-                {% if messages %}
-                    <div class="alert-container">
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            {% if college_profile.profile_pic %}
+                <img src="{{ college_profile.profile_pic.url }}" alt="{{ college_profile.college_name }} Logo">
+            {% else %}
+                <img src="{% static 'images/default-logo.png' %}" alt="Default Logo">
+            {% endif %}
+            <h2>{% if college_profile %}{{ college_profile.college_name }}{% else %}College Profile{% endif %}</h2>
+        </div>
+        <div class="profile-details">
+            {% if college_profile %}
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-university"></i> College Information</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Principal:</strong> {{ college_profile.principal_name|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Type:</strong> {{ college_profile.get_college_type_display|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Affiliation:</strong> {{ college_profile.affiliation|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Accreditation:</strong> {{ college_profile.get_accreditation_display|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Medium:</strong> {{ college_profile.get_medium_of_instruction_display|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Established:</strong> {{ college_profile.established_year|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Students:</strong> {{ college_profile.total_students|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Faculty:</strong> {{ college_profile.total_faculty|default:"N/A" }}</div>
+                        <div class="info-item"><strong>College Code:</strong> {{ college_profile.college_code|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Courses Offered:</strong> {{ college_profile.courses_offered|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Streams Available:</strong> {{ college_profile.streams_available|default:"N/A" }}</div>
                     </div>
-                {% endif %}
+                </div>
 
-                <!-- Show form if creating or editing -->
-                {% if show_form %}
-                    <form method="post" enctype="multipart/form-data" class="profile-form">
-                        {% csrf_token %}
-                        <div class="row g-4">
-                            {% for field in form %}
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.errors %}
-                                            <div class="text-danger mt-1 small">{{ field.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Save Profile</button>
-                        </div>
-                    </form>
-                {% else %}
-                    <!-- Display profile details -->
-                    <div class="profile-details">
-                        <div class="row g-4">
-                            <!-- Profile Picture Section -->
-                            <div class="col-md-3 text-center">
-                                <div class="profile-pic-container">
-                                    {% if college_profile.profile_pic %}
-                                        <img src="{{ college_profile.profile_pic.url }}" alt="Profile Picture" class="profile-pic" style="height: 150px;">
-                                    {% else %}
-                                        <div class="profile-pic-placeholder">
-                                            <i class="bi bi-building"></i>
-                                            <p class="text-muted small mt-2">No Image Uploaded</p>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <h5 class="mt-3">{{ college_profile.college_name|default:"Not specified" }}</h5>
-                                <p class="text-muted small">Established: {{ college_profile.established_year|default:"Not specified" }}</p>
-                            </div>
-                            <!-- Profile Details Section -->
-                            <div class="col-md-9">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Principal Name</h6>
-                                            <p>{{ college_profile.principal_name|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Website</h6>
-                                            <p>{{ college_profile.website|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Address</h6>
-                                            <p>
-                                                {% with address_parts=college_profile.street_address|add:", "|add:college_profile.city|add:", "|add:college_profile.state|add:", "|add:college_profile.pincode|add:", "|add:college_profile.country %}
-                                                    {{ address_parts|default:"Not specified" }}
-                                                {% endwith %}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Contact Email</h6>
-                                            <p>{{ college_profile.contact_email|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Contact Phone</h6>
-                                            <p>{{ college_profile.contact_phone|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">College Type</h6>
-                                            <p>{{ college_profile.get_college_type_display|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Affiliation</h6>
-                                            <p>{{ college_profile.affiliation|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Accreditation</h6>
-                                            <p>{{ college_profile.accreditation|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Hostel Availability</h6>
-                                            <p>{{ college_profile.hostel_availability|yesno:"Yes,No" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Hostel Capacity (Boys)</h6>
-                                            <p>{{ college_profile.hostel_capacity_boys|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Hostel Capacity (Girls)</h6>
-                                            <p>{{ college_profile.hostel_capacity_girls|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Library</h6>
-                                            <p>{{ college_profile.library|yesno:"Yes,No" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Library Books Count</h6>
-                                            <p>{{ college_profile.library_books_count|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Labs</h6>
-                                            <p>{{ college_profile.labs|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Placement Cell</h6>
-                                            <p>{{ college_profile.placement_cell|yesno:"Yes,No" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Placement Percentage</h6>
-                                            <p>{{ college_profile.placement_percentage|default:"Not specified" }}%</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Top Recruiters</h6>
-                                            <p>{{ college_profile.top_recruiters|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <h6 class="info-title">Other Facilities</h6>
-                                            <p>{{ college_profile.other_facilities|default:"Not specified" }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-phone"></i> Contact Details</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Phone:</strong> {{ college_profile.contact_phone|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Alternate Phone:</strong> {{ college_profile.alternate_phone_number|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Email:</strong> {{ college_profile.contact_email|default:"N/A" }}</div>
+                        {% if college_profile.website %}
+                            <div class="info-item"><strong>Website:</strong> <a href="{{ college_profile.website }}" class="text-accent">{{ college_profile.website }}</a></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-map-marker-alt"></i> Address</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Address:</strong>
+                            {{ college_profile.street_address|default:"" }}
+                            {% if college_profile.city %}, {{ college_profile.city }}{% endif %}
+                            {% if college_profile.district %}, {{ college_profile.district }}{% endif %}
+                            {% if college_profile.state %}, {{ college_profile.state }}{% endif %}
+                            {% if college_profile.pincode %}- {{ college_profile.pincode }}{% endif %}
                         </div>
                     </div>
-                    <!-- Edit Button at Bottom -->
-                    {% if not show_form %}
-                        <div class="mt-4 text-end">
-                            <a href="{% url 'colleges:college_profile' %}?edit=true" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i>Edit Profile</a>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            </div>
+                </div>
+
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-file"></i> Documents</h5>
+                    <div class="info-grid">
+                        {% if college_profile.accreditation_certificate %}
+                            <div class="info-item"><strong>Accreditation Cert:</strong> <a href="{{ college_profile.accreditation_certificate.url }}" class="text-accent">View</a></div>
+                        {% else %}
+                            <div class="info-item"><strong>Accreditation Cert:</strong> N/A</div>
+                        {% endif %}
+                        {% if college_profile.brochure %}
+                            <div class="info-item"><strong>Brochure:</strong> <a href="{{ college_profile.brochure.url }}" class="text-accent">View</a></div>
+                        {% else %}
+                            <div class="info-item"><strong>Brochure:</strong> N/A</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h5 class="section-title"><i class="fas fa-tools"></i> Facilities</h5>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Hostel:</strong> {{ college_profile.hostel_availability|yesno:"Yes,No" }}</div>
+                        <div class="info-item"><strong>Library:</strong> {{ college_profile.library|yesno:"Yes,No" }}</div>
+                        <div class="info-item"><strong>Placement Cell:</strong> {{ college_profile.placement_cell|yesno:"Yes,No" }}</div>
+                        <div class="info-item"><strong>Hostel (Boys):</strong> {{ college_profile.hostel_capacity_boys|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Hostel (Girls):</strong> {{ college_profile.hostel_capacity_girls|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Library Books:</strong> {{ college_profile.library_books_count|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Placement %:</strong> {{ college_profile.placement_percentage|default:"N/A" }}%</div>
+                        <div class="info-item"><strong>Top Recruiters:</strong> {{ college_profile.top_recruiters|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Labs:</strong> {{ college_profile.labs|default:"N/A" }}</div>
+                        <div class="info-item"><strong>Other Facilities:</strong> {{ college_profile.other_facilities|default:"N/A" }}</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-message">No college profile data available.</div>
+            {% endif %}
+        </div>
+        <div class="action-buttons mt-3 text-center">
+            <a href="{% url 'colleges:edit_college_profile' %}" class="btn btn-edit">Edit Profile</a>
         </div>
     </div>
-{% endblock %}
+</div>
 
-{% block extra_css %}
-    <style>
-        /* General Styling */
-        body {
-            background-color: #f5f7fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .container {
-            max-width: 1200px;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background: linear-gradient(90deg, #1a2a6c, #b21f1f);
-            color: white;
-            padding: 20px 25px;
-        }
-        .card-body {
-            padding: 30px;
-            background-color: #ffffff;
+<style>
+    :root {
+        --primary: #2C3E50; /* Dark Blue */
+        --secondary: #3498DB; /* Soft Blue */
+        --accent: #F1C40F; /* Gold */
+        --highlight: #E74C3C; /* Red */
+        --text: #2D2D2D;
+        --card-bg: #F5F7FA;
+        --border: #E0E0E0;
+        --white: #FFFFFF;
+        --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        background-color: var(--card-bg);
+       
+        color: var(--text);
+        
+    }
+
+    .profile-container {
+        max-width: 1000px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .profile-card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px var(--shadow);
+        padding: 0;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--white);
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .profile-header img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid var(--white);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .profile-header img:hover {
+        transform: scale(1.05);
+    }
+
+    .profile-header h2 {
+       
+
+        font-weight: 700;
+        font-size: 2rem;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .profile-details {
+        padding: 2rem;
+        background: var(--white);
+    }
+
+    .section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--shadow);
+        transition: transform 0.2s ease;
+    }
+
+    .section:hover {
+        transform: translateY(-2px);
+    }
+
+    .section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        color: var(--primary);
+       
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 2px solid var(--secondary);
+        padding-bottom: 0.5rem;
+    }
+
+    .section-title i {
+        color: var(--secondary);
+        font-size: 1.3rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        padding: 0.5rem 0;
+    }
+
+    .info-item {
+        background: var(--white);
+        padding: 0.8rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-left: 4px solid var(--secondary);
+        box-shadow: 0 1px 4px var(--shadow);
+        transition: background-color 0.3s ease;
+    }
+
+    .info-item:hover {
+        background-color: #f0f4f8;
+    }
+
+    .info-item strong {
+        color: var(--primary);
+        font-weight: 600;
+        min-width: 140px;
+        display: inline-block;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: var(--text);
+        font-style: italic;
+        padding: 2rem;
+        font-size: 1.1rem;
+    }
+
+    .action-buttons {
+        padding: 1.5rem;
+        background: var(--card-bg);
+        text-align: center;
+        border-top: 1px solid var(--border);
+    }
+
+    .btn-edit {
+        background-color: var(--primary);
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-edit:hover {
+        background-color: var(--secondary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .text-accent {
+        color: var(--secondary);
+        font-weight: 500;
+        transition: color 0.2s ease, text-decoration 0.2s ease;
+    }
+
+    .text-accent:hover {
+        color: var(--highlight);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
         }
 
-        /* Alerts */
-        .alert-container {
-            margin-bottom: 20px;
-        }
-        .alert {
-            border-radius: 8px;
-            padding: 15px 20px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
+        .profile-card {
+            border-radius: 12px;
         }
 
-        /* Form Styling */
-        .profile-form .form-group {
-            margin-bottom: 0;
-        }
-        .profile-form .form-label {
-            font-weight: 500;
-            color: #1a2a6c;
-            margin-bottom: 5px;
-        }
-        .profile-form input,
-        .profile-form select,
-        .profile-form textarea {
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
-            padding: 10px 15px;
-            width: 100%;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        .profile-form input:focus,
-        .profile-form select:focus,
-        .profile-form textarea:focus {
-            border-color: #b21f1f;
-            box-shadow: 0 0 5px rgba(178, 31, 31, 0.2);
-            outline: none;
-        }
-        .profile-form .text-danger {
-            font-size: 0.875rem;
+        .profile-header {
+            padding: 1.5rem;
         }
 
-        /* Profile Details Styling */
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-header h2 {
+            font-size: 1.6rem;
+        }
+
         .profile-details {
-            margin-top: 10px;
+            padding: 1.5rem;
         }
-        .profile-pic-container {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
+
+        .section {
+            padding: 1rem;
         }
-        .profile-pic {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        .section-title {
+            font-size: 1.3rem;
         }
-        .profile-pic-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 150px;
-            background-color: #e9ecef;
-            border-radius: 10px;
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
         }
-        .profile-pic-placeholder i {
-            font-size: 3rem;
-            color: #6c757d;
-        }
-        .info-box {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .info-box:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .info-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1a2a6c;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 5px;
-        }
-        .info-box p {
-            margin: 0;
-            color: #333;
+
+        .info-item {
             font-size: 0.95rem;
         }
+    }
 
-        /* Buttons */
-        .btn-primary, .btn-outline-light {
-            background: linear-gradient(90deg, #1a2a6c, #b21f1f);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover, .btn-outline-light:hover {
-            background: linear-gradient(90deg, #b21f1f, #1a2a6c);
-            color: white;
-        }
-        .btn-outline-light {
-            background: transparent;
-            border: 1px solid white;
+    @media (max-width: 576px) {
+        .profile-header {
+            padding: 1rem;
         }
 
-        /* Text Styling */
-        h5 {
-            color: #1a2a6c;
-            font-weight: 600;
-        }
-        .text-muted {
-            color: #6c757d !important;
-        }
-        .text-danger {
-            color: #b21f1f !important;
+        .profile-header img {
+            width: 80px;
+            height: 80px;
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 767px) {
-            .profile-pic-container {
-                margin-bottom: 20px;
-            }
-            .info-box {
-                padding: 10px;
-            }
-            .info-title {
-                font-size: 0.9rem;
-            }
-            .info-box p {
-                font-size: 0.85rem;
-            }
+        .profile-header h2 {
+            font-size: 1.4rem;
         }
-    </style>
-{% endblock %}
 
-{% block extra_js %}
-    <!-- Bootstrap Icons (Add this in your base.html if not already included) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        .profile-details {
+            padding: 1rem;
+        }
+
+        .section {
+            padding: 0.8rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+        }
+
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            font-size: 0.9rem;
+        }
+
+        .info-item strong {
+            min-width: auto;
+        }
+
+        .btn-edit {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
 {% endblock %}

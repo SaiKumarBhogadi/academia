@@ -3,33 +3,298 @@
 {% block title %}Edit Admission Cycle{% endblock %}
 
 {% block content %}
-    <div class="management-container" style="padding: 20px; max-width: 600px; margin: 0 auto;">
-        <div class="card">
-            <div class="card-header" style="background-color: #1a2a6c; color: white; border-radius: 5px 5px 0 0;">
-                <h3 class="mb-0">Edit Admission Cycle {{ cycle.year }} for {{ school.school_name }}</h3>
-            </div>
-            <div class="card-body" style="padding: 1.5rem;">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-                <form method="post">
-                    {% csrf_token %}
+<div class="cycle-management-container">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Edit Admission Cycle {{ cycle.year }} for {{ school.school_name }}</h3>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-section">
+                    <h5 class="form-section-title">Cycle Details</h5>
                     {% for field in form %}
-                        <div class="form-group mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                {% for error in field.errors %}
-                                    <p style="color: red;">{{ error }}</p>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                        {% if field.name != 'is_active' and field.name != 'is_archived' %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ field }}
+                                </div>
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     {% endfor %}
-                    <button type="submit" class="btn btn-primary" style="background-color: #1a2a6c; color: white; border: none; padding: 0.5rem 1rem;">Update Cycle</button>
-                </form>
-            </div>
+                </div>
+
+                <div class="form-section">
+                    <h5 class="form-section-title">Cycle Status</h5>
+                    <div class="checkbox-group">
+                        {% for field in form %}
+                            {% if field.name == 'is_active' or field.name == 'is_archived' %}
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" id="{{ field.id_for_label }}" name="{{ field.name }}" {% if field.value %}checked{% endif %}>
+                                    <label for="{{ field.id_for_label }}" class="checkbox-label">{{ field.label }}</label>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Cycle</button>
+            </form>
         </div>
     </div>
+</div>
+
+<style>
+    .cycle-management-container {
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #3498DB;
+        padding-left: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        color: #666666;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-group .input-wrapper {
+        position: relative;
+    }
+
+    .form-group input:not([type="checkbox"]),
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:not([type="checkbox"]):focus,
+    .form-group select:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .form-group .input-wrapper i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #E67E22;
+        font-size: 1rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        appearance: none;
+        width: 1.2rem;
+        height: 1.2rem;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked {
+        background: #3498DB;
+        border-color: #3498DB;
+        position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked::after {
+        content: '\f00c';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #ffffff;
+        font-size: 0.8rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:hover:not(:checked) {
+        border-color: #3498DB;
+        background: #e6f0fa;
+    }
+
+    .checkbox-wrapper .checkbox-label {
+        font-size: 0.9rem;
+        color: #333333;
+        cursor: pointer;
+    }
+
+    .error-message {
+        color: #9B2D30;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .btn-primary {
+        background-color: #3498DB;
+        border: none;
+        color: #ffffff;
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+        background-color: #2980B9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .alert-success {
+        background: #e6f0fa;
+        border: 1px solid #d1e7ff;
+        color: #2C3E50;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .alert-error {
+        background: #fef2f2;
+        border: 1px solid #f9caca;
+        color: #9B2D30;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    @media (max-width: 576px) {
+        .cycle-management-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+        }
+
+        .form-group input:not([type="checkbox"]),
+        .form-group select {
+            font-size: 0.85rem;
+            padding: 0.65rem 1rem 0.65rem 2.25rem;
+        }
+
+        .form-group .input-wrapper i {
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked::after {
+            font-size: 0.7rem;
+        }
+
+        .checkbox-wrapper .checkbox-label {
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            font-size: 0.9rem;
+            padding: 0.65rem 1.25rem;
+        }
+    }
+</style>
 {% endblock %}

@@ -4,92 +4,340 @@
 
 {% block content %}
 <style>
-    /* Custom styles for pending applications actions */
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        margin-top: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+
+    .card-header h5 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .alert-warning {
+        background: #fef9e7;
+        border: 1px solid #f9e4a0;
+        color: #7A4B00;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .alert-info {
+        background: #e6f0fa;
+        border: 1px solid #d1e7ff;
+        color: #2C3E50;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .alert-link {
+        color: #E67E22;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .alert-link:hover {
+        color: #F39C12;
+        text-decoration: underline;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+        color: #666666;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .btn-primary {
+        background-color: #3498DB;
+        border: none;
+        color: #ffffff;
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+        background-color: #2980B9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-primary i {
+        color: #ffffff;
+    }
+
+    .btn-success {
+        background-color: #4CAF50;
+        border: none;
+        color: #ffffff;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-success:hover {
+        background-color: #388E3C;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
+    }
+
+    .btn-danger {
+        background-color: #EF5350;
+        border: none;
+        color: #ffffff;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-danger:hover {
+        background-color: #D32F2F;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(239, 83, 80, 0.3);
+    }
+
+    .btn-details {
+        background-color: #3498DB;
+        border: none;
+        color: #ffffff;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-details:hover {
+        background-color: #2980B9;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .table th {
+        background: #f1f5f9;
+        color: #2C3E50;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .table td {
+        background: #ffffff;
+        color: #333333;
+        font-size: 0.9rem;
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .table a {
+        color: #3498DB;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .table a:hover {
+        color: #2980B9;
+        text-decoration: underline;
+    }
+
     .actions-container {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 0.5rem;
         white-space: nowrap;
     }
+
     .actions-container select {
         width: 100px;
-        height: 30px;
+        height: 32px;
         font-size: 0.85rem;
-        padding: 3px;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: #f9fafb;
+        transition: all 0.3s ease;
     }
+
+    .actions-container select:focus {
+        border-color: #3498DB;
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
     .actions-container .btn {
-        height: 30px;
-        font-size: 0.8rem;
-        padding: 3px 6px;
+        height: 32px;
+        font-size: 0.85rem;
+        padding: 0.25rem 0.75rem;
         line-height: 1.2;
     }
+
     .actions-container .form-check {
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 3px;
+        gap: 0.25rem;
     }
+
     .actions-container .form-check-input {
         margin-top: 0;
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
     }
+
+    .actions-container .form-check-input:checked {
+        background-color: #3498DB;
+        border-color: #3498DB;
+    }
+
     .actions-container .form-check-label {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        color: #666666;
+        cursor: pointer;
     }
-    .table th, .table td {
-        vertical-align: middle;
-        padding: 6px;
+
+    h6 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 1rem;
+        border-left: 4px solid #3498DB;
+        padding-left: 0.75rem;
     }
-    .btn-details {
-        background-color: #1a2a6c;
-        border-color: #1a2a6c;
-        color: white;
-        font-size: 0.8rem;
-        padding: 3px 6px;
-    }
-    .btn-details:hover {
-        background-color: #b21f1f;
-        border-color: #b21f1f;
-    }
+
     @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.85rem;
+            padding: 0.65rem 1rem;
+        }
+
+        .btn-primary {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .table th, .table td {
+            font-size: 0.85rem;
+            padding: 0.75rem;
+        }
+
         .actions-container {
-            gap: 3px;
+            gap: 0.3rem;
             flex-wrap: nowrap;
         }
+
         .actions-container select {
-            width: 60px;
+            width: 80px;
             font-size: 0.75rem;
-            padding: 2px;
+            padding: 0.2rem 0.4rem;
         }
+
         .actions-container .btn, .btn-details {
-            font-size: 0.7rem;
-            padding: 2px 4px;
-            min-width: 50px;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            min-width: 60px;
         }
+
         .actions-container .form-check-input {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
         }
+
         .actions-container .form-check-label {
-            font-size: 0.7rem;
-        }
-        .table td {
-            padding: 4px;
+            font-size: 0.75rem;
         }
     }
+
     @media (max-width: 576px) {
         .actions-container {
             flex-direction: column;
             align-items: flex-start;
-            gap: 2px;
+            gap: 0.5rem;
         }
+
         .actions-container select, .actions-container .btn, .btn-details {
             width: 100%;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
+            height: 36px;
         }
+
         .actions-container .form-check {
             width: 100%;
+        }
+
+        .table th, .table td {
+            font-size: 0.8rem;
+            padding: 0.5rem;
+        }
+
+        .btn-primary {
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
         }
     }
 </style>
@@ -131,7 +379,7 @@
     <!-- Applications by Cycle -->
     {% for cycle, apps in cycle_applications.items %}
         <div class="card mb-4">
-            <div class="card-header bg-light">
+            <div class="card-header">
                 <h5 class="mb-0">Cycle: {{ cycle.year }}</h5>
             </div>
             <div class="card-body">

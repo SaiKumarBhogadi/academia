@@ -101,13 +101,29 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        /* Debug Section */
+        .debug-section {
+            background: #f8d7da;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
     </style>
 
-    <div class="card" style="margin-top: 50px;"> 
+    <div class="card" style="margin-top: 50px;">
         <div class="card-header">
             <h3 class="mb-0">{{ school_profile.school_name }} Profile</h3>
         </div>
         <div class="card-body">
+            <!-- Debug Section -->
+            <!-- <div class="debug-section">
+                <strong>Debug Info:</strong><br>
+                School: {{ school_profile.school_name }}<br>
+                Active Cycle: {% if active_cycle %}{{ active_cycle.year }}{% else %}None{% endif %}<br>
+                Classes: {{ classes.count }}
+            </div> -->
+
             <!-- Display messages -->
             {% if messages %}
                 <ul class="messages">
@@ -126,78 +142,104 @@
                     <th>Principal Name</th>
                     <td>{{ school_profile.principal_name|default:"Not specified" }}</td>
                 </tr>
-                <!-- Row 2: Established Year + Website -->
+                <!-- Row 2: Established Year + School Code -->
                 <tr>
                     <th>Established Year</th>
                     <td>{{ school_profile.established_year|default:"Not specified" }}</td>
-                    <th>Website</th>
-                    <td>{{ school_profile.website|default:"Not specified" }}</td>
+                    <th>School Code</th>
+                    <td>{{ school_profile.school_code|default:"Not specified" }}</td>
                 </tr>
-                <!-- Row 3: Address + Contact Email -->
-                <tr>
-                    <th>Address</th>
-                    <td>
-                        {% with address_parts=school_profile.street_address|add:", "|add:school_profile.landmark|add:", "|add:school_profile.city|add:", "|add:school_profile.district|add:", "|add:school_profile.state|add:", "|add:school_profile.pincode|add:", "|add:school_profile.country %}
-                            {{ address_parts|default:"Not specified" }}
-                        {% endwith %}
-                    </td>
-                    <th>Contact Email</th>
-                    <td>{{ school_profile.contact_email|default:"Not specified" }}</td>
-                </tr>
-                <!-- Row 4: Contact Phone + Total Students -->
+                <!-- Row 3: Contact Phone + Alternate Phone -->
                 <tr>
                     <th>Contact Phone</th>
                     <td>{{ school_profile.contact_phone|default:"Not specified" }}</td>
-                    <th>Total Students</th>
-                    <td>{{ school_profile.total_students|default:"Not specified" }}</td>
+                    <th>Alternate Phone</th>
+                    <td>{{ school_profile.alternate_phone_number|default:"Not specified" }}</td>
                 </tr>
-                <!-- Row 5: Total Teachers + Grades Offered -->
+                <!-- Row 4: Contact Email + Website -->
                 <tr>
-                    <th>Total Teachers</th>
-                    <td>{{ school_profile.total_teachers|default:"Not specified" }}</td>
-                    <th>Grades Offered</th>
+                    <th>Contact Email</th>
+                    <td>{{ school_profile.contact_email|default:"Not specified" }}</td>
+                    <th>Website</th>
                     <td>
-                        {% if school_profile.start_grade and school_profile.end_grade %}
-                            {{ school_profile.start_grade }} - {{ school_profile.end_grade }}
+                        {% if school_profile.website %}
+                            <a href="{{ school_profile.website }}" target="_blank">{{ school_profile.website }}</a>
                         {% else %}
                             Not specified
                         {% endif %}
                     </td>
                 </tr>
-                <!-- Row 6: School Type + Medium of Instruction -->
+                <!-- Row 5: Address + School Type -->
                 <tr>
-                    <th>School Type</th>
-                    <td>{{ school_profile.school_type|default:"Not specified" }}</td>
-                    <th>Medium of Instruction</th>
-                    <td>{{ school_profile.medium_of_instruction|default:"Not specified" }}</td>
-                </tr>
-                <!-- Row 7: Is Co-Education + Accreditation -->
-                <tr>
-                    <th>Is Co-Education</th>
-                    <td>{{ school_profile.is_co_education|yesno:"Yes,No" }}</td>
-                    <th>Accreditation</th>
-                    <td>{{ school_profile.accreditation|default:"Not specified" }}</td>
-                </tr>
-                <!-- Row 8: Affiliation Number + Facilities -->
-                <tr>
-                    <th>Affiliation Number</th>
-                    <td>{{ school_profile.affiliation_number|default:"Not specified" }}</td>
-                    <th>Facilities</th>
-                    <td>{{ school_profile.facilities|default:"Not specified" }}</td>
-                </tr>
-                <!-- Row 9: Transport Availability + School Motto -->
-                <tr>
-                    <th>Transport Availability</th>
-                    <td>{{ school_profile.has_transport|yesno:"Yes,No" }}</td>
-                    <th>School Motto</th>
-                    <td>{{ school_profile.school_motto|default:"Not specified" }}</td>
-                </tr>
-                <!-- Row 10: Profile Picture (single field) -->
-                <tr>
-                    <th>Profile Picture</th>
+                    <th>Address</th>
                     <td>
-                        {% if school_profile.profile_pic %}
-                            <img src="{{ school_profile.profile_pic.url }}" alt="Profile Picture" style="max-width: 150px; border-radius: 5px;">
+                        {% with address_parts=school_profile.street_address|add:", "|add:school_profile.city|add:", "|add:school_profile.district|add:", "|add:school_profile.state|add:", "|add:school_profile.pincode %}
+                            {{ address_parts|default:"Not specified" }}
+                        {% endwith %}
+                    </td>
+                    <th>School Type</th>
+                    <td>{{ school_profile.get_school_type_display|default:"Not specified" }}</td>
+                </tr>
+                <!-- Row 6: Board Affiliation + Medium of Instruction -->
+                <tr>
+                    <th>Board Affiliation</th>
+                    <td>{{ school_profile.get_board_affiliation_display|default:"Not specified" }}</td>
+                    <th>Medium of Instruction</th>
+                    <td>{{ school_profile.get_medium_of_instruction_display|default:"Not specified" }}</td>
+                </tr>
+                <!-- Row 7: Total Students + Total Teachers -->
+                <tr>
+                    <th>Total Students</th>
+                    <td>{{ school_profile.total_students|default:"Not specified" }}</td>
+                    <th>Total Teachers</th>
+                    <td>{{ school_profile.total_teachers|default:"Not specified" }}</td>
+                </tr>
+                <!-- Row 8: Active Admission Cycle + Available Classes -->
+                <tr>
+                    <th>Active Admission Cycle</th>
+                    <td>
+                        {% if active_cycle %}
+                            {{ active_cycle.year }} ({{ active_cycle.start_date|date:"d M Y" }} - {{ active_cycle.end_date|date:"d M Y" }})
+                        {% else %}
+                            No active cycle
+                        {% endif %}
+                    </td>
+                    <th>Available Classes</th>
+                    <td>
+                        {% if classes %}
+                            {% for class_obj in classes %}
+                                {{ class_obj.grade }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            No classes available
+                        {% endif %}
+                    </td>
+                </tr>
+                <!-- Row 9: Logo + Affiliation Certificate -->
+                <tr>
+                    <th>Logo</th>
+                    <td>
+                        {% if school_profile.logo %}
+                            <img src="{{ school_profile.logo.url }}" alt="School Logo" style="max-width: 150px; border-radius: 5px;">
+                        {% else %}
+                            Not uploaded
+                        {% endif %}
+                    </td>
+                    <th>Affiliation Certificate</th>
+                    <td>
+                        {% if school_profile.affiliation_certificate %}
+                            <a href="{{ school_profile.affiliation_certificate.url }}" target="_blank">View Certificate</a>
+                        {% else %}
+                            Not uploaded
+                        {% endif %}
+                    </td>
+                </tr>
+                <!-- Row 10: Brochure -->
+                <tr>
+                    <th>Brochure</th>
+                    <td>
+                        {% if school_profile.brochure %}
+                            <a href="{{ school_profile.brochure.url }}" target="_blank">View Brochure</a>
                         {% else %}
                             Not uploaded
                         {% endif %}

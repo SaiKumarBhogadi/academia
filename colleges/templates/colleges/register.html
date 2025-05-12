@@ -1,0 +1,526 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Registration - Academia Vendors</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #f5f7fa url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ddd" fill-opacity="0.3" d="M0,192L48,186.7C96,181,192,171,288,176C384,181,480,203,576,213.3C672,224,768,224,864,202.7C960,181,1056,139,1152,133.3C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E') no-repeat bottom;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            padding: 1rem;
+        }
+        .register-container {
+            max-width: 900px;
+            width: 100%;
+            padding: 0 15px;
+            margin: 0 auto;
+        }
+        .register-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+            overflow: hidden;
+        }
+        .register-card .card-header {
+            background: none;
+            text-align: center;
+            padding: 2rem 1.5rem 1rem;
+            border-bottom: 2px solid #FFB300;
+        }
+        .register-card .card-header img {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+        .register-card .card-body {
+            padding: 2.5rem;
+        }
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 2rem 0 1.5rem;
+            border-left: 4px solid #FFB300;
+            padding-left: 0.75rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #FFB300;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(255, 179, 0, 0.2);
+            outline: none;
+        }
+        .form-group textarea {
+            height: 80px;
+            resize: none;
+        }
+        .form-group i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #EC407A;
+            font-size: 1rem;
+        }
+        /* Checkbox-specific styling */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+            margin-left: 0.5rem;
+            order: 1;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin: 0;
+            order: 0;
+            cursor: pointer;
+        }
+        .checkbox-group i {
+            display: none; /* Hide the icon for checkboxes to avoid overlap */
+        }
+        .btn-register {
+            background: #FFB300;
+            border: none;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            width: 100%;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .btn-register:hover {
+            background: #EC407A;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236, 64, 122, 0.3);
+        }
+        .alert {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            border: 1px solid;
+            text-align: center;
+        }
+        .alert-success {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+            color: #0c4a6e;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 0 10px;
+            }
+            .register-card .card-body {
+                padding: 1.5rem;
+            }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 0.85rem;
+                padding: 0.65rem 1rem 0.65rem 2.25rem;
+            }
+            .form-group i {
+                font-size: 0.9rem;
+            }
+            .form-section-title {
+                font-size: 1.1rem;
+            }
+            .btn-register {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+            .register-card .card-header img {
+                max-width: 120px;
+            }
+        }
+        @media (max-width: 576px) {
+            .register-card .card-header {
+                padding: 1.5rem 1rem 0.5rem;
+            }
+            .register-card .card-header h2 {
+                font-size: 1.5rem;
+            }
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            .form-group label {
+                font-size: 0.85rem;
+            }
+            .col-md-6 {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="card register-card">
+            <div class="card-header">
+                <img src="{% static 'images/logo.png' %}" alt="Academia Vendors Logo">
+                <h2>College Registration</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    {{ field.label }}: {{ field.errors.0 }}<br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <h5 class="form-section-title">Login Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.username.id_for_label }}">Username</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}">Email Address</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.password.id_for_label }}">Set Password</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.password }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.confirm_password }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">College Details</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.college_name.id_for_label }}">College Name</label>
+                                {{ form.college_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.principal_name.id_for_label }}">Dean/Principal Name</label>
+                                {{ form.principal_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.contact_phone.id_for_label }}">Phone Number</label>
+                                {{ form.contact_phone }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.alternate_phone_number.id_for_label }}">Alternate Phone Number (Optional)</label>
+                                {{ form.alternate_phone_number }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.contact_email.id_for_label }}">Email Address</label>
+                                {{ form.contact_email }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.college_type.id_for_label }}">College Type</label>
+                                {{ form.college_type }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.affiliation.id_for_label }}">Affiliated University Name</label>
+                                {{ form.affiliation }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.accreditation.id_for_label }}">Accreditation</label>
+                                {{ form.accreditation }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.courses_offered.id_for_label }}">Courses Offered</label>
+                                {{ form.courses_offered }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.streams_available.id_for_label }}">Streams Available</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    {{ form.streams_available }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.medium_of_instruction.id_for_label }}">Medium of Instruction</label>
+                                {{ form.medium_of_instruction }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.established_year.id_for_label }}">Established Year</label>
+                                {{ form.established_year }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.total_students.id_for_label }}">Total Number of Students</label>
+                                {{ form.total_students }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.total_faculty.id_for_label }}">Total Number of Faculty</label>
+                                {{ form.total_faculty }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.college_code.id_for_label }}">College Code (Optional)</label>
+                                {{ form.college_code }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.website.id_for_label }}">College Website (Optional)</label>
+                                {{ form.website }}
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">Facilities</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="{{ form.hostel_availability.id_for_label }}" name="{{ form.hostel_availability.name }}" {% if form.hostel_availability.value %}checked{% endif %}>
+                                <label for="{{ form.hostel_availability.id_for_label }}">Hostel Available</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.hostel_capacity_boys.id_for_label }}">Hostel Capacity (Boys)</label>
+                                {{ form.hostel_capacity_boys }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.hostel_capacity_girls.id_for_label }}">Hostel Capacity (Girls)</label>
+                                {{ form.hostel_capacity_girls }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="{{ form.library.id_for_label }}" name="{{ form.library.name }}" {% if form.library.value %}checked{% endif %}>
+                                <label for="{{ form.library.id_for_label }}">Library Available</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.library_books_count.id_for_label }}">Library Books Count</label>
+                                {{ form.library_books_count }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="{{ form.placement_cell.id_for_label }}" name="{{ form.placement_cell.name }}" {% if form.placement_cell.value %}checked{% endif %}>
+                                <label for="{{ form.placement_cell.id_for_label }}">Placement Cell</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.placement_percentage.id_for_label }}">Placement Percentage</label>
+                                {{ form.placement_percentage }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.labs.id_for_label }}">Labs</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-flask"></i>
+                            {{ form.labs }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.top_recruiters.id_for_label }}">Top Recruiters</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-briefcase"></i>
+                            {{ form.top_recruiters }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.other_facilities.id_for_label }}">Other Facilities</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-building"></i>
+                            {{ form.other_facilities }}
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">Address</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.street_address.id_for_label }}">Street/Area</label>
+                                {{ form.street_address }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.city.id_for_label }}">City</label>
+                                {{ form.city }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.state.id_for_label }}">State</label>
+                                {{ form.state }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.district.id_for_label }}">District</label>
+                                {{ form.district }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.pincode.id_for_label }}">Pincode</label>
+                                {{ form.pincode }}
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="form-section-title">Documents</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.profile_pic.id_for_label }}">Upload Logo (Optional)</label>
+                                {{ form.profile_pic }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.accreditation_certificate.id_for_label }}">Upload Accreditation Certificate (Optional)</label>
+                                {{ form.accreditation_certificate }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.brochure.id_for_label }}">Upload Brochure/Prospectus (Optional)</label>
+                        {{ form.brochure }}
+                    </div>
+                    <button type="submit" class="btn btn-register">Register</button>
+                </form>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        const statesDistricts = {{ states_districts|safe }};
+        const stateSelect = document.getElementById('{{ form.state.id_for_label }}');
+        const districtSelect = document.getElementById('{{ form.district.id_for_label }}');
+    
+        function updateDistricts() {
+            const selectedState = stateSelect.value;
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+    
+            if (selectedState && statesDistricts[selectedState]) {
+                statesDistricts[selectedState].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    // Pre-select the district if it was previously selected
+                    if (district === '{{ form.district.value|default:"" }}') {
+                        option.selected = true;
+                    }
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+    
+        stateSelect.addEventListener('change', updateDistricts);
+    
+        // Initialize districts on page load if a state is already selected
+        document.addEventListener('DOMContentLoaded', () => {
+            if (stateSelect.value) {
+                updateDistricts();
+            }
+        });
+    </script>
+</body>
+</html>

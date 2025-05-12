@@ -3,88 +3,331 @@
 {% block title %}Manage Seats - {{ department.name }}{% endblock %}
 
 {% block content %}
-    <style>
-        .seat-card {
-            cursor: pointer;
+<style>
+    .seats-container {
+        max-width: 1000px;
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .seats-container .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: #ffffff;
+        transition: transform 0.3s ease;
+    }
+
+    .seats-container .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .seats-container .card-header {
+        background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .seats-container .card-header h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .seats-container .card-body {
+        padding: 2rem;
+    }
+
+    .seats-container .alert {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        border: none;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .seats-container .alert-success {
+        background: #e6f4ea;
+        color: #2c6b40;
+    }
+
+    .seats-container .alert-danger {
+        background: #fee2e2;
+        color: #E74C3C;
+    }
+
+    .seats-container .accordion-item {
+        border: none;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background: #f9fafb;
+    }
+
+    .seats-container .accordion-header {
+        background: #ffffff;
+        border-radius: 8px;
+    }
+
+    .seats-container .accordion-button {
+        background: #ffffff;
+        color: #2C3E50;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: none !important;
+    }
+
+    .seats-container .accordion-button:not(.collapsed) {
+        background: #e6f0fa;
+        color: #3498DB;
+    }
+
+    .seats-container .accordion-button:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    .seats-container .accordion-body {
+        padding: 1.5rem;
+        background: #ffffff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .seats-container .seat-card {
+        cursor: pointer;
+        height: 70px;
+        width: 100%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        margin: 4px 0;
+        border-radius: 8px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .seats-container .seat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .seats-container .seat-card.bg-success {
+        background-color: #2ECC71 !important;
+    }
+
+    .seats-container .seat-card.bg-danger {
+        background-color: #E74C3C !important;
+    }
+
+    .seats-container .seat-card.bg-danger a {
+        color: white;
+        text-decoration: none;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 4px;
+        word-break: break-word;
+        font-size: 0.75rem;
+    }
+
+    .seats-container .seat-card.bg-danger a:hover {
+        text-decoration: underline;
+    }
+
+    .seats-container .seat-card .card-body {
+        padding: 0.5rem;
+    }
+
+    .seats-container .seat-card p {
+        margin: 0;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .seats-container .seat-card small {
+        font-size: 0.65rem;
+        color: #ffffff;
+        font-weight: 500;
+    }
+
+    .seats-container .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .seats-container .btn-primary {
+        background-color: #2C3E50;
+        border: none;
+        color: #ffffff;
+    }
+
+    .seats-container .btn-primary:hover {
+        background-color: #3498DB;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .seats-container .btn-secondary {
+        background-color: #95A5A6;
+        border: none;
+        color: #ffffff;
+    }
+
+    .seats-container .btn-secondary:hover {
+        background-color: #7F8C8D;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .seats-container .btn-warning {
+        background-color: #F1C40F;
+        border: none;
+        color: #ffffff;
+    }
+
+    .seats-container .btn-warning:hover {
+        background-color: #E67E22;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .seats-container .form-select {
+        width: auto;
+        display: inline-block;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin-left: 1rem;
+        font-size: 0.95rem;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+    }
+
+    .seats-container .form-select:focus {
+        border-color: #3498DB;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        outline: none;
+        background: #ffffff;
+    }
+
+    .seats-container p {
+        color: #666666;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .seats-container {
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .seats-container .card-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .seats-container .card-header h3 {
+            font-size: 1.5rem;
+        }
+
+        .seats-container .card-body {
+            padding: 1.5rem;
+        }
+
+        .seats-container .seat-card {
             height: 60px;
-            width: 100%;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            margin: 2px;
-            border-radius: 5px;
-        }
-        .seat-card.bg-success {
-            background-color: #28a745 !important;
-        }
-        .seat-card.bg-danger {
-            background-color: #dc3545 !important;
-        }
-        .seat-card.bg-danger a {
-            color: white;
-            text-decoration: none;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 2px;
-            word-break: break-word;
             font-size: 0.7rem;
         }
-        .seat-card.bg-danger a:hover {
-            text-decoration: underline;
-        }
-        .btn-primary {
-            background-color: #1a2a6c;
-            border-color: #1a2a6c;
-        }
-        .btn-primary:hover {
-            background-color: #b21f1f;
-            border-color: #b21f1f;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #5a6268;
-        }
-        .alert {
-            margin-bottom: 20px;
-        }
-        .form-select {
-            width: auto;
-            display: inline-block;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 5px 10px;
-            margin-left: 10px;
-        }
-        .form-select:focus {
-            border-color: #b21f1f;
-            box-shadow: 0 0 5px rgba(178, 31, 31, 0.2);
-            outline: none;
-        }
-        @media (max-width: 768px) {
-            .seat-card { height: 50px; font-size: 0.65rem; }
-            .col { flex: 0 0 25%; max-width: 25%; }
-            .row { margin-left: -2px; margin-right: -2px; }
-            .col { padding-left: 2px; padding-right: 2px; }
-        }
-        @media (max-width: 576px) {
-            .col { flex: 0 0 33.33%; max-width: 33.33%; }
-        }
-        @media (max-width: 400px) {
-            .col { flex: 0 0 50%; max-width: 50%; }
-        }
-    </style>
 
-    <div class="card" style="margin-top: 50px;">
+        .seats-container .seat-card small {
+            font-size: 0.6rem;
+        }
+
+        .seats-container .col {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        .seats-container .row {
+            margin-left: -4px;
+            margin-right: -4px;
+        }
+
+        .seats-container .col {
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .seats-container .card-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .seats-container .card-body {
+            padding: 1rem;
+        }
+
+        .seats-container .seat-card {
+            height: 50px;
+            font-size: 0.65rem;
+        }
+
+        .seats-container .seat-card small {
+            font-size: 0.55rem;
+        }
+
+        .seats-container .col {
+            flex: 0 0 33.33%;
+            max-width: 33.33%;
+        }
+
+        .seats-container .btn {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .seats-container .col {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .seats-container .seat-card {
+            height: 60px;
+            font-size: 0.7rem;
+        }
+    }
+</style>
+
+<div class="seats-container">
+    <div class="card">
         <div class="card-header">
             <h3 class="mb-0">Manage Seats - {{ college_profile.college_name }} - {{ department.name }} ({{ degree.name }})</h3>
             <form method="get" style="display:inline;">
@@ -153,7 +396,7 @@
                                 {% else %}
                                     <p>No seats available for this section. Seats will be created when you edit the section.</p>
                                 {% endif %}
-                                <a href="{% url 'colleges:edit_section' department.id section.id %}?cycle_id={{ cycle.id }}" class="btn btn-warning mt-3">Edit Section</a>
+                                <a href="{% url 'colleges:edit_section' department.id section.id %}?cycle_id={{ selected_cycle.id }}" class="btn btn-warning mt-3">Edit Section</a>
                             </div>
                         </div>
                     </div>
@@ -163,8 +406,9 @@
             </div>
 
             <div class="mt-3">
-                <a href="{% url 'colleges:section_list' department_id=department.id %}" class="btn btn-secondary">Back to Sections</a>
+                <a href="{% url 'colleges:section_list' department_id=department.id %}?cycle_id={{ selected_cycle.id }}" class="btn btn-secondary">Back to Sections</a>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

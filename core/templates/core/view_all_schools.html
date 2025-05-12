@@ -1,0 +1,518 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Admit</title>
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+
+
+      <!-- Top Bar -->
+<nav class="topbar navbar navbar-expand-md bg-light py-1 border-bottom">
+    <div class="container d-flex justify-content-between align-items-center">
+      <!-- Left Side: Contact Info -->
+      <div class="d-flex align-items-center">
+        <span class="me-3 small" style="color: #FFB300 !important;font-weight:600;"><i class="bi bi-telephone"></i> +91-0000000000</span>
+        <span class="small" style="color: #FFB300 !important;font-weight:600;"><i class="bi bi-envelope"></i>info@academiaadmit.in</span>
+      </div>
+  
+      <!-- Toggle Button for Small Screens -->
+      <!-- Toggle Button with 3 Vertical Dots -->
+  <button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topbarLinks" aria-controls="topbarLinks" aria-expanded="false" aria-label="Toggle topbar">
+    <span style="font-size: 1.5rem; line-height: 1;">&#8942;</span> <!-- Unicode for vertical dots (⋮) -->
+  </button>
+  
+  
+      <!-- Right Side Links (Collapsible on small screens) -->
+      <div class="collapse navbar-collapse justify-content-end" id="topbarLinks">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link small px-2" href="#" id="top-link">Fee Payment</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link small px-2" href="{% url 'core:online_admission' %}" id="top-link">Online Admission</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link small px-2" href="{% url 'core:login' %}" id="top-link">Login</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-md shadow-sm">
+      <div class="container">
+        <!-- Logo (Left Side) -->
+        <a class="navbar-brand" href="/">
+          <img src="{% static 'images/logo.png' %}" alt="Academia Admit Logo" class="logo-img">
+        </a>
+  
+        <!-- Toggler for Mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <!-- Menu Links (Right Side) -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:home' %}">Home</a>
+            </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="#about">About Us</a>
+            </li> -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:clients' %}">Our Clients</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:testimonials' %}">Testimonials</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:contact' %}">Contact</a>
+            </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link btn btn-login px-3 py-1" href="/login">Login</a>
+            </li> -->
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+    <!-- Filters Section -->
+    <section class="filters-section py-4">
+        <div class="container">
+            <h5 class="text-center mb-4 fw-bold text-uppercase text-white">Filter Institutions</h5>
+            <form id="filterForm" class="row g-3 justify-content-center align-items-end">
+                <!-- Institution Type -->
+                <div class="col-md-2 col-sm-6">
+                    <label for="institution_type" class="form-label fw-medium text-white">Type</label>
+                    <select name="institution_type" id="institution_type" class="form-select shadow-sm">
+                        <option value="School" {% if institution_type == 'School' %}selected{% endif %}>School</option>
+                        <option value="College" {% if institution_type == 'College' %}selected{% endif %}>College</option>
+                    </select>
+                </div>
+                <!-- State -->
+                <div class="col-md-2 col-sm-6">
+                    <label for="state" class="form-label fw-medium text-white">State</label>
+                    <select name="state" id="state" class="form-select shadow-sm">
+                        <option value="">All States</option>
+                        {% for state in states %}
+                        <option value="{{ state }}" {% if selected_state == state %}selected{% endif %}>{{ state }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- District -->
+                <div class="col-md-2 col-sm-6">
+                    <label for="district" class="form-label fw-medium text-white">District</label>
+                    <select name="district" id="district" class="form-select shadow-sm">
+                        <option value="">All Districts</option>
+                        {% for district in districts %}
+                        <option value="{{ district }}" {% if selected_district == district %}selected{% endif %}>{{ district }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- City -->
+                <div class="col-md-2 col-sm-6">
+                    <label for="city" class="form-label fw-medium text-white">City</label>
+                    <select name="city" id="city" class="form-select shadow-sm">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Schools/Colleges List Section -->
+    <section class="schools-list-section py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold text-uppercase" style="color: #2c3e50;">
+                {% if institution_type == 'College' %}
+                All Colleges
+                {% else %}
+                All Schools
+                {% endif %}
+            </h2>
+            <div class="row">
+                {% for item in page_obj %}
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm border-0 rounded-3 institution-card">
+                        <!-- Image -->
+                        <div class="card-img-wrapper">
+                            {% if institution_type == 'College' %}
+                                {% if item.profile_pic %}
+                                <img src="{{ item.profile_pic.url }}" class="card-img-top" alt="{{ item.college_name }} Logo">
+                                {% else %}
+                                <div class="card-img-top placeholder-img">
+                                    <i class="fas fa-university fa-2x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                {% if item.logo %}
+                                <img src="{{ item.logo.url }}" class="card-img-top" alt="{{ item.school_name }} Logo">
+                                {% else %}
+                                <div class="card-img-top placeholder-img">
+                                    <i class="fas fa-school fa-2x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-3 text-truncate text-primary">
+                                {% if institution_type == 'College' %}
+                                {{ item.college_name }}
+                                {% else %}
+                                {{ item.school_name }}
+                                {% endif %}
+                            </h5>
+                            <div class="info-list flex-grow-1">
+                                <p class="mb-2 address-field">
+                                    <i class="fas fa-map-marker-alt icon-color me-2"></i>
+                                    <span class="fw-medium">Location:</span>
+                                    <span class="address-text">{{ item.city }}, {{ item.state }}</span>
+                                </p>
+                                {% if institution_type == 'College' %}
+                                <p class="mb-2">
+                                    <i class="fas fa-university icon-color me-2"></i>
+                                    <span class="fw-medium">Type:</span> {{ item.college_type }}
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-certificate icon-color me-2"></i>
+                                    <span class="fw-medium">Affiliation:</span> {{ item.affiliation }}
+                                </p>
+                                {% else %}
+                                <p class="mb-2">
+                                    <i class="fas fa-school icon-color me-2"></i>
+                                    <span class="fw-medium">Type:</span> {{ item.school_type }}
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-book icon-color me-2"></i>
+                                    <span class="fw-medium">Board:</span> {{ item.board_affiliation }}
+                                </p>
+                                {% endif %}
+                                <p class="mb-2">
+                                    <i class="fas fa-language icon-color me-2"></i>
+                                    <span class="fw-medium">Medium:</span> {{ item.medium_of_instruction }}
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-calendar-alt icon-color me-2"></i>
+                                    <span class="fw-medium">Established:</span>
+                                    <span class="badge bg-success text-white ms-1">{{ item.established_year }}</span>
+                                </p>
+                            </div>
+                            <!-- Rating -->
+                            <div class="rating mt-3">
+                                {% for i in "12345" %}
+                                <span class="fa fa-star {% if forloop.counter <= 4 %}checked{% endif %}"></span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-transparent border-0 pt-0">
+                            <a href="{% if institution_type == 'College' %}{% url 'core:college_detail' item.id %}{% else %}{% url 'core:school_detail' item.id %}{% endif %}" class="btn btn-primary btn-sm w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p class="text-muted fs-5">No {% if institution_type == 'College' %}colleges{% else %}schools{% endif %} found matching your criteria.</p>
+                </div>
+                {% endfor %}
+            </div>
+    
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if institution_type %}&institution_type={{ institution_type }}{% endif %}{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">«</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if institution_type %}&institution_type={{ institution_type }}{% endif %}{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if institution_type %}&institution_type={{ institution_type }}{% endif %}{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">»</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </section>
+    
+    <style>
+    /* Filters Section */
+    .filters-section {
+        background: linear-gradient(135deg, #008080 0%, #00a8a8 100%);
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .filters-section .form-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #fff;
+        margin-bottom: 0.3rem;
+    }
+    .filters-section .form-select {
+        border-radius: 25px;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        background-color: #fff;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .filters-section .form-select:focus {
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        transform: scale(1.02);
+    }
+    
+    /* Schools/Colleges List Section */
+    .schools-list-section {
+        background-color: #f8f9fa;
+    }
+    .institution-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f9f9f9 100%);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        border-radius: 15px !important;
+    }
+    .institution-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    .card-img-wrapper {
+        position: relative;
+        height: 200px;
+        background-color: #f0f0f0;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 1.5rem;
+        background: #fff;
+    }
+    .placeholder-img {
+        width: 100%;
+        height: 100%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .card-body {
+        padding: 1.5rem;
+    }
+    .card-title {
+        font-size: 1.2rem;
+        color: #008080;
+        margin-bottom: 1.25rem;
+        line-height: 1.4;
+    }
+    .info-list p {
+        font-size: 0.9rem;
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+    .info-list .fw-medium {
+        color: #333;
+        margin-right: 5px;
+    }
+    .info-list i.icon-color {
+        font-size: 1rem;
+        color: #e67e22; /* Changed to orange */
+    }
+    .address-field {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .address-text {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+    }
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+    }
+    .rating .fa-star {
+        font-size: 1rem;
+        color: #ddd;
+    }
+    .rating .fa-star.checked {
+        color: #f39c12;
+    }
+    .card-footer {
+        padding: 0 1.5rem 1.5rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #008080 0%, #00a8a8 100%);
+        border: none;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        padding: 0.6rem 1.5rem;
+        transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #006666 0%, #008080 100%);
+        transform: scale(1.05);
+    }
+    
+    /* Pagination */
+    .pagination .page-link {
+        border-radius: 25px;
+        margin: 0 5px;
+        color: #008080;
+        border: none;
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #008080 0%, #00a8a8 100%);
+        color: #fff;
+    }
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        transform: scale(1.1);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .card-img-wrapper {
+            height: 180px;
+        }
+        .card-title {
+            font-size: 1.1rem;
+        }
+        .info-list p {
+            font-size: 0.85rem;
+        }
+    }
+    @media (max-width: 768px) {
+        .filters-section .col-md-2 {
+            margin-bottom: 1rem;
+        }
+        .card-img-wrapper {
+            height: 160px;
+        }
+        .col-md-4 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+    @media (max-width: 576px) {
+        .col-md-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .card-img-wrapper {
+            height: 140px;
+        }
+    }
+    </style>
+    
+ 
+    <!-- Bootstrap JS and dependencies (Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        // Handle filter changes
+        $('#filterForm select').on('change', function() {
+            var form = $('#filterForm');
+            var institutionType = $('#institution_type').val();
+            var state = $('#state').val();
+            var district = $('#district').val();
+            var city = $('#city').val();
+    
+            // Build the query string
+            var queryParams = [];
+            if (institutionType) queryParams.push('institution_type=' + institutionType);
+            if (state) queryParams.push('state=' + state);
+            if (district) queryParams.push('district=' + district);
+            if (city) queryParams.push('city=' + city);
+    
+            // Update the URL without refreshing
+            var newUrl = window.location.pathname + (queryParams.length ? '?' + queryParams.join('&') : '');
+            window.history.pushState({}, '', newUrl);
+    
+            // Reload the page with the new filters
+            window.location.href = newUrl;
+        });
+    });
+    </script>
+
+
+<footer class="footer">
+    <div class="container">
+      <div class="row">
+        <!-- Contact Info -->
+        <div class="col-md-4">
+          <h4>Contact Us</h4>
+          <p><i class="fas fa-map-marker-alt"></i>Near N Convention Lane , Hyderabad, India</p>
+          <p><i class="fas fa-phone"></i>+91 9177120736</p>
+          <p><i class="fas fa-envelope"></i> info@academiaadmit.com</p>
+        </div>
+        <!-- Quick Links -->
+        <div class="col-md-4">
+          <h4>Quick Links</h4>
+          <p><a href="#home">Home</a></p>
+          <p><a href="#about">About Us</a></p>
+          <p><a href="#services">Our Services</a></p>
+          <p><a href="#contact">Contact Us</a></p>
+        </div>
+        <!-- Social Media -->
+        <div class="col-md-4">
+          <h4>Follow Us</h4>
+          <div class="social-icons">
+            <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 Academia Admit. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Bootstrap 5 JS and Popper.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

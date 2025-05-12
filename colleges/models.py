@@ -1,47 +1,59 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from core.models import User
+from django.utils import timezone
 
 class CollegeProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='college_profile')
     college_name = models.CharField(max_length=255)
-    principal_name = models.CharField(max_length=100, blank=True)
-    established_year = models.PositiveIntegerField(blank=True, null=True)
-    street_address = models.CharField(max_length=255, blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    state = models.CharField(max_length=100, blank=True)
-    pincode = models.CharField(max_length=10, blank=True)
-    country = models.CharField(max_length=100, default="India")
-    contact_email = models.EmailField(blank=True)
-    contact_phone = models.CharField(max_length=15, blank=True)
-    website = models.URLField(blank=True)
-    COLLEGE_TYPE_CHOICES = (
-        ('government', 'Government'),
-        ('private', 'Private'),
-        ('autonomous', 'Autonomous'),
+    principal_name = models.CharField(max_length=100)
+    contact_phone = models.CharField(max_length=15)
+    alternate_phone_number = models.CharField(max_length=15, blank=True, null=True)
+    contact_email = models.EmailField()
+    college_type = models.CharField(
+        max_length=50,
+        choices=[('Private', 'Private'), ('Government', 'Government'), ('Autonomous', 'Autonomous')]
     )
-    college_type = models.CharField(max_length=20, choices=COLLEGE_TYPE_CHOICES, default='private')
-    affiliation = models.CharField(max_length=255, blank=True)
-    accreditation = models.CharField(max_length=100, blank=True)
+    affiliation = models.CharField(max_length=100)
+    accreditation = models.CharField(
+        max_length=100,
+        choices=[('AICTE', 'AICTE'), ('NAAC', 'NAAC'), ('NBA', 'NBA'), ('', 'Other')]
+    )
+    courses_offered = models.TextField(blank=True, null=True)
+    streams_available = models.TextField(blank=True, null=True)
+    medium_of_instruction = models.CharField(
+        max_length=50,
+        choices=[('English', 'English'), ('Telugu', 'Telugu'), ('Hindi', 'Hindi'), ('Other', 'Other')],
+        blank=True,
+        null=True
+    )
+    established_year = models.IntegerField()
+    total_students = models.IntegerField()
+    total_faculty = models.IntegerField()
+    college_code = models.CharField(max_length=50, blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
     hostel_availability = models.BooleanField(default=False)
-    hostel_capacity_boys = models.PositiveIntegerField(blank=True, null=True)
-    hostel_capacity_girls = models.PositiveIntegerField(blank=True, null=True)
+    hostel_capacity_boys = models.IntegerField(blank=True, null=True)
+    hostel_capacity_girls = models.IntegerField(blank=True, null=True)
     library = models.BooleanField(default=False)
-    library_books_count = models.PositiveIntegerField(blank=True, null=True)
-    labs = models.TextField(blank=True)
+    library_books_count = models.IntegerField(blank=True, null=True)
+    labs = models.TextField(blank=True, null=True)
     placement_cell = models.BooleanField(default=False)
     placement_percentage = models.FloatField(blank=True, null=True)
-    top_recruiters = models.TextField(blank=True)
-    other_facilities = models.TextField(blank=True)
-    profile_pic = models.ImageField(upload_to='college_profiles/', blank=True, null=True)
+    top_recruiters = models.TextField(blank=True, null=True)
+    other_facilities = models.TextField(blank=True, null=True)
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100, blank=True)
+    district = models.CharField(max_length=100, blank=True)
+    pincode = models.CharField(max_length=10)
+    profile_pic = models.ImageField(upload_to='college_logos/', blank=True, null=True)
+    accreditation_certificate = models.FileField(upload_to='college_certificates/', blank=True, null=True)
+    brochure = models.FileField(upload_to='college_brochures/', blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.college_name
-
-    class Meta:
-        verbose_name = "College Profile"
-        verbose_name_plural = "College Profiles"
 
 from django.db import models
 
@@ -90,6 +102,15 @@ class Department(models.Model):
     @property
     def total_seats(self):
         return sum(section.total_seats for section in self.sections.all())
+    
+    def admissions_left(self):
+        # Get all sections for this department
+        sections = self.sections.all()
+        # Count total filled seats across all sections
+        filled_seats = sum(section.seats.filter(is_filled=True).count() for section in sections)
+        # Calculate remaining seats
+        return max(0, self.total_seats - filled_seats)
+
 
     def __str__(self):
         return f"{self.name} - {self.degree.name} ({self.cycle.year})"
